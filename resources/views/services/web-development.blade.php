@@ -1,19 +1,17 @@
 @extends('layouts.app')
 
 @section('title', 'Website Development Services & Pricing in India (2025) | IndSoft24')
-@section('meta_description',
-    'Transparent website development pricing in India including domain, hosting, server, SSL,
+@section('meta_description', 'Transparent website development pricing in India including domain, hosting, server, SSL,
     GST, and maintenance. IndSoft24 offers affordable web development services for startups, businesses, and enterprises.')
 
 @section('content')
     <!-- Bootstrap Icons CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
 
-    
     <!-- Hero Section -->
     <section class="achievement-badge text-white py-5" style="margin-top:72px">
         <div class="container text-center">
-            <h1 class="display-4 fw-bold mb-3">Website Development & Price in India</h1>
+            <h1 class="display-4 fw-bold mb-3">Website Development Services & Price in India</h1>
             <p class="lead mb-4">
                 At IndSoft24, we believe in transparent pricing. No hidden costs — only clear packages and real value.
             </p>
@@ -146,8 +144,7 @@
                         <h5 class="fw-bold">Domain Registration</h5>
                         <p class="text-muted fw-semibold">₹500 – ₹1,500/year</p>
                         <p class="small text-muted">Your unique online identity (<code>.com</code>, <code>.in</code>,
-                            <code>.org</code>). Essential for every website.
-                        </p>
+                            <code>.org</code>). Essential for every website.</p>
                     </div>
                 </div>
 
