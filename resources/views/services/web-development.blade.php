@@ -12,7 +12,7 @@
     <!-- Hero Section -->
     <section class="achievement-badge text-white py-5" style="margin-top:72px">
         <div class="container text-center">
-            <h1 class="display-4 fw-bold mb-3">Website Development & Price in India</h1>
+            <h1 class="display-4 fw-bold mb-3">Website Development & Pricing in India</h1>
             <p class="lead mb-4">
                 At IndSoft24, we believe in transparent pricing. No hidden costs — only clear packages and real value.
             </p>
