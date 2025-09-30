@@ -30,8 +30,8 @@
             <div class="card mb-4">
                 <div class="card-header"><h5 class="mb-0"><i class="fas fa-edit"></i> Post Content</h5></div>
                 <div class="card-body">
-                    <textarea class="form-control ckeditor @error('content') is-invalid @enderror" name="content" id="content" rows="15" required>{{ old('content') }}</textarea>
-                    @error('content')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    <x-tinymce-editor />
+                    @error('content')<div class="text-danger mt-2 small">{{ $message }}</div>@enderror
                 </div>
             </div>
             <div class="card mb-4">
@@ -122,49 +122,45 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize CKEditor
-    ClassicEditor.create(document.querySelector('#content')).catch(error => console.error(error));
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-generate meta title from post title
+        document.querySelector('input[name="title"]').addEventListener('input', function() {
+            document.getElementById('meta_title').value = this.value;
+        });
 
-    // Auto-generate meta title from post title
-    document.querySelector('input[name="title"]').addEventListener('input', function() {
-        document.getElementById('meta_title').value = this.value;
+        // Tag input functionality (press Enter to add)
+        document.querySelector('.tag-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addTag(this.value);
+                this.value = '';
+            }
+        });
     });
 
-    // Tag input functionality (press Enter to add)
-    document.querySelector('.tag-input').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addTag(this.value);
-            this.value = '';
+    // --- Tag management functions ---
+    function addTag(tagName) {
+        tagName = tagName.trim();
+        if (!tagName) return;
+        const existingTags = document.querySelectorAll('.tag-container input');
+        for (let input of existingTags) {
+            if (input.value.toLowerCase() === tagName.toLowerCase()) return;
         }
-    });
-});
-
-// --- Tag management functions ---
-function addTag(tagName) {
-    tagName = tagName.trim();
-    if (!tagName) return;
-    const existingTags = document.querySelectorAll('.tag-container input');
-    for (let input of existingTags) {
-        if (input.value.toLowerCase() === tagName.toLowerCase()) return;
+        const tagContainer = document.querySelector('.tag-container');
+        const tagElement = document.createElement('span');
+        tagElement.className = 'badge bg-primary me-2 mb-2';
+        tagElement.innerHTML = `
+            ${tagName}
+            <input type="hidden" name="tags[]" value="${tagName}">
+            <button type="button" class="btn-close btn-close-white ms-2" onclick="this.parentElement.remove()"></button>
+        `;
+        tagContainer.appendChild(tagElement);
     }
-    const tagContainer = document.querySelector('.tag-container');
-    const tagElement = document.createElement('span');
-    tagElement.className = 'badge bg-primary me-2 mb-2';
-    tagElement.innerHTML = `
-        ${tagName}
-        <input type="hidden" name="tags[]" value="${tagName}">
-        <button type="button" class="btn-close btn-close-white ms-2" onclick="this.parentElement.remove()"></button>
-    `;
-    tagContainer.appendChild(tagElement);
-}
 
-function addTagFromList(element) {
-    const tagName = element.textContent.trim();
-    addTag(tagName);
-}
+    function addTagFromList(element) {
+        const tagName = element.textContent.trim();
+        addTag(tagName);
+    }
 </script>
 @endpush
