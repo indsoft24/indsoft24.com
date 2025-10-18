@@ -32,8 +32,8 @@
             <div class="card mb-4">
                 <div class="card-header"><h5 class="mb-0"><i class="fas fa-edit"></i> Post Content</h5></div>
                 <div class="card-body">
-                    <textarea class="form-control ckeditor @error('content') is-invalid @enderror" name="content" id="content" rows="15" required>{{ old('content', $post->content) }}</textarea>
-                    @error('content')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    <x-tinymce-editor :content="$post->content" />
+                    @error('content')<div class="text-danger mt-2 small">{{ $message }}</div>@enderror
                 </div>
             </div>
             <div class="card mb-4">
@@ -131,12 +131,20 @@
 @endsection
 
 @push('scripts')
-{{-- The JavaScript is identical to the create page --}}
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+{{-- This script is nearly identical to the create page's script --}}
 <script>
-ClassicEditor.create(document.querySelector('#content')).catch(error => console.error(error));
-document.querySelector('input[name="title"]').addEventListener('input', function() {
-    document.getElementById('meta_title').value = this.value;
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('input[name="title"]').addEventListener('input', function() {
+        document.getElementById('meta_title').value = this.value;
+    });
+
+    document.querySelector('.tag-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag(this.value);
+            this.value = '';
+        }
+    });
 });
 
 function addTag(tagName) {
@@ -161,13 +169,5 @@ function addTagFromList(element) {
     const tagName = element.textContent.trim();
     addTag(tagName);
 }
-
-document.querySelector('.tag-input').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        addTag(this.value);
-        this.value = '';
-    }
-});
 </script>
 @endpush

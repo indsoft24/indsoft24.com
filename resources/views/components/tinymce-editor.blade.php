@@ -1,0 +1,1 @@
+<textarea name="content" class="form-control tinymce-editor">{{ $content }}</textarea>

@@ -53,9 +53,9 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
                         <li><a class="dropdown-item" href="{{ route('services.web') }}">Web Development</a></li>
-                        <li><a class="dropdown-item" href="">App Development</a></li>
-                        <li><a class="dropdown-item" href="">Software Development</a></li>
-                        <li><a class="dropdown-item" href="">SEO Optimization</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.app') }}">App Development</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.software') }}">Software Development</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.seo') }}">SEO Optimization</a></li>
                     </ul>
                 </div>
                 

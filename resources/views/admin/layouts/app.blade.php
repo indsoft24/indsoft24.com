@@ -7,18 +7,14 @@
     <title>@yield('title', 'Admin Dashboard') - Indsoft24.com</title>
     <link rel="icon" type="image/png" href="{{ asset('images/Indsoft24.png') }}">
     
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Custom Admin CSS -->
     <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
     
     @stack('styles')
 </head>
 <body>
     <div class="admin-wrapper">
-        <!-- Sidebar -->
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <img src="{{ asset('images/Indsoft24.png') }}" alt="Logo" class="sidebar-logo">
@@ -77,9 +73,7 @@
             </ul>
         </nav>
 
-        <!-- Main Content -->
         <div class="main-content">
-            <!-- Top Navigation -->
             <nav class="top-navbar">
                 <div class="navbar-content">
                     <button class="sidebar-toggle" id="sidebarToggle">
@@ -111,7 +105,6 @@
                 </div>
             </nav>
 
-            <!-- Page Content -->
             <div class="page-content">
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -147,61 +140,13 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Custom Admin JS -->
     <script src="{{ asset('js/admin.js') }}"></script>
     
-    <!-- SweetAlert Flash Messages -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle Laravel flash messages with SweetAlert
-            @if(session('success'))
-                Swal.fire({
-                    title: 'Success!',
-                    text: '{{ session('success') }}',
-                    icon: 'success',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#28a745'
-                });
-            @endif
-
-            @if(session('error'))
-                Swal.fire({
-                    title: 'Error!',
-                    text: '{{ session('error') }}',
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#dc3545'
-                });
-            @endif
-
-            @if(session('warning'))
-                Swal.fire({
-                    title: 'Warning!',
-                    text: '{{ session('warning') }}',
-                    icon: 'warning',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#ffc107'
-                });
-            @endif
-
-            @if(session('info'))
-                Swal.fire({
-                    title: 'Information',
-                    text: '{{ session('info') }}',
-                    icon: 'info',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#17a2b8'
-                });
-            @endif
-        });
-    </script>
-    
     @stack('scripts')
+
+    <x-tinymce-config />
 </body>
 </html>

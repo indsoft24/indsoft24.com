@@ -27,7 +27,7 @@ class PostController extends Controller
         $query = Post::with(['category', 'user', 'tags']);
 
         $isUserBlog = $request->route()->getName() && str_starts_with($request->route()->getName(), 'user.blog.');
-        
+
         if ($isUserBlog) {
             $query->where('user_id', auth()->id());
         }
@@ -44,9 +44,9 @@ class PostController extends Controller
 
         // Search
         if ($request->has('search') && $request->search !== '') {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('content', 'like', '%' . $request->search . '%');
+                    ->orWhere('content', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -54,7 +54,7 @@ class PostController extends Controller
         $categories = Category::active()->get();
 
         $view = $isUserBlog ? 'user.blog.index' : 'admin.posts.index';
-        
+
         return view($view, compact('posts', 'categories'));
     }
 
@@ -65,11 +65,11 @@ class PostController extends Controller
     {
         $categories = Category::active()->get();
         $tags = Tag::active()->get();
-        
+
         // Check if this is a user blog route
         $isUserBlog = $request->route()->getName() && str_starts_with($request->route()->getName(), 'user.blog.');
         $view = $isUserBlog ? 'user.blog.create' : 'admin.posts.create';
-        
+
         return view($view, compact('categories', 'tags'));
     }
 
@@ -108,7 +108,7 @@ class PostController extends Controller
         if ($request->hasFile('featured_image')) {
             $image = $request->file('featured_image');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            
+
             // Store in public/images/posts directory
             $image->move(public_path('images/posts'), $imageName);
             $featuredImage = 'images/posts/' . $imageName;
@@ -128,7 +128,7 @@ class PostController extends Controller
             'user_id' => auth()->id(),
             'published_at' => $request->status === 'published' ? now() : null,
         ]);
-        
+
         $isUserBlog = $request->route()->getName() && str_starts_with($request->route()->getName(), 'user.blog.');
 
 
@@ -151,7 +151,7 @@ class PostController extends Controller
         try {
             $isUserBlog = $request->route()->getName() && str_starts_with($request->route()->getName(), 'user.blog.');
             $redirectRoute = $isUserBlog ? 'user.blog.index' : 'admin.posts.index';
-            
+
             // Check if this is an AJAX request
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
@@ -166,12 +166,12 @@ class PostController extends Controller
                     ]
                 ]);
             }
-            
+
             return redirect()->route($redirectRoute)
-                            ->with('success', 'Post created successfully!');
+                ->with('success', 'Post created successfully!');
         } catch (\Exception $e) {
             \Log::error('Post creation failed: ' . $e->getMessage());
-            
+
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
@@ -179,10 +179,10 @@ class PostController extends Controller
                     'error' => $e->getMessage()
                 ], 500);
             }
-            
+
             return redirect()->back()
-                            ->with('error', 'An error occurred while creating the post. Please try again.')
-                            ->withInput();
+                ->with('error', 'An error occurred while creating the post. Please try again.')
+                ->withInput();
         }
     }
 
@@ -193,16 +193,16 @@ class PostController extends Controller
     {
         // Check if this is a user blog route
         $isUserBlog = $request->route()->getName() && str_starts_with($request->route()->getName(), 'user.blog.');
-        
+
         if ($isUserBlog) {
             // For user blog, ensure they can only view their own posts
             if ($post->user_id !== auth()->id()) {
                 abort(403);
             }
         }
-        
+
         $post->load(['category', 'user', 'tags']);
-        
+
         $view = $isUserBlog ? 'user.blog.show' : 'admin.posts.show';
         return view($view, compact('post'));
     }
@@ -214,17 +214,17 @@ class PostController extends Controller
     {
         // Check if this is a user blog route
         $isUserBlog = $request->route()->getName() && str_starts_with($request->route()->getName(), 'user.blog.');
-        
+
         if ($isUserBlog) {
             // For user blog, ensure they can only edit their own posts
             if ($post->user_id !== auth()->id()) {
                 abort(403);
             }
         }
-        
+
         $categories = Category::active()->get();
         $tags = Tag::active()->get();
-        
+
         $view = $isUserBlog ? 'user.blog.edit' : 'admin.posts.edit';
         return view($view, compact('post', 'categories', 'tags'));
     }
@@ -266,10 +266,10 @@ class PostController extends Controller
             if ($post->featured_image && file_exists(public_path($post->featured_image))) {
                 unlink(public_path($post->featured_image));
             }
-            
+
             $image = $request->file('featured_image');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            
+
             // Store in public/images/posts directory
             $image->move(public_path('images/posts'), $imageName);
             $post->featured_image = 'images/posts/' . $imageName;
@@ -299,12 +299,12 @@ class PostController extends Controller
         }
 
         $post->update($updateData);
-        
+
         $isUserBlog = $request->route()->getName() && str_starts_with($request->route()->getName(), 'user.blog.');
 
 
         if ($request->has('tags')) {
-             if ($isUserBlog) {
+            if ($isUserBlog) {
                 $post->tags()->sync($request->tags);
             } else {
                 $tagIds = [];
@@ -325,7 +325,7 @@ class PostController extends Controller
             // Check if this is a user blog route
             $isUserBlog = $request->route()->getName() && str_starts_with($request->route()->getName(), 'user.blog.');
             $redirectRoute = $isUserBlog ? 'user.blog.index' : 'admin.posts.index';
-            
+
             // Check if this is an AJAX request
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
@@ -340,12 +340,12 @@ class PostController extends Controller
                     ]
                 ]);
             }
-            
+
             return redirect()->route($redirectRoute)
-                            ->with('success', 'Post updated successfully!');
+                ->with('success', 'Post updated successfully!');
         } catch (\Exception $e) {
             \Log::error('Post update failed: ' . $e->getMessage());
-            
+
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
@@ -353,10 +353,10 @@ class PostController extends Controller
                     'error' => $e->getMessage()
                 ], 500);
             }
-            
+
             return redirect()->back()
-                            ->with('error', 'An error occurred while updating the post. Please try again.')
-                            ->withInput();
+                ->with('error', 'An error occurred while updating the post. Please try again.')
+                ->withInput();
         }
     }
 
@@ -367,18 +367,18 @@ class PostController extends Controller
     {
         // Check if this is a user blog route
         $isUserBlog = $request->route()->getName() && str_starts_with($request->route()->getName(), 'user.blog.');
-        
+
         if ($isUserBlog) {
             // For user blog, ensure they can only delete their own posts
             if ($post->user_id !== auth()->id()) {
                 abort(403);
             }
         }
-        
+
         $post->delete();
 
         $redirectRoute = $isUserBlog ? 'user.blog.index' : 'admin.posts.index';
-        
+
         // Check if this is an AJAX request
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -393,29 +393,32 @@ class PostController extends Controller
                 ]
             ]);
         }
-        
+
         return redirect()->route($redirectRoute)
-                        ->with('success', 'Post deleted successfully!');
+            ->with('success', 'Post deleted successfully!');
     }
-    
+
+
     /**
-     * Handles image uploads from CKEditor.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+      * Handles image uploads from a WYSIWYG editor.
+      *
+       * @param  \Illuminate\Http\Request  $request
+       * @return \Illuminate\Http\JsonResponse
      */
     public function uploadImage(Request $request)
     {
+        $fileKey = $request->hasFile('file') ? 'file' : 'upload';
+
         $request->validate([
-            'upload' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            $fileKey => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $path = $request->file('upload')->store('post-images', 'public');
+        $path = $request->file($fileKey)->store('post-images', 'public');
 
         $url = asset('storage/' . $path);
 
         return response()->json([
-            'url' => $url
+            'location' => $url
         ]);
     }
 }
