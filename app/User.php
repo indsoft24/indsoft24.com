@@ -120,4 +120,22 @@ class User extends Authenticatable
     {
         return $this->hasMany(Like::class);
     }
+
+    /**
+     * Get the projects created by the user
+     */
+    public function createdProjects()
+    {
+        return $this->hasMany(Project::class, 'created_by');
+    }
+
+    /**
+     * Get the projects the user is working on
+     */
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class, 'project_developers')
+                    ->withPivot('role')
+                    ->withTimestamps();
+    }
 }

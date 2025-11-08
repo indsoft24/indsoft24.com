@@ -2,13 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Project;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        return view('home');
+        // Get featured projects for the swiper
+        $featuredProjects = Project::published()
+            ->featured()
+            ->with(['techStacks', 'screenshots'])
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
+        return view('home', compact('featuredProjects'));
     }
     public function privacyPolicy()
     {

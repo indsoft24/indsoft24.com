@@ -62,6 +62,13 @@
                         <span>Subscribers</span>
                     </a>
                 </li>
+                
+                <li class="menu-item {{ request()->routeIs('admin.projects.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.projects.index') }}">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Projects</span>
+                    </a>
+                </li>
 
                 
                 <li class="menu-item">

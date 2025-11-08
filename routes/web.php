@@ -12,6 +12,8 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\CareerController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
 
 // --- Admin Controllers ---
 use App\Http\Controllers\Admin\AuthController;
@@ -52,6 +54,12 @@ Route::prefix('blog')->name('blog.')->group(function () {
     Route::get('/tag/{tag:slug}', [BlogController::class, 'tag'])->name('tag');
     Route::post('/{post:id}/comments', [CommentController::class, 'store'])->name('comments.store')->middleware('auth');
     Route::post('/{post:id}/like', [LikeController::class, 'toggle'])->name('posts.like')->middleware('auth');
+});
+
+// --- Public Project Routes ---
+Route::prefix('projects')->name('projects.')->group(function () {
+    Route::get('/', [ProjectController::class, 'index'])->name('index');
+    Route::get('/{project:slug}', [ProjectController::class, 'show'])->name('show');
 });
 
 
@@ -109,6 +117,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('categories', CategoryController::class);
         Route::resource('tags', TagController::class);
         Route::resource('comments', AdminCommentController::class)->only(['index', 'edit', 'update', 'destroy']);
+        Route::resource('projects', AdminProjectController::class);
         
         // Subscriber Management
         Route::get('subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');

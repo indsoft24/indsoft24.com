@@ -41,9 +41,9 @@
                         <span>Start Your Project</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
-                    <a href="#services" class="btn btn-secondary">
-                        <i class="fas fa-play"></i>
-                        <span>Watch Our Work</span>
+                    <a href="#projects" class="btn btn-secondary">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>View Our Projects</span>
                     </a>
                 </div>
             </div>
@@ -196,6 +196,106 @@
     </div>
 </section>
 
+<!-- Featured Projects Section -->
+@if($featuredProjects->count() > 0)
+<section id="projects" class="featured-projects py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="section-header text-center text-white mb-5">
+            <div class="section-badge" style="background: rgba(255, 255, 255, 0.2); color: white;">
+                <i class="fas fa-star"></i>
+                <span>Featured Projects</span>
+            </div>
+            <h2 class="section-title text-white">Our <span class="text-warning">Portfolio</span></h2>
+            <p class="section-subtitle text-white-50">
+                Explore our showcase of innovative projects that demonstrate our expertise and creativity
+            </p>
+        </div>
+
+        <!-- Swiper -->
+        <div class="swiper featured-projects-swiper mb-4">
+            <div class="swiper-wrapper">
+                @foreach($featuredProjects as $project)
+                    <div class="swiper-slide">
+                        <div class="project-swiper-card">
+                            <a href="{{ route('projects.show', $project) }}" class="project-card-link">
+                                <div class="project-card-image">
+                                    @if($project->featured_image)
+                                        <img src="{{ asset($project->featured_image) }}" 
+                                             alt="{{ $project->name }}" 
+                                             class="project-img">
+                                    @else
+                                        <div class="project-image-placeholder">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    @endif
+                                    <div class="project-card-overlay">
+                                        <span class="btn btn-light">
+                                            <i class="fas fa-eye me-2"></i>View Project
+                                        </span>
+                                    </div>
+                                    <div class="project-featured-badge">
+                                        <i class="fas fa-star"></i> Featured
+                                    </div>
+                                </div>
+                                <div class="project-card-content">
+                                    <h4 class="project-card-title">{{ $project->name }}</h4>
+                                    <p class="project-card-description">
+                                        {{ Str::limit($project->description ?? 'No description available', 120) }}
+                                    </p>
+                                    @if($project->techStacks->count() > 0)
+                                        <div class="project-card-tech">
+                                            @foreach($project->techStacks->take(4) as $tech)
+                                                <span class="tech-tag" style="background-color: {{ $tech->color ?? '#6c757d' }}">
+                                                    {{ $tech->name }}
+                                                </span>
+                                            @endforeach
+                                            @if($project->techStacks->count() > 4)
+                                                <span class="tech-tag bg-secondary">+{{ $project->techStacks->count() - 4 }}</span>
+                                            @endif
+                                        </div>
+                                    @endif
+                                    <div class="project-card-footer">
+                                        @if($project->live_url)
+                                            <a href="{{ $project->live_url }}" 
+                                               target="_blank" 
+                                               class="btn btn-sm btn-primary"
+                                               onclick="event.stopPropagation();">
+                                                <i class="fas fa-external-link-alt"></i> Live
+                                            </a>
+                                        @endif
+                                        @if($project->github_url)
+                                            <a href="{{ $project->github_url }}" 
+                                               target="_blank" 
+                                               class="btn btn-sm btn-dark"
+                                               onclick="event.stopPropagation();">
+                                                <i class="fab fa-github"></i> Code
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            <!-- Navigation -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <!-- Pagination -->
+            <div class="swiper-pagination"></div>
+        </div>
+
+        <!-- View All Projects Button -->
+        <div class="text-center mt-4">
+            <a href="{{ route('projects.index') }}" class="btn btn-light btn-lg">
+                <span>View All Projects</span>
+                <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+@endif
+
 
     <section id="about" class="about">
         <div class="container">
@@ -299,6 +399,235 @@
             </div>
         </div>
     </section>
+
+@push('styles')
+<style>
+.featured-projects {
+    position: relative;
+    overflow: hidden;
+    padding: 80px 0;
+}
+
+.featured-projects::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+}
+
+.featured-projects .container {
+    position: relative;
+    z-index: 1;
+}
+
+.featured-projects-swiper {
+    padding: 20px 0 60px 0;
+}
+
+.project-swiper-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-swiper-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.project-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.project-card-image {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+}
+
+.project-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.project-swiper-card:hover .project-img {
+    transform: scale(1.15);
+}
+
+.project-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+}
+
+.project-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.project-swiper-card:hover .project-card-overlay {
+    opacity: 1;
+}
+
+.project-featured-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ffc107;
+    color: #000;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    z-index: 2;
+}
+
+.project-card-content {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #2c3e50;
+}
+
+.project-card-description {
+    color: #6c757d;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+}
+
+.project-card-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.tech-tag {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: white;
+}
+
+.project-card-footer {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: auto;
+}
+
+/* Swiper Customization */
+.featured-projects-swiper .swiper-button-next,
+.featured-projects-swiper .swiper-button-prev {
+    color: white;
+    background: rgba(255, 255, 255, 0.2);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    backdrop-filter: blur(10px);
+}
+
+.featured-projects-swiper .swiper-button-next:after,
+.featured-projects-swiper .swiper-button-prev:after {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.featured-projects-swiper .swiper-button-next:hover,
+.featured-projects-swiper .swiper-button-prev:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.featured-projects-swiper .swiper-pagination-bullet {
+    background: white;
+    opacity: 0.5;
+    width: 12px;
+    height: 12px;
+}
+
+.featured-projects-swiper .swiper-pagination-bullet-active {
+    opacity: 1;
+    background: #ffc107;
+}
+</style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const featuredProjectsSwiper = new Swiper('.featured-projects-swiper', {
+        slidesPerView: 1,
+        spaceBetween: 30,
+        loop: true,
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        breakpoints: {
+            640: {
+                slidesPerView: 2,
+                spaceBetween: 20,
+            },
+            768: {
+                slidesPerView: 2,
+                spaceBetween: 30,
+            },
+            1024: {
+                slidesPerView: 3,
+                spaceBetween: 30,
+            },
+        },
+    });
+});
+</script>
+@endpush
 
     <section id="contact" class="contact">
         <div class="container">
