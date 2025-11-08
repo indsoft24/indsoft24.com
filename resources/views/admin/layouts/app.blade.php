@@ -69,6 +69,19 @@
                         <span>Projects</span>
                     </a>
                 </li>
+                
+                <li class="menu-item {{ request()->routeIs('admin.leads.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.leads.index') }}">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Leads</span>
+                        @php
+                            $unreadLeads = \App\Lead::where('is_read', false)->count();
+                        @endphp
+                        @if($unreadLeads > 0)
+                            <span class="badge bg-danger ms-2">{{ $unreadLeads }}</span>
+                        @endif
+                    </a>
+                </li>
 
                 
                 <li class="menu-item">

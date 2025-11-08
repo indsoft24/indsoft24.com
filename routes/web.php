@@ -14,6 +14,7 @@ use App\Http\Controllers\CareerController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
+use App\Http\Controllers\LeadController;
 
 // --- Admin Controllers ---
 use App\Http\Controllers\Admin\AuthController;
@@ -23,11 +24,13 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Admin\SubscriberController;
+use App\Http\Controllers\Admin\LeadController as AdminLeadController;
 
 
 // --- Main Public Routes ---
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
 
 Route::post('/logout', function () {
     Auth::logout();
@@ -123,6 +126,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');
         Route::delete('subscribers/{subscriber}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
         Route::get('subscribers/export', [SubscriberController::class, 'export'])->name('subscribers.export');
+        
+        // Lead Management
+        Route::get('leads', [AdminLeadController::class, 'index'])->name('leads.index');
+        Route::get('leads/{lead}', [AdminLeadController::class, 'show'])->name('leads.show');
+        Route::put('leads/{lead}/status', [AdminLeadController::class, 'updateStatus'])->name('leads.updateStatus');
+        Route::put('leads/{lead}/notes', [AdminLeadController::class, 'updateNotes'])->name('leads.updateNotes');
+        Route::post('leads/{lead}/toggle-read', [AdminLeadController::class, 'toggleRead'])->name('leads.toggleRead');
+        Route::delete('leads/{lead}', [AdminLeadController::class, 'destroy'])->name('leads.destroy');
         
         // Utilities
         Route::post('posts/upload-image', [PostController::class, 'uploadImage'])->name('posts.uploadImage');

@@ -80,6 +80,65 @@
     </div>
 </div>
 
+<!-- Additional Stats Row -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card stats-primary">
+            <div class="card-body">
+                <div class="stats-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="stats-content">
+                    <h3>{{ $stats['total_leads'] }}</h3>
+                    <p>Total Leads</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card stats-warning">
+            <div class="card-body">
+                <div class="stats-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="stats-content">
+                    <h3>{{ $stats['new_leads'] }}</h3>
+                    <p>New Leads</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card stats-info">
+            <div class="card-body">
+                <div class="stats-icon">
+                    <i class="fas fa-envelope-open"></i>
+                </div>
+                <div class="stats-content">
+                    <h3>{{ $stats['unread_leads'] }}</h3>
+                    <p>Unread Leads</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card stats-success">
+            <div class="card-body">
+                <div class="stats-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stats-content">
+                    <h3>{{ $stats['converted_leads'] }}</h3>
+                    <p>Converted Leads</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <!-- Recent Posts -->
     <div class="col-lg-8 mb-4">
@@ -178,6 +237,60 @@
                         <i class="fas fa-external-link-alt"></i> View Blog
                     </a>
                 </div>
+            </div>
+        </div>
+
+        <!-- Recent Leads -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-user-plus"></i> Recent Leads</h5>
+            </div>
+            <div class="card-body">
+                @if(isset($recent_leads) && $recent_leads->count() > 0)
+                    @foreach($recent_leads as $lead)
+                    <div class="recent-lead-item mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">
+                                    {{ $lead->name }}
+                                    @if(!$lead->is_read)
+                                        <span class="badge bg-danger ms-1">New</span>
+                                    @endif
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-envelope"></i> {{ $lead->email }}
+                                </small>
+                                @if($lead->company)
+                                    <div class="mt-1">
+                                        <small class="text-muted">
+                                            <i class="fas fa-building"></i> {{ $lead->company }}
+                                        </small>
+                                    </div>
+                                @endif
+                            </div>
+                            <a href="{{ route('admin.leads.show', $lead) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                        <div class="mt-2">
+                            <span class="badge bg-secondary">{{ ucfirst($lead->status) }}</span>
+                            <small class="text-muted ms-2">
+                                {{ $lead->created_at->diffForHumans() }}
+                            </small>
+                        </div>
+                    </div>
+                    @endforeach
+                    <div class="text-center mt-3">
+                        <a href="{{ route('admin.leads.index') }}" class="btn btn-sm btn-outline-primary">
+                            View All Leads <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                @else
+                    <div class="text-center py-3">
+                        <i class="fas fa-user-plus fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0">No leads yet</p>
+                    </div>
+                @endif
             </div>
         </div>
 

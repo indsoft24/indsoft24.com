@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Indsoft24.com - Web Development, Mobile Apps & Custom Software in India')
 @section('content')
+<link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <section id="home" class="hero">
         <div class="hero-background">
             <div class="hero-particles"></div>
@@ -48,33 +49,54 @@
                 </div>
             </div>
             <div class="hero-visual">
-                <div class="floating-cards">
-                    <div class="floating-card floating-card-1">
-                        <div class="floating-card-icon">
-                            <i class="fas fa-code"></i>
+                <div class="lead-form-container">
+                    <div class="lead-form-card">
+                        <div class="lead-form-header">
+                            <h3><i class="fas fa-rocket"></i> Get Started Today</h3>
+                            <p>Fill out the form and we'll get back to you within 24 hours</p>
                         </div>
-                        <div class="floating-card-content">
-                            <p class="fw-bold">Web Development</p>
-                            <p>Modern, responsive websites</p>
-                        </div>
-                    </div>
-                    <div class="floating-card floating-card-2">
-                        <div class="floating-card-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <div class="floating-card-content">
-                            <p class="fw-bold">Mobile Apps</p>
-                            <p>iOS & Android solutions</p>
-                        </div>
-                    </div>
-                    <div class="floating-card floating-card-3">
-                        <div class="floating-card-icon">
-                            <i class="fas fa-cogs"></i>
-                        </div>
-                        <div class="floating-card-content">
-                            <p class="fw-bold">Custom Software</p>
-                            <p>Tailored business solutions</p>
-                        </div>
+                        <form id="leadForm" method="POST" action="{{ route('leads.store') }}" class="lead-form">
+                            @csrf
+                            <input type="text" name="website" style="display: none;" tabindex="-1" autocomplete="off">
+                            <input type="hidden" name="source" value="homepage">
+                            
+                            <div class="form-group">
+                                <label for="lead_name"><i class="fas fa-user"></i> Full Name</label>
+                                <input type="text" id="lead_name" name="name" class="form-control" 
+                                       placeholder="Enter your name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lead_email"><i class="fas fa-envelope"></i> Email Address</label>
+                                <input type="email" id="lead_email" name="email" class="form-control" 
+                                       placeholder="Enter your email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lead_phone"><i class="fas fa-phone"></i> Phone Number</label>
+                                <input type="tel" id="lead_phone" name="phone" class="form-control" 
+                                       placeholder="Enter your phone (optional)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lead_company"><i class="fas fa-building"></i> Company Name</label>
+                                <input type="text" id="lead_company" name="company" class="form-control" 
+                                       placeholder="Enter your company (optional)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lead_message"><i class="fas fa-comment"></i> Message</label>
+                                <textarea id="lead_message" name="message" class="form-control" rows="3" 
+                                          placeholder="Tell us about your project (optional)"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-submit w-100">
+                                <span>Submit Request</span>
+                                <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                            
+                            <div class="form-message mt-3" id="leadFormMessage"></div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -400,200 +422,69 @@
         </div>
     </section>
 
-@push('styles')
-<style>
-.featured-projects {
-    position: relative;
-    overflow: hidden;
-    padding: 80px 0;
-}
-
-.featured-projects::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-    opacity: 0.3;
-}
-
-.featured-projects .container {
-    position: relative;
-    z-index: 1;
-}
-
-.featured-projects-swiper {
-    padding: 20px 0 60px 0;
-}
-
-.project-swiper-card {
-    background: white;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.project-swiper-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-}
-
-.project-card-link {
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.project-card-image {
-    position: relative;
-    width: 100%;
-    height: 280px;
-    overflow: hidden;
-}
-
-.project-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-}
-
-.project-swiper-card:hover .project-img {
-    transform: scale(1.15);
-}
-
-.project-image-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 3rem;
-}
-
-.project-card-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.75);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.project-swiper-card:hover .project-card-overlay {
-    opacity: 1;
-}
-
-.project-featured-badge {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: #ffc107;
-    color: #000;
-    padding: 8px 16px;
-    border-radius: 25px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    z-index: 2;
-}
-
-.project-card-content {
-    padding: 1.5rem;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.project-card-title {
-    font-size: 1.35rem;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-    color: #2c3e50;
-}
-
-.project-card-description {
-    color: #6c757d;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin-bottom: 1rem;
-    flex-grow: 1;
-}
-
-.project-card-tech {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.tech-tag {
-    padding: 5px 12px;
-    border-radius: 15px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: white;
-}
-
-.project-card-footer {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: auto;
-}
-
-/* Swiper Customization */
-.featured-projects-swiper .swiper-button-next,
-.featured-projects-swiper .swiper-button-prev {
-    color: white;
-    background: rgba(255, 255, 255, 0.2);
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    backdrop-filter: blur(10px);
-}
-
-.featured-projects-swiper .swiper-button-next:after,
-.featured-projects-swiper .swiper-button-prev:after {
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.featured-projects-swiper .swiper-button-next:hover,
-.featured-projects-swiper .swiper-button-prev:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.featured-projects-swiper .swiper-pagination-bullet {
-    background: white;
-    opacity: 0.5;
-    width: 12px;
-    height: 12px;
-}
-
-.featured-projects-swiper .swiper-pagination-bullet-active {
-    opacity: 1;
-    background: #ffc107;
-}
-</style>
-@endpush
 
 @push('scripts')
 <script>
+// Lead Form Submission
 document.addEventListener('DOMContentLoaded', function() {
+    const leadForm = document.getElementById('leadForm');
+    const formMessage = document.getElementById('leadFormMessage');
+    
+    if (leadForm) {
+        leadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = leadForm.querySelector('.btn-submit');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Submitting...</span><i class="fas fa-spinner fa-spin ms-2"></i>';
+            
+            const formData = new FormData(leadForm);
+            
+            fetch(leadForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    formMessage.className = 'form-message success';
+                    formMessage.textContent = data.message || 'Thank you! We will contact you soon.';
+                    leadForm.reset();
+                    
+                    // Show success toast
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success(data.message || 'Thank you! We will contact you soon.');
+                    }
+                } else {
+                    formMessage.className = 'form-message error';
+                    formMessage.textContent = data.message || 'Something went wrong. Please try again.';
+                    
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error(data.message || 'Something went wrong. Please try again.');
+                    }
+                }
+            })
+            .catch(error => {
+                formMessage.className = 'form-message error';
+                formMessage.textContent = 'An error occurred. Please try again.';
+                
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('An error occurred. Please try again.');
+                }
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        });
+    }
+    
+    // Swiper initialization
     const featuredProjectsSwiper = new Swiper('.featured-projects-swiper', {
         slidesPerView: 1,
         spaceBetween: 30,
