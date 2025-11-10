@@ -188,6 +188,21 @@
     font-weight: 500;
 }
 
+/* Menu Section Styles */
+.menu-section {
+    padding: 15px 20px 10px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 5px;
+}
+
+.menu-section span {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
 /* Main Content Styles */
 .main-content {
     margin-left: var(--sidebar-width);
@@ -483,24 +498,24 @@
     .sidebar {
         transform: translateX(-100%);
     }
-    
+
     .sidebar.show {
         transform: translateX(0);
     }
-    
+
     .main-content {
         margin-left: 0;
     }
-    
+
     .page-content {
         padding: 20px;
     }
-    
+
     .stats-card .card-body {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .stats-icon {
         margin-right: 0;
         margin-bottom: 15px;
@@ -513,8 +528,15 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .slide-in {
@@ -522,6 +544,11 @@
 }
 
 @keyframes slideIn {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(0); }
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
 }

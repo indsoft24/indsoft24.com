@@ -21,6 +21,13 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Admin\SubscriberController;
+use App\Http\Controllers\Admin\StateController;
+use App\Http\Controllers\Admin\CityController;
+use App\Http\Controllers\Admin\AreaController;
+use App\Http\Controllers\Admin\PageController;
+
+// --- CMS Controllers ---
+use App\Http\Controllers\CmsController;
 
 
 // --- Main Public Routes ---
@@ -77,6 +84,19 @@ Route::view('/seo-services', 'services.seo-services')->name('services.seo');
 Route::view('/e-commerce', 'e-commerce.index')->name('e-commerce');
 
 
+// --- CMS Public Routes ---
+Route::prefix('cms')->name('cms.')->group(function () {
+    Route::get('/states', [CmsController::class, 'states'])->name('states');
+    Route::get('/state/{state}', [CmsController::class, 'statePages'])->name('state.pages');
+    Route::get('/state/{state}/cities', [CmsController::class, 'stateCities'])->name('state.cities');
+    Route::get('/city/{city}', [CmsController::class, 'cityPages'])->name('city.pages');
+    Route::get('/city/{city}/areas', [CmsController::class, 'cityAreas'])->name('city.areas');
+    Route::get('/area/{area}', [CmsController::class, 'areaPages'])->name('area.pages');
+    Route::get('/page/{page}', [CmsController::class, 'showPage'])->name('page');
+    Route::get('/search', [CmsController::class, 'search'])->name('search');
+});
+
+
 // --- User-Specific Routes ---
 Route::middleware('auth')->prefix('my-blog')->name('user.blog.')->group(function () {
     Route::get('/', [PostController::class, 'index'])->name('index');
@@ -110,6 +130,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('tags', TagController::class);
         Route::resource('comments', AdminCommentController::class)->only(['index', 'edit', 'update', 'destroy']);
         
+        // CMS Management
+        Route::resource('states', StateController::class);
+        Route::resource('cities', CityController::class);
+        Route::resource('areas', AreaController::class);
+        Route::resource('pages', PageController::class);
+        
+        // AJAX routes for CMS
+        Route::get('cities/by-state', [CityController::class, 'getByState'])->name('cities.byState');
+        Route::get('areas/by-city', [AreaController::class, 'getByCity'])->name('areas.byCity');
+        
         // Subscriber Management
         Route::get('subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');
         Route::delete('subscribers/{subscriber}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
@@ -117,5 +147,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         
         // Utilities
         Route::post('posts/upload-image', [PostController::class, 'uploadImage'])->name('posts.uploadImage');
+        Route::post('pages/upload-image', [PageController::class, 'uploadImage'])->name('pages.uploadImage');
     });
 });

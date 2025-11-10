@@ -265,7 +265,6 @@ function bulkAction(action) {
     
     if (confirm(`Are you sure you want to ${action} ${selectedIds.length} post(s)?`)) {
         // Implement bulk action logic here
-        console.log(`${action} action for posts:`, selectedIds);
     }
 }
 </script>

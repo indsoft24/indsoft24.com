@@ -13,6 +13,13 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
+        
+        // Auto-update CMS pages daily (runs at 2 AM)
+        // Uncomment the line below to enable automatic daily updates
+        // $schedule->command('cms:auto-update-pages')->dailyAt('02:00');
+        
+        // Or run every 6 hours
+        // $schedule->command('cms:auto-update-pages')->everySixHours();
     }
 
     /**

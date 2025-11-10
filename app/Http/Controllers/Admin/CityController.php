@@ -1,0 +1,166 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\City;
+use App\Http\Controllers\Controller;
+use App\State;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
+class CityController extends Controller
+{
+    /**
+     * Create a new controller instance
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
+     * Display a listing of cities
+     */
+    public function index(Request $request)
+    {
+        $query = City::with('state');
+
+        // Filter by state
+        if ($request->has('state') && $request->state !== '') {
+            $query->where('state_id', $request->state);
+        }
+
+        // Filter by status
+        if ($request->has('status') && $request->status !== '') {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+
+        // Search
+        if ($request->has('search') && $request->search !== '') {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%')
+                    ->orWhereHas('state', function ($stateQuery) use ($request) {
+                        $stateQuery->where('name', 'like', '%'.$request->search.'%');
+                    });
+            });
+        }
+
+        $cities = $query->orderBy('city_name', 'asc')->paginate(15);
+        $states = State::active()->orderBy('name')->get();
+
+        return view('admin.cms.cities.index', compact('cities', 'states'));
+    }
+
+    /**
+     * Show the form for creating a new city
+     */
+    public function create()
+    {
+        $states = State::active()->orderBy('name')->get();
+
+        return view('admin.cms.cities.create', compact('states'));
+    }
+
+    /**
+     * Store a newly created city
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'state_id' => 'required|exists:states,id',
+            'description' => 'nullable|string',
+            'is_active' => 'boolean',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+        ]);
+
+        $data = $request->all();
+        $data['slug'] = Str::slug($request->name);
+        $data['is_active'] = $request->has('is_active');
+
+        City::create($data);
+
+        return redirect()->route('admin.cities.index')
+            ->with('success', 'City created successfully!');
+    }
+
+    /**
+     * Display the specified city
+     */
+    public function show(City $city)
+    {
+        $city->load(['state', 'areas', 'pages']);
+
+        return view('admin.cms.cities.show', compact('city'));
+    }
+
+    /**
+     * Show the form for editing the specified city
+     */
+    public function edit(City $city)
+    {
+        $states = State::active()->orderBy('name')->get();
+
+        return view('admin.cms.cities.edit', compact('city', 'states'));
+    }
+
+    /**
+     * Update the specified city
+     */
+    public function update(Request $request, City $city)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'state_id' => 'required|exists:states,id',
+            'description' => 'nullable|string',
+            'is_active' => 'boolean',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+        ]);
+
+        $data = $request->all();
+        $data['slug'] = Str::slug($request->name);
+        $data['is_active'] = $request->has('is_active');
+
+        $city->update($data);
+
+        return redirect()->route('admin.cities.index')
+            ->with('success', 'City updated successfully!');
+    }
+
+    /**
+     * Remove the specified city
+     */
+    public function destroy(City $city)
+    {
+        if ($city->areas()->count() > 0) {
+            return redirect()->route('admin.cities.index')
+                ->with('error', 'Cannot delete city with associated areas!');
+        }
+
+        $city->delete();
+
+        return redirect()->route('admin.cities.index')
+            ->with('success', 'City deleted successfully!');
+    }
+
+    /**
+     * Get cities by state (AJAX)
+     */
+    public function getByState(Request $request)
+    {
+        $stateId = $request->get('state_id');
+        $cities = City::where('state_id', $stateId)
+            ->where('is_active', true)
+            ->orderBy('city_name')
+            ->get(['id', 'name']);
+
+        return response()->json($cities);
+    }
+}

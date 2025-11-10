@@ -63,6 +63,38 @@
                     </a>
                 </li>
 
+                <!-- CMS Section -->
+                <li class="menu-section">
+                    <span>CMS Management</span>
+                </li>
+                
+                <li class="menu-item {{ request()->routeIs('admin.pages.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.pages.index') }}">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Pages</span>
+                    </a>
+                </li>
+                
+                <li class="menu-item {{ request()->routeIs('admin.states.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.states.index') }}">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>States</span>
+                    </a>
+                </li>
+                
+                <li class="menu-item {{ request()->routeIs('admin.cities.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.cities.index') }}">
+                        <i class="fas fa-city"></i>
+                        <span>Cities</span>
+                    </a>
+                </li>
+                
+                <li class="menu-item {{ request()->routeIs('admin.areas.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.areas.index') }}">
+                        <i class="fas fa-map-pin"></i>
+                        <span>Areas</span>
+                    </a>
+                </li>
                 
                 <li class="menu-item">
                     <a href="{{ route('home') }}" target="_blank">
