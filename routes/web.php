@@ -1,38 +1,34 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-
+use App\Http\Controllers\Admin\AreaController;
+use App\Http\Controllers\Admin\AuthController;
 // --- Controllers ---
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CityController;
+use App\Http\Controllers\Admin\CommentController as AdminCommentController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\LeadController as AdminLeadController;
+use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
+use App\Http\Controllers\Admin\StateController;
+use App\Http\Controllers\Admin\SubscriberController;
+use App\Http\Controllers\Admin\TagController;
+// --- Admin Controllers ---
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CareerController;
+use App\Http\Controllers\CmsController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\NewsletterController;
-use App\Http\Controllers\CareerController;
-use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
-use App\Http\Controllers\LeadController;
-
-// --- Admin Controllers ---
-use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\PostController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\TagController;
-use App\Http\Controllers\Admin\CommentController as AdminCommentController;
-use App\Http\Controllers\Admin\SubscriberController;
-use App\Http\Controllers\Admin\StateController;
-use App\Http\Controllers\Admin\CityController;
-use App\Http\Controllers\Admin\AreaController;
-use App\Http\Controllers\Admin\PageController;
-
 // --- CMS Controllers ---
-use App\Http\Controllers\CmsController;
-use App\Http\Controllers\Admin\LeadController as AdminLeadController;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 // --- Main Public Routes ---
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -41,20 +37,18 @@ Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
 
 Route::post('/logout', function () {
     Auth::logout();
+
     return redirect()->route('home')->with('success', 'Successfully logged out!');
 })->name('logout');
-
 
 // --- Newsletter Routes ---
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 Route::get('/newsletter/verify', [NewsletterController::class, 'showVerificationForm'])->name('newsletter.verify.form');
 Route::post('/newsletter/verify', [NewsletterController::class, 'verifyOtp'])->name('newsletter.verify.otp');
 
-
 // --- Google OAuth Routes ---
 Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('auth.google.callback');
-
 
 // --- Public Blog Routes ---
 Route::prefix('blog')->name('blog.')->group(function () {
@@ -71,7 +65,6 @@ Route::prefix('projects')->name('projects.')->group(function () {
     Route::get('/', [ProjectController::class, 'index'])->name('index');
     Route::get('/{project:slug}', [ProjectController::class, 'show'])->name('show');
 });
-
 
 // --- Static Page Routes ---
 // Company Pages
@@ -94,7 +87,6 @@ Route::view('/seo-services', 'services.seo-services')->name('services.seo');
 // E-commerce Page
 Route::view('/e-commerce', 'e-commerce.index')->name('e-commerce');
 
-
 // --- CMS Public Routes ---
 Route::prefix('cms')->name('cms.')->group(function () {
     Route::get('/states', [CmsController::class, 'states'])->name('states');
@@ -107,7 +99,6 @@ Route::prefix('cms')->name('cms.')->group(function () {
     Route::get('/search', [CmsController::class, 'search'])->name('search');
 });
 
-
 // --- User-Specific Routes ---
 Route::middleware('auth')->prefix('my-blog')->name('user.blog.')->group(function () {
     Route::get('/', [PostController::class, 'index'])->name('index');
@@ -118,7 +109,6 @@ Route::middleware('auth')->prefix('my-blog')->name('user.blog.')->group(function
     Route::put('/{post}', [PostController::class, 'update'])->name('update');
     Route::delete('/{post}', [PostController::class, 'destroy'])->name('destroy');
 });
-
 
 // --- Admin Routes ---
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -140,23 +130,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('categories', CategoryController::class);
         Route::resource('tags', TagController::class);
         Route::resource('comments', AdminCommentController::class)->only(['index', 'edit', 'update', 'destroy']);
-        
+
         // CMS Management
         Route::resource('states', StateController::class);
         Route::resource('cities', CityController::class);
         Route::resource('areas', AreaController::class);
         Route::resource('pages', PageController::class);
-        
+
         // AJAX routes for CMS
         Route::get('cities/by-state', [CityController::class, 'getByState'])->name('cities.byState');
         Route::get('areas/by-city', [AreaController::class, 'getByCity'])->name('areas.byCity');
         Route::resource('projects', AdminProjectController::class);
-        
+
         // Subscriber Management
         Route::get('subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');
         Route::delete('subscribers/{subscriber}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
         Route::get('subscribers/export', [SubscriberController::class, 'export'])->name('subscribers.export');
-        
+
         // Lead Management
         Route::get('leads', [AdminLeadController::class, 'index'])->name('leads.index');
         Route::get('leads/{lead}', [AdminLeadController::class, 'show'])->name('leads.show');
@@ -164,7 +154,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('leads/{lead}/notes', [AdminLeadController::class, 'updateNotes'])->name('leads.updateNotes');
         Route::post('leads/{lead}/toggle-read', [AdminLeadController::class, 'toggleRead'])->name('leads.toggleRead');
         Route::delete('leads/{lead}', [AdminLeadController::class, 'destroy'])->name('leads.destroy');
-        
+
         // Utilities
         Route::post('posts/upload-image', [PostController::class, 'uploadImage'])->name('posts.uploadImage');
         Route::post('pages/upload-image', [PageController::class, 'uploadImage'])->name('pages.uploadImage');
