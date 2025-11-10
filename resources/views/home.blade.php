@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Indsoft24.com - Web Development, Mobile Apps & Custom Software in India')
 @section('content')
+<link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <section id="home" class="hero">
         <div class="hero-background">
             <div class="hero-particles"></div>
@@ -41,40 +42,61 @@
                         <span>Start Your Project</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
-                    <a href="#services" class="btn btn-secondary">
-                        <i class="fas fa-play"></i>
-                        <span>Watch Our Work</span>
+                    <a href="#projects" class="btn btn-secondary">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>View Our Projects</span>
                     </a>
                 </div>
             </div>
             <div class="hero-visual">
-                <div class="floating-cards">
-                    <div class="floating-card floating-card-1">
-                        <div class="floating-card-icon">
-                            <i class="fas fa-code"></i>
+                <div class="lead-form-container">
+                    <div class="lead-form-card">
+                        <div class="lead-form-header">
+                            <h3><i class="fas fa-rocket"></i> Get Started Today</h3>
+                            <p>Fill out the form and we'll get back to you within 24 hours</p>
                         </div>
-                        <div class="floating-card-content">
-                            <p class="fw-bold">Web Development</p>
-                            <p>Modern, responsive websites</p>
-                        </div>
-                    </div>
-                    <div class="floating-card floating-card-2">
-                        <div class="floating-card-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <div class="floating-card-content">
-                            <p class="fw-bold">Mobile Apps</p>
-                            <p>iOS & Android solutions</p>
-                        </div>
-                    </div>
-                    <div class="floating-card floating-card-3">
-                        <div class="floating-card-icon">
-                            <i class="fas fa-cogs"></i>
-                        </div>
-                        <div class="floating-card-content">
-                            <p class="fw-bold">Custom Software</p>
-                            <p>Tailored business solutions</p>
-                        </div>
+                        <form id="leadForm" method="POST" action="{{ route('leads.store') }}" class="lead-form">
+                            @csrf
+                            <input type="text" name="website" style="display: none;" tabindex="-1" autocomplete="off">
+                            <input type="hidden" name="source" value="homepage">
+                            
+                            <div class="form-group">
+                                <label for="lead_name"><i class="fas fa-user"></i> Full Name</label>
+                                <input type="text" id="lead_name" name="name" class="form-control" 
+                                       placeholder="Enter your name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lead_email"><i class="fas fa-envelope"></i> Email Address</label>
+                                <input type="email" id="lead_email" name="email" class="form-control" 
+                                       placeholder="Enter your email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lead_phone"><i class="fas fa-phone"></i> Phone Number</label>
+                                <input type="tel" id="lead_phone" name="phone" class="form-control" 
+                                       placeholder="Enter your phone (optional)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lead_company"><i class="fas fa-building"></i> Company Name</label>
+                                <input type="text" id="lead_company" name="company" class="form-control" 
+                                       placeholder="Enter your company (optional)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lead_message"><i class="fas fa-comment"></i> Message</label>
+                                <textarea id="lead_message" name="message" class="form-control" rows="3" 
+                                          placeholder="Tell us about your project (optional)"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-submit w-100">
+                                <span>Submit Request</span>
+                                <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                            
+                            <div class="form-message mt-3" id="leadFormMessage"></div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -196,6 +218,106 @@
     </div>
 </section>
 
+<!-- Featured Projects Section -->
+@if($featuredProjects->count() > 0)
+<section id="projects" class="featured-projects py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="section-header text-center text-white mb-5">
+            <div class="section-badge" style="background: rgba(255, 255, 255, 0.2); color: white;">
+                <i class="fas fa-star"></i>
+                <span>Featured Projects</span>
+            </div>
+            <h2 class="section-title text-white">Our <span class="text-warning">Portfolio</span></h2>
+            <p class="section-subtitle text-white-50">
+                Explore our showcase of innovative projects that demonstrate our expertise and creativity
+            </p>
+        </div>
+
+        <!-- Swiper -->
+        <div class="swiper featured-projects-swiper mb-4">
+            <div class="swiper-wrapper">
+                @foreach($featuredProjects as $project)
+                    <div class="swiper-slide">
+                        <div class="project-swiper-card">
+                            <a href="{{ route('projects.show', $project) }}" class="project-card-link">
+                                <div class="project-card-image">
+                                    @if($project->featured_image)
+                                        <img src="{{ asset($project->featured_image) }}" 
+                                             alt="{{ $project->name }}" 
+                                             class="project-img">
+                                    @else
+                                        <div class="project-image-placeholder">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    @endif
+                                    <div class="project-card-overlay">
+                                        <span class="btn btn-light">
+                                            <i class="fas fa-eye me-2"></i>View Project
+                                        </span>
+                                    </div>
+                                    <div class="project-featured-badge">
+                                        <i class="fas fa-star"></i> Featured
+                                    </div>
+                                </div>
+                                <div class="project-card-content">
+                                    <h4 class="project-card-title">{{ $project->name }}</h4>
+                                    <p class="project-card-description">
+                                        {{ Str::limit($project->description ?? 'No description available', 120) }}
+                                    </p>
+                                    @if($project->techStacks->count() > 0)
+                                        <div class="project-card-tech">
+                                            @foreach($project->techStacks->take(4) as $tech)
+                                                <span class="tech-tag" style="background-color: {{ $tech->color ?? '#6c757d' }}">
+                                                    {{ $tech->name }}
+                                                </span>
+                                            @endforeach
+                                            @if($project->techStacks->count() > 4)
+                                                <span class="tech-tag bg-secondary">+{{ $project->techStacks->count() - 4 }}</span>
+                                            @endif
+                                        </div>
+                                    @endif
+                                    <div class="project-card-footer">
+                                        @if($project->live_url)
+                                            <a href="{{ $project->live_url }}" 
+                                               target="_blank" 
+                                               class="btn btn-sm btn-primary"
+                                               onclick="event.stopPropagation();">
+                                                <i class="fas fa-external-link-alt"></i> Live
+                                            </a>
+                                        @endif
+                                        @if($project->github_url)
+                                            <a href="{{ $project->github_url }}" 
+                                               target="_blank" 
+                                               class="btn btn-sm btn-dark"
+                                               onclick="event.stopPropagation();">
+                                                <i class="fab fa-github"></i> Code
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            <!-- Navigation -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <!-- Pagination -->
+            <div class="swiper-pagination"></div>
+        </div>
+
+        <!-- View All Projects Button -->
+        <div class="text-center mt-4">
+            <a href="{{ route('projects.index') }}" class="btn btn-light btn-lg">
+                <span>View All Projects</span>
+                <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+@endif
+
 
     <section id="about" class="about">
         <div class="container">
@@ -299,6 +421,104 @@
             </div>
         </div>
     </section>
+
+
+@push('scripts')
+<script>
+// Lead Form Submission
+document.addEventListener('DOMContentLoaded', function() {
+    const leadForm = document.getElementById('leadForm');
+    const formMessage = document.getElementById('leadFormMessage');
+    
+    if (leadForm) {
+        leadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = leadForm.querySelector('.btn-submit');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Submitting...</span><i class="fas fa-spinner fa-spin ms-2"></i>';
+            
+            const formData = new FormData(leadForm);
+            
+            fetch(leadForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    formMessage.className = 'form-message success';
+                    formMessage.textContent = data.message || 'Thank you! We will contact you soon.';
+                    leadForm.reset();
+                    
+                    // Show success toast
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success(data.message || 'Thank you! We will contact you soon.');
+                    }
+                } else {
+                    formMessage.className = 'form-message error';
+                    formMessage.textContent = data.message || 'Something went wrong. Please try again.';
+                    
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error(data.message || 'Something went wrong. Please try again.');
+                    }
+                }
+            })
+            .catch(error => {
+                formMessage.className = 'form-message error';
+                formMessage.textContent = 'An error occurred. Please try again.';
+                
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('An error occurred. Please try again.');
+                }
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        });
+    }
+    
+    // Swiper initialization
+    const featuredProjectsSwiper = new Swiper('.featured-projects-swiper', {
+        slidesPerView: 1,
+        spaceBetween: 30,
+        loop: true,
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        breakpoints: {
+            640: {
+                slidesPerView: 2,
+                spaceBetween: 20,
+            },
+            768: {
+                slidesPerView: 2,
+                spaceBetween: 30,
+            },
+            1024: {
+                slidesPerView: 3,
+                spaceBetween: 30,
+            },
+        },
+    });
+});
+</script>
+@endpush
 
     <section id="contact" class="contact">
         <div class="container">

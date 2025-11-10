@@ -8,6 +8,7 @@ use App\Category;
 use App\Tag;
 use App\Subscriber;
 use App\ContactMessage;
+use App\Lead;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -34,6 +35,10 @@ class DashboardController extends Controller
             'total_contacts' => ContactMessage::count(),
             'unread_contacts' => ContactMessage::where('is_read', false)->count(),
             'total_subscribers' => Subscriber::whereNotNull('email_verified_at')->count(),
+            'total_leads' => Lead::count(),
+            'new_leads' => Lead::where('status', 'new')->count(),
+            'unread_leads' => Lead::where('is_read', false)->count(),
+            'converted_leads' => Lead::where('status', 'converted')->count(),
         ];
 
         $recent_posts = Post::with(['category', 'user'])

@@ -17,6 +17,7 @@
     @endif
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @stack('styles')
@@ -64,8 +65,8 @@
                 <a href="{{ route('e-commerce') }}" class="nav-link {{ request()->routeIs('e-commerce') ? 'active' : '' }}">e commerce</a>
             </div>
             
-            <!-- Auth Buttons - Right Side -->
-            <div class="nav-auth" id="nav-auth">
+            <!-- Auth Buttons - Right Side (Desktop Only) -->
+            <div class="nav-auth desktop-only" id="nav-auth">
                 @auth
                     <a href="{{ route('user.blog.index') }}" class="auth-link auth-blog">
                         <i class="fas fa-blog"></i>
@@ -90,13 +91,132 @@
                 @endauth
             </div>
             
-            <!-- Mobile Toggle - Right Side -->
-            <div class="nav-toggle" id="nav-toggle">
+            <!-- Mobile Toggle - Right Side (Mobile/Tablet Only) -->
+            <div class="nav-toggle mobile-only" id="nav-toggle">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
             </div>
         </div>
+    </nav>
+
+    <!-- Mobile/Tablet Sidebar Menu -->
+    <div class="mobile-sidebar" id="mobile-sidebar">
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <div class="sidebar-content">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Menu</h2>
+                <button class="sidebar-close" id="sidebar-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Sidebar Navigation -->
+            <div class="sidebar-nav">
+                <a href="{{ route('home') }}" class="sidebar-item {{ request()->routeIs('home') ? 'active' : '' }}">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+
+                <!-- Services Dropdown -->
+                <div class="sidebar-item sidebar-dropdown">
+                    <div class="sidebar-dropdown-toggle">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Service</span>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    </div>
+                    <div class="sidebar-dropdown-menu">
+                        <a href="{{ route('services.web') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-globe"></i>
+                            <span>Web Development</span>
+                        </a>
+                        <a href="{{ route('services.app') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>App Development</span>
+                        </a>
+                        <a href="{{ route('services.software') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-cogs"></i>
+                            <span>Software Development</span>
+                        </a>
+                        <a href="{{ route('services.seo') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-search"></i>
+                            <span>SEO Optimization</span>
+                        </a>
+                    </div>
+                </div>
+
+                <a href="{{ route('about') }}" class="sidebar-item {{ request()->routeIs('about') ? 'active' : '' }}">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About Us</span>
+                </a>
+
+                <a href="#contact" class="sidebar-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact Us</span>
+                </a>
+
+                <!-- Auth Section -->
+                <div class="sidebar-divider"></div>
+                @auth
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="sidebar-user-details">
+                            <span class="sidebar-user-name">{{ Auth::user()->name }}</span>
+                            <span class="sidebar-user-email">{{ Auth::user()->email }}</span>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-form">
+                        @csrf
+                        <button type="submit" class="sidebar-btn sidebar-btn-logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('auth.google') }}" class="sidebar-btn sidebar-btn-login">
+                        <i class="fab fa-google"></i>
+                        <span>Login</span>
+                    </a>
+                    <a href="{{ route('auth.google') }}" class="sidebar-btn sidebar-btn-register">
+                        <span>Register</span>
+                    </a>
+                @endauth
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar (Mobile/Tablet Only) -->
+    <nav class="bottom-nav mobile-only">
+        <a href="{{ route('home') }}" class="bottom-nav-item {{ request()->routeIs('home') ? 'active' : '' }}">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#services" class="bottom-nav-item {{ request()->is('services*') ? 'active' : '' }}">
+            <i class="fas fa-briefcase"></i>
+            <span>Services</span>
+        </a>
+        @auth
+            <a href="{{ route('projects.index') }}" class="bottom-nav-item {{ request()->routeIs('projects*') ? 'active' : '' }}">
+                <i class="fas fa-project-diagram"></i>
+                <span>Projects</span>
+            </a>
+            <a href="{{ route('user.blog.index') }}" class="bottom-nav-item {{ request()->routeIs('user.blog*') ? 'active' : '' }}">
+                <i class="fas fa-blog"></i>
+                <span>My Blog</span>
+            </a>
+        @else
+            <a href="{{ route('projects.index') }}" class="bottom-nav-item {{ request()->routeIs('projects*') ? 'active' : '' }}">
+                <i class="fas fa-project-diagram"></i>
+                <span>Projects</span>
+            </a>
+        @endauth
+        <a href="{{ route('blog.index') }}" class="bottom-nav-item {{ request()->routeIs('blog*') ? 'active' : '' }}">
+            <i class="fas fa-newspaper"></i>
+            <span>Blog</span>
+        </a>
     </nav>
 
     <!-- Main Content -->
@@ -249,6 +369,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="{{ asset('js/script.js') }}"></script>
 
 <script>
