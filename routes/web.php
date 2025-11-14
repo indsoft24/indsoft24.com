@@ -26,6 +26,7 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\SitemapController;
 // --- CMS Controllers ---
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -86,6 +87,18 @@ Route::view('/seo-services', 'services.seo-services')->name('services.seo');
 
 // E-commerce Page
 Route::view('/e-commerce', 'e-commerce.index')->name('e-commerce');
+
+// --- Sitemap Routes ---
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+Route::get('/sitemap-static.xml', [SitemapController::class, 'staticPages'])->name('sitemap.static');
+Route::get('/sitemap-posts-{page}.xml', [SitemapController::class, 'posts'])->where('page', '[0-9]+')->name('sitemap.posts');
+Route::get('/sitemap-categories.xml', [SitemapController::class, 'categories'])->name('sitemap.categories');
+Route::get('/sitemap-tags.xml', [SitemapController::class, 'tags'])->name('sitemap.tags');
+Route::get('/sitemap-projects.xml', [SitemapController::class, 'projects'])->name('sitemap.projects');
+Route::get('/sitemap-pages-{page}.xml', [SitemapController::class, 'pages'])->where('page', '[0-9]+')->name('sitemap.pages');
+Route::get('/sitemap-states.xml', [SitemapController::class, 'states'])->name('sitemap.states');
+Route::get('/sitemap-cities-{page}.xml', [SitemapController::class, 'cities'])->where('page', '[0-9]+')->name('sitemap.cities');
+Route::get('/sitemap-areas-{page}.xml', [SitemapController::class, 'areas'])->where('page', '[0-9]+')->name('sitemap.areas');
 
 // --- CMS Public Routes ---
 Route::prefix('cms')->name('cms.')->group(function () {

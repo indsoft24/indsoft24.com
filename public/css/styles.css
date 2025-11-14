@@ -2012,7 +2012,7 @@ body{font-family:'Inter',sans-serif;line-height:1.6;color:#333;overflow-x:hidden
 
     /* Add padding to main content for bottom nav on mobile only */
     main {
-        padding-bottom: 70px !important;
+        padding-bottom: 10px !important;
     }
 
     .hero-container {

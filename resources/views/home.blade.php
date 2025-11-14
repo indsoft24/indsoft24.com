@@ -86,7 +86,7 @@
                             
                             <div class="form-group">
                                 <label for="lead_message"><i class="fas fa-comment"></i> Message</label>
-                                <textarea id="lead_message" name="message" class="form-control" rows="3" 
+                                <textarea id="lead_message" name="message" class="form-control" rows="2" 
                                           placeholder="Tell us about your project (optional)"></textarea>
                             </div>
                             
