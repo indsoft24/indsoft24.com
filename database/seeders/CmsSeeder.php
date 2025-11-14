@@ -398,11 +398,30 @@ class CmsSeeder extends Seeder
         // Create pages for each area
         foreach ($areas as $area) {
             try {
+                // Get city relationship properly - check if it's a model instance or string
                 $city = $area->city;
+                if (! $city instanceof \App\City) {
+                    // If city is a string (column), try to get the relationship
+                    if ($area->city_id) {
+                        $city = \App\City::find($area->city_id);
+                    } else {
+                        $city = null;
+                    }
+                }
+                
+                // Get state relationship properly - check if it's a model instance or string
                 $state = $area->state;
+                if (! $state instanceof \App\State) {
+                    // If state is a string (column), try to get the relationship
+                    if ($area->state_id) {
+                        $state = \App\State::find($area->state_id);
+                    } else {
+                        $state = null;
+                    }
+                }
 
-                if (! $city || ! $state) {
-                    $this->command->warn("Area '{$area->name}' is missing city or state. Skipping...");
+                if (! $state) {
+                    $this->command->warn("Area '{$area->name}' is missing state. Skipping...");
                     $skippedPages++;
 
                     continue;
@@ -419,8 +438,8 @@ class CmsSeeder extends Seeder
                     continue;
                 }
 
-                // Generate dynamic content based on area data
-                $title = "Local Business Services in {$area->name}, {$city->city_name}";
+                // Generate dynamic content based on area data - city pages are created, so we don't need city in title
+                $title = "Local Business Services in {$area->name}, {$state->name}";
                 $slug = Str::slug("local-business-services-{$area->slug}");
 
                 // Ensure unique slug
@@ -431,8 +450,8 @@ class CmsSeeder extends Seeder
                     $counter++;
                 }
 
-                $content = $this->generateAreaPageContent($area, $city, $state);
-                $excerpt = $this->generateAreaExcerpt($area, $city, $state);
+                $content = $this->generateAreaPageContent($area, $state);
+                $excerpt = $this->generateAreaExcerpt($area, $state);
 
                 Page::create([
                     'title' => $title,
@@ -442,7 +461,7 @@ class CmsSeeder extends Seeder
                     'status' => 'published',
                     'is_featured' => false,
                     'state_id' => $state->id,
-                    'city_id' => $city->id,
+                    'city_id' => $city ? $city->id : null,
                     'area_id' => $area->id,
                     'user_id' => $user->id,
                     'page_type' => 'area',
@@ -521,7 +540,7 @@ class CmsSeeder extends Seeder
     /**
      * Generate area page content
      */
-    private function generateAreaPageContent($area, $city, $state): string
+    private function generateAreaPageContent($area, $state): string
     {
         $address = $area->address ? "Located at {$area->address}" : '';
         $types = $area->types ? 'Area type: '.str_replace('|', ', ', $area->types) : '';
@@ -530,11 +549,11 @@ class CmsSeeder extends Seeder
             $mapLink = "<p><a href='https://www.google.com/maps?q={$area->latitude},{$area->longitude}' target='_blank'>View on Google Maps</a></p>";
         }
 
-        return "<h2>Local Business Services in {$area->name}, {$city->city_name}</h2>
-        <p>Welcome to {$area->name}, a prime location in {$city->city_name}, {$state->name}. {$address}. {$types}.</p>
+        return "<h2>Local Business Services in {$area->name}, {$state->name}</h2>
+        <p>Welcome to {$area->name}, a prime location in {$state->name}. {$address}. {$types}.</p>
         
         <h3>About {$area->name}</h3>
-        <p>{$area->name} is a well-established area in {$city->city_name}, offering excellent business opportunities and a thriving local economy. This area is perfect for businesses looking to establish a strong local presence.</p>
+        <p>{$area->name} is a well-established area in {$state->name}, offering excellent business opportunities and a thriving local economy. This area is perfect for businesses looking to establish a strong local presence.</p>
         
         {$mapLink}
         
@@ -549,7 +568,7 @@ class CmsSeeder extends Seeder
         <h3>Why Choose {$area->name}?</h3>
         <p>{$area->name} offers strategic advantages for businesses:</p>
         <ul>
-            <li>Prime location in {$city->city_name}</li>
+            <li>Prime location in {$state->name}</li>
             <li>Excellent connectivity and accessibility</li>
             <li>Growing local market</li>
             <li>Supportive business environment</li>
@@ -559,14 +578,14 @@ class CmsSeeder extends Seeder
         <h3>Start Your Business Today</h3>
         <p>Ready to start or expand your business in {$area->name}? Our platform provides everything you need to set up your e-commerce store and establish your online presence. With support for all business categories, you can launch your store in minutes.</p>
         
-        <p>Contact us to learn more about business opportunities in {$area->name}, {$city->city_name}, {$state->name}.</p>";
+        <p>Contact us to learn more about business opportunities in {$area->name}, {$state->name}.</p>";
     }
 
     /**
      * Generate area page excerpt
      */
-    private function generateAreaExcerpt($area, $city, $state): string
+    private function generateAreaExcerpt($area, $state): string
     {
-        return "Explore business opportunities in {$area->name}, {$city->city_name}, {$state->name}. Set up your e-commerce store, get listed in our directory, and grow your local business with our comprehensive platform.";
+        return "Explore business opportunities in {$area->name}, {$state->name}. Set up your e-commerce store, get listed in our directory, and grow your local business with our comprehensive platform.";
     }
 }
