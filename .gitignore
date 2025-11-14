@@ -42,6 +42,8 @@ storage/framework/views/*
 storage/logs/*
 
 # Uploads
+public/images/*
+!public/images/.gitkeep
 public/images/posts/*
 !public/images/posts/.gitkeep
 

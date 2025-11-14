@@ -308,6 +308,11 @@
 @endsection
 @push('styles')
     <style>
+        /* Remove border radius from hero section */
+        .achievement-badge {
+            border-radius: 0 !important;
+        }
+
         /* Pricing Section */
         .pricing-section {
             background: linear-gradient(135deg, #f9fafb, #f1f3f6);
@@ -315,7 +320,7 @@
 
         .pricing-card {
             background: #fff;
-            border-radius: 20px;
+            border-radius: 0;
             padding: 30px 20px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
             position: relative;
@@ -338,7 +343,7 @@
             width: 70px;
             height: 70px;
             margin: 0 auto;
-            border-radius: 50%;
+            border-radius: 0;
             background: #e9f2ff;
             display: flex;
             align-items: center;
@@ -361,7 +366,7 @@
             position: relative;
             display: inline-block;
             padding: 5px 15px;
-            border-radius: 8px;
+            border-radius: 0;
             background: #f8f9fa;
         }
 
@@ -381,7 +386,7 @@
         }
 
         .btn {
-            border-radius: 25px;
+            border-radius: 0;
             padding: 8px 20px;
             font-weight: 600;
         }
@@ -393,6 +398,11 @@
         .hover-shadow:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Remove border radius from cards */
+        .card {
+            border-radius: 0 !important;
         }
 
         /* Hover Effects */

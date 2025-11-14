@@ -80,6 +80,7 @@ Route::get('/career', [CareerController::class, 'index'])->name('career.index');
 Route::post('/career/apply', [CareerController::class, 'apply'])->name('career.apply');
 
 // Service Pages
+Route::view('/services', 'services.index')->name('services.index');
 Route::view('/web-development', 'services.web-development')->name('services.web');
 Route::view('/app-development', 'services.app-development')->name('services.app');
 Route::view('/software-development', 'services.software-development')->name('services.software');

@@ -53,6 +53,8 @@
                         Services
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                        <li><a class="dropdown-item" href="{{ route('services.index') }}"><i class="fas fa-th me-2"></i>All Services</a></li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{{ route('services.web') }}">Web Development</a></li>
                         <li><a class="dropdown-item" href="{{ route('services.app') }}">App Development</a></li>
                         <li><a class="dropdown-item" href="{{ route('services.software') }}">Software Development</a></li>
@@ -127,6 +129,10 @@
                         <i class="fas fa-chevron-down dropdown-arrow"></i>
                     </div>
                     <div class="sidebar-dropdown-menu">
+                        <a href="{{ route('services.index') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-th"></i>
+                            <span>All Services</span>
+                        </a>
                         <a href="{{ route('services.web') }}" class="sidebar-dropdown-item">
                             <i class="fas fa-globe"></i>
                             <span>Web Development</span>
@@ -194,7 +200,7 @@
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
-        <a href="#services" class="bottom-nav-item {{ request()->is('services*') ? 'active' : '' }}">
+        <a href="{{ route('services.index') }}" class="bottom-nav-item {{ request()->is('services*') ? 'active' : '' }}">
             <i class="fas fa-briefcase"></i>
             <span>Services</span>
         </a>
