@@ -25,7 +25,7 @@ class CmsController extends Controller
                 },
                 'user' => function ($q) {
                     $q->select('id', 'name');
-                }
+                },
             ])
             ->orderBy('published_at', 'desc')
             ->paginate(10);
@@ -55,7 +55,7 @@ class CmsController extends Controller
                 },
                 'user' => function ($q) {
                     $q->select('id', 'name');
-                }
+                },
             ])
             ->orderBy('published_at', 'desc')
             ->paginate(10);
@@ -77,7 +77,7 @@ class CmsController extends Controller
             },
             'state' => function ($q) {
                 $q->select('id', 'name');
-            }
+            },
         ]);
 
         $pages = $area->publishedPages()
@@ -90,7 +90,7 @@ class CmsController extends Controller
                 },
                 'user' => function ($q) {
                     $q->select('id', 'name');
-                }
+                },
             ])
             ->orderBy('published_at', 'desc')
             ->paginate(10);
@@ -127,7 +127,7 @@ class CmsController extends Controller
             },
             'user' => function ($q) {
                 $q->select('id', 'name');
-            }
+            },
         ]);
 
         $metaTitle = $page->meta_title ?: $page->title.' | '.config('app.name');
@@ -225,7 +225,7 @@ class CmsController extends Controller
                 },
                 'user' => function ($q) {
                     $q->select('id', 'name');
-                }
+                },
             ]);
 
         if ($request->has('q') && $request->q !== '') {
@@ -254,7 +254,7 @@ class CmsController extends Controller
         }
 
         $pages = $query->orderBy('published_at', 'desc')->paginate(10);
-        
+
         // Limit dropdown options to prevent memory exhaustion
         // Only load what's needed for dropdowns (top 500 should be enough)
         $states = State::active()

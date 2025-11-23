@@ -9,6 +9,7 @@ use App\State;
 use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AutoUpdateCmsPages extends Command
@@ -19,24 +20,54 @@ class AutoUpdateCmsPages extends Command
      * @var string
      */
     protected $signature = 'cms:auto-update-pages 
-                            {--update-existing : Update existing pages if data has changed}
-                            {--chunk-size=100 : Number of areas to process in each batch}
-                            {--start-id=0 : Start processing from this area ID}';
+                            {--chunk-size=50 : Number of records to process in each batch}
+                            {--resume : Resume from last checkpoint}
+                            {--reset : Reset and start from beginning}
+                            {--service= : Process only specific service}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Automatically create and update CMS pages from existing areas in database';
+    protected $description = 'Automatically create SEO-friendly CMS pages for services (State -> City -> Area) - One service at a time';
+
+    /**
+     * Resume checkpoint file path
+     */
+    private $checkpointFile = 'cms_pages_checkpoint.json';
+
+    /**
+     * List of services to create pages for
+     */
+    private $services = [
+        'web development',
+        'app development',
+        'ios development',
+        'ecommerce platform',
+        'software development',
+        'digital marketing',
+        'mobile app development',
+        'website development',
+        'ecommerce development',
+        'web design',
+    ];
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $this->info('🚀 Starting CMS Pages Auto-Update Process...');
+        $this->info('🚀 Starting CMS Pages Auto-Insert Process...');
+        $this->info('📋 Services to create: '.implode(', ', $this->services));
         $this->newLine();
+
+        // Handle reset option
+        if ($this->option('reset')) {
+            $this->resetCheckpoint();
+            $this->info('✅ Checkpoint reset. Starting from beginning...');
+            $this->newLine();
+        }
 
         // Get or create a user for creating pages
         $user = User::first();
@@ -46,30 +77,124 @@ class AutoUpdateCmsPages extends Command
             return 1;
         }
 
-        $updateExisting = $this->option('update-existing');
+        // Load checkpoint if resume is enabled
+        $checkpoint = null;
+        if ($this->option('resume')) {
+            $checkpoint = $this->loadCheckpoint();
+            if ($checkpoint) {
+                $this->info('📍 Resuming from checkpoint...');
+                $this->info('   Current Service: '.($checkpoint['current_service'] ?? 'N/A'));
+                $this->info('   Last Step: '.($checkpoint['step'] ?? 'N/A'));
+                $this->info('   Last State ID: '.($checkpoint['last_state_id'] ?? 'N/A'));
+                $this->info('   Last City ID: '.($checkpoint['last_city_id'] ?? 'N/A'));
+                $this->info('   Last Area ID: '.($checkpoint['last_area_id'] ?? 'N/A'));
+                $this->newLine();
+            }
+        }
+
+        // Get services to process
+        $servicesToProcess = $this->getServicesToProcess($checkpoint);
 
         $totalCreated = 0;
-        $totalUpdated = 0;
         $totalSkipped = 0;
 
-        // Process areas
-        $this->info('📋 Processing Areas...');
-        $this->newLine();
-        [$created, $updated, $skipped] = $this->processAreas($user, $updateExisting);
-        $totalCreated += $created;
-        $totalUpdated += $updated;
-        $totalSkipped += $skipped;
-        $this->newLine();
+        // Process each service completely (States -> Cities -> Areas) before moving to next
+        foreach ($servicesToProcess as $serviceIndex => $service) {
+            $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            $this->info('🔧 Processing Service: '.ucfirst($service).' ('.($serviceIndex + 1).'/'.count($servicesToProcess).')');
+            $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            $this->newLine();
+
+            // Determine which step to start from for this service
+            $startStep = null;
+            if ($checkpoint && isset($checkpoint['current_service']) && $checkpoint['current_service'] === $service) {
+                $startStep = $checkpoint['step'] ?? 'states';
+            } else {
+                $startStep = 'states';
+            }
+
+            // Step 1: Process States for this service
+            if ($startStep === 'states' || ! $checkpoint || $checkpoint['current_service'] !== $service) {
+                $this->info('📍 Step 1: Processing States for '.ucfirst($service).'...');
+                $this->newLine();
+                [$created, $skipped] = $this->processStates($user, $service, $checkpoint);
+                $totalCreated += $created;
+                $totalSkipped += $skipped;
+                $this->newLine();
+
+                // Update checkpoint after states are done
+                $this->saveCheckpoint([
+                    'current_service' => $service,
+                    'step' => 'cities',
+                    'last_state_id' => null,
+                    'last_city_id' => null,
+                    'last_area_id' => null,
+                ]);
+            }
+
+            // Step 2: Process Cities for this service
+            $currentStep = ($checkpoint && isset($checkpoint['current_service']) && $checkpoint['current_service'] === $service)
+                ? ($checkpoint['step'] ?? 'cities')
+                : 'cities';
+
+            if ($currentStep === 'cities' || ($startStep === 'states' && (! $checkpoint || $checkpoint['current_service'] !== $service))) {
+                $this->info('📍 Step 2: Processing Cities for '.ucfirst($service).'...');
+                $this->newLine();
+                [$created, $skipped] = $this->processCities($user, $service, $checkpoint);
+                $totalCreated += $created;
+                $totalSkipped += $skipped;
+                $this->newLine();
+
+                // Update checkpoint after cities are done
+                $this->saveCheckpoint([
+                    'current_service' => $service,
+                    'step' => 'areas',
+                    'last_state_id' => null,
+                    'last_city_id' => null,
+                    'last_area_id' => null,
+                ]);
+            }
+
+            // Step 3: Process Areas for this service
+            $currentStep = ($checkpoint && isset($checkpoint['current_service']) && $checkpoint['current_service'] === $service)
+                ? ($checkpoint['step'] ?? 'areas')
+                : 'areas';
+
+            if ($currentStep === 'areas' || ($currentStep === 'cities' && (! $checkpoint || $checkpoint['current_service'] !== $service))) {
+                $this->info('📍 Step 3: Processing Areas for '.ucfirst($service).'...');
+                $this->newLine();
+                [$created, $skipped] = $this->processAreas($user, $service, $checkpoint);
+                $totalCreated += $created;
+                $totalSkipped += $skipped;
+                $this->newLine();
+            }
+
+            // Service completed - reset checkpoint for next service
+            if ($serviceIndex < count($servicesToProcess) - 1) {
+                $this->saveCheckpoint([
+                    'current_service' => $servicesToProcess[$serviceIndex + 1],
+                    'step' => 'states',
+                    'last_state_id' => null,
+                    'last_city_id' => null,
+                    'last_area_id' => null,
+                ]);
+            }
+
+            $this->info('✅ Completed: '.ucfirst($service));
+            $this->newLine();
+        }
+
+        // Clear checkpoint on successful completion
+        $this->resetCheckpoint();
 
         // Summary
-        $this->info('✅ Auto-Update Process Completed!');
+        $this->info('✅ Auto-Insert Process Completed!');
         $this->table(
             ['Action', 'Count'],
             [
                 ['Created', $totalCreated],
-                ['Updated', $totalUpdated],
                 ['Skipped', $totalSkipped],
-                ['Total Processed', $totalCreated + $totalUpdated + $totalSkipped],
+                ['Total Processed', $totalCreated + $totalSkipped],
             ]
         );
 
@@ -77,410 +202,652 @@ class AutoUpdateCmsPages extends Command
     }
 
     /**
-     * Process areas and create/update pages
+     * Get services to process based on checkpoint or option
      */
-    private function processAreas($user, $updateExisting): array
+    private function getServicesToProcess($checkpoint): array
     {
-        $created = 0;
-        $updated = 0;
-        $skipped = 0;
-        $errors = 0;
-
-        $chunkSize = (int) $this->option('chunk-size');
-        $startId = (int) $this->option('start-id');
-
-        // Get total count for progress bar
-        $totalCount = Area::where('status', 1)
-            ->where('id', '>', max($startId, 7693))
-            ->count();
-
-        // Get count of existing pages before processing
-        $existingPagesBefore = Page::where('page_type', 'area')
-            ->where('area_id', '>', 0)
-            ->count();
-
-        $this->info("Found {$totalCount} active areas to process...");
-        $this->info("Processing in chunks of {$chunkSize} areas...");
-        $this->info("Existing area pages in database: {$existingPagesBefore}");
-        $this->newLine();
-
-        if ($totalCount == 0) {
-            $this->warn('No active areas found.');
-
-            return [0, 0, 0];
+        // If specific service is requested
+        if ($this->option('service')) {
+            $requestedService = $this->option('service');
+            if (in_array($requestedService, $this->services)) {
+                return [$requestedService];
+            } else {
+                $this->warn("Service '{$requestedService}' not found. Processing all services.");
+            }
         }
 
-        $bar = $this->output->createProgressBar($totalCount);
-        $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
+        // If resuming, start from checkpoint service
+        if ($checkpoint && isset($checkpoint['current_service'])) {
+            $currentServiceIndex = array_search($checkpoint['current_service'], $this->services);
+            if ($currentServiceIndex !== false) {
+                return array_slice($this->services, $currentServiceIndex);
+            }
+        }
+
+        // Default: process all services
+        return $this->services;
+    }
+
+    /**
+     * Process states and create pages for the service
+     */
+    private function processStates($user, $service, $checkpoint = null): array
+    {
+        $created = 0;
+        $skipped = 0;
+
+        $query = State::where('status', 1);
+
+        // Resume from last processed state if checkpoint exists and matches current service
+        if ($checkpoint && isset($checkpoint['current_service']) && $checkpoint['current_service'] === $service && isset($checkpoint['last_state_id'])) {
+            $query->where('id', '>', $checkpoint['last_state_id']);
+        }
+
+        $states = $query->orderBy('id', 'asc')->get();
+        $totalStates = $states->count();
+
+        $this->info("Found {$totalStates} active states to process for ".ucfirst($service));
+        $this->newLine();
+
+        if ($totalStates == 0) {
+            $this->warn('No active states found.');
+
+            return [0, 0];
+        }
+
+        $bar = $this->output->createProgressBar($totalStates);
+        $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
         $bar->start();
 
-        $processed = 0;
-        $lastProcessedId = $startId;
+        $lastProcessedId = ($checkpoint && isset($checkpoint['current_service']) && $checkpoint['current_service'] === $service)
+            ? ($checkpoint['last_state_id'] ?? 0)
+            : 0;
 
-        // Process areas in chunks to avoid memory issues
-        // Load areas without eager loading relationships to avoid issues
-        Area::where('status', 1)
-            ->where('id', '>', max($startId, 7646))
-            ->orderBy('id', 'asc')
-            ->chunk($chunkSize, function ($areas) use ($user, $updateExisting, &$created, &$updated, &$skipped, &$errors, &$processed, &$lastProcessedId, $bar) {
-                foreach ($areas as $area) {
-                    try {
-                        // Ensure database connection is alive
-                        try {
-                            DB::connection()->getPdo();
-                        } catch (\Exception $e) {
-                            // Reconnect if connection is lost
-                            DB::reconnect();
-                        }
+        foreach ($states as $state) {
+            try {
+                DB::beginTransaction();
 
-                        // Validate area has required data BEFORE starting transaction
-                        if (empty($area->name)) {
-                            $skipped++;
-                            $bar->advance();
+                // Generate SEO-friendly slug: "web-development-in-delhi"
+                $slug = $this->generateSlug($service, $state->name, null, null);
 
-                            continue; // Skip to next area
-                        }
+                // Check if page already exists - IMPROVED: Check by slug AND service pattern
+                $pageExists = Page::where('slug', $slug)
+                    ->where('page_type', 'state')
+                    ->where('state_id', $state->id)
+                    ->exists();
 
-                        // Process one area at a time with transaction
-                        // Use try-catch inside transaction to handle errors properly
-                        try {
-                            DB::beginTransaction();
+                if ($pageExists) {
+                    $skipped++;
+                    $bar->advance();
+                    DB::rollBack();
 
-                            // Generate slug if missing
-                            if (empty($area->slug)) {
-                                $area->slug = Str::slug($area->name);
-                            }
-
-                            // Get state relationship properly - check if it's a model instance or string
-                            $state = null;
-                            $stateName = 'Unknown State';
-
-                            if ($area->state_id) {
-                                $state = $area->state;
-                                if (! $state instanceof State) {
-                                    $state = State::select('id', 'name')->find($area->state_id);
-                                }
-
-                                if ($state && ! empty($state->name)) {
-                                    $stateName = $state->name;
-                                }
-                            }
-
-                            // Get city relationship properly - check if it's a model instance or string
-                            // City is optional - process area even without city
-                            $city = null;
-                            if ($area->city_id) {
-                                try {
-                                    $city = $area->city;
-                                    if (! $city instanceof City) {
-                                        $city = City::select('id', 'city_name')->find($area->city_id);
-                                    }
-                                } catch (\Exception $e) {
-                                    // City not found or invalid - continue without city
-                                    $city = null;
-                                }
-                            }
-
-                            // Check if page already exists (optimized query)
-                            $pageExists = Page::where('area_id', $area->id)
-                                ->where('page_type', 'area')
-                                ->exists();
-
-                            if ($pageExists) {
-                                if ($updateExisting) {
-                                    $existingPage = Page::where('area_id', $area->id)
-                                        ->where('page_type', 'area')
-                                        ->first();
-
-                                    if ($existingPage) {
-                                        // Update existing page
-                                        $title = "Web Development, App Development & E-commerce Store in {$area->name}, {$stateName} | Local Business Services";
-                                        $content = $this->generateAreaPageContent($area, $stateName);
-                                        $excerpt = $this->generateAreaExcerpt($area, $stateName);
-
-                                        $existingPage->update([
-                                            'title' => $title,
-                                            'content' => $content,
-                                            'excerpt' => $excerpt,
-                                            'meta_title' => "{$title} | Indsoft24",
-                                            'meta_description' => $excerpt,
-                                        ]);
-                                        $updated++;
-                                    } else {
-                                        $skipped++;
-                                    }
-                                } else {
-                                    $skipped++;
-                                }
-                            } else {
-                                // Create new page - process ALL areas regardless of city
-                                $title = "Web Development, App Development & E-commerce Store in {$area->name}, {$stateName} | Local Business Services";
-                                $slug = Str::slug("web-development-app-development-ecommerce-{$area->slug}-{$stateName}");
-
-                                // Ensure unique slug (optimized check)
-                                $originalSlug = $slug;
-                                $counter = 1;
-                                while (Page::where('slug', $slug)->exists()) {
-                                    $slug = $originalSlug.'-'.$counter;
-                                    $counter++;
-                                    // Safety limit to prevent infinite loop
-                                    if ($counter > 1000) {
-                                        $slug = $originalSlug.'-'.time();
-                                        break;
-                                    }
-                                }
-
-                                $content = $this->generateAreaPageContent($area, $stateName);
-                                $excerpt = $this->generateAreaExcerpt($area, $stateName);
-
-                                // Validate content length
-                                if (strlen($content) > 65000 || strlen($excerpt) > 1000) {
-                                    $skipped++;
-                                    $bar->advance();
-                                    DB::rollBack(); // Rollback since we're not creating
-                                    // Break out of transaction try block, continue will be handled in outer catch
-                                    throw new \Exception('Content too long - skipping');
-                                }
-
-                                // Create page with explicit save to ensure it's committed
-                                // Insert ALL areas - city_id is optional (can be null)
-                                $page = new Page([
-                                    'title' => $title,
-                                    'slug' => $slug,
-                                    'content' => $content,
-                                    'excerpt' => $excerpt,
-                                    'status' => 'published',
-                                    'is_featured' => false,
-                                    'state_id' => $state ? $state->id : null,
-                                    'city_id' => $city ? $city->id : null, // Optional - can be null
-                                    'area_id' => $area->id, // Always required
-                                    'user_id' => $user->id,
-                                    'page_type' => 'area',
-                                    'template' => 'area',
-                                    'meta_title' => "{$title} | Indsoft24",
-                                    'meta_description' => $excerpt,
-                                    'published_at' => now(),
-                                ]);
-
-                                $saved = $page->save();
-
-                                // Verify insertion
-                                if ($saved && $page->id) {
-                                    $created++;
-                                    // Refresh to ensure data is persisted
-                                    $page->refresh();
-
-                                    // Log first few creations for verification
-                                    if ($created <= 5) {
-                                        $this->newLine();
-                                        $this->line("  ✓ Created page #{$page->id} for area: {$area->name} (Area ID: {$area->id})");
-                                    }
-                                } else {
-                                    throw new \Exception('Page creation failed - save returned false or no ID');
-                                }
-                            }
-
-                            $bar->advance();
-
-                            // Commit transaction
-                            DB::commit();
-                        } catch (\Exception $e) {
-                            // Rollback transaction on error
-                            if (DB::transactionLevel() > 0) {
-                                DB::rollBack();
-                            }
-                            throw $e;
-                        }
-
-                        $lastProcessedId = $area->id;
-                        $processed++;
-
-                        // Clear memory and reconnect every 50 records
-                        if ($processed % 50 == 0) {
-                            try {
-                                // Reconnect to prevent "MySQL server has gone away" errors
-                                DB::reconnect();
-                            } catch (\Exception $e) {
-                                // If reconnect fails, try to continue
-                            }
-
-                            try {
-                                $pdo = DB::connection()->getPdo();
-                                if ($pdo) {
-                                    $pdo->exec('SET SESSION query_cache_type = OFF');
-                                }
-                            } catch (\Exception $e) {
-                                // Ignore if query cache is not supported
-                            }
-
-                            if (function_exists('gc_collect_cycles')) {
-                                gc_collect_cycles();
-                            }
-                        }
-
-                    } catch (\Exception $e) {
-                        $errorMessage = $e->getMessage();
-
-                        // Skip certain exceptions from error count (they're expected)
-                        $isSkipException = strpos($errorMessage, 'Content too long') !== false;
-
-                        if (! $isSkipException) {
-                            $errors++;
-                        }
-
-                        $skipped++;
-                        $bar->advance();
-
-                        // Ensure transaction is rolled back
-                        if (DB::transactionLevel() > 0) {
-                            try {
-                                DB::rollBack();
-                            } catch (\Exception $rollbackException) {
-                                // Ignore rollback errors
-                            }
-                        }
-
-                        // Handle connection errors specially
-                        $isConnectionError = strpos($errorMessage, 'MySQL server has gone away') !== false
-                                          || strpos($errorMessage, 'getaddrinfo') !== false
-                                          || strpos($errorMessage, 'Connection') !== false
-                                          || strpos($errorMessage, '2006') !== false
-                                          || strpos($errorMessage, '2002') !== false
-                                          || strpos($errorMessage, 'active transaction') !== false;
-
-                        if ($isConnectionError) {
-                            // Try to reconnect
-                            try {
-                                DB::reconnect();
-                                sleep(2); // Wait 2 seconds before continuing
-                            } catch (\Exception $reconnectException) {
-                                // If reconnect fails, log and continue
-                            }
-                        }
-
-                        // Log error but continue processing (skip logging for expected skip exceptions)
-                        if (! $isSkipException && $errors <= 10) {
-                            $this->newLine();
-                            $errorType = $isConnectionError ? 'Connection Error' : 'Error';
-                            $this->error("  ❌ {$errorType} processing area ID {$area->id} ({$area->name}): ".$errorMessage);
-                        } elseif ($errors == 11) {
-                            $this->newLine();
-                            $this->warn('  ⚠️  Suppressing further error messages...');
-                        }
-                    }
+                    continue;
                 }
 
-                // Clear relationships after each chunk
-                $areas->each(function ($area) {
-                    $area->unsetRelation('city');
-                    $area->unsetRelation('state');
-                });
-            });
+                // Ensure unique slug (add postfix if duplicate)
+                $slug = $this->ensureUniqueSlug($slug);
+
+                // Generate content
+                $title = ucfirst($service).' in '.$state->name.' | Professional Services';
+                $content = $this->generateStateContent($service, $state);
+                $excerpt = $this->generateStateExcerpt($service, $state);
+
+                // Create page
+                $page = new Page([
+                    'title' => $title,
+                    'slug' => $slug,
+                    'content' => $content,
+                    'excerpt' => $excerpt,
+                    'status' => 'published',
+                    'is_featured' => false,
+                    'state_id' => $state->id,
+                    'city_id' => null,
+                    'area_id' => null,
+                    'user_id' => $user->id,
+                    'page_type' => 'state',
+                    'template' => 'state',
+                    'meta_title' => $title.' | Indsoft24',
+                    'meta_description' => $excerpt,
+                    'published_at' => now(),
+                ]);
+
+                $page->save();
+                $created++;
+                $bar->advance();
+
+                DB::commit();
+
+                // Update checkpoint after each successful state completion
+                $lastProcessedId = $state->id;
+                $this->saveCheckpoint([
+                    'current_service' => $service,
+                    'step' => 'states',
+                    'last_state_id' => $lastProcessedId,
+                    'last_city_id' => null,
+                    'last_area_id' => null,
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $skipped++;
+                $bar->advance();
+
+                // Save checkpoint on error so we can resume
+                $this->saveCheckpoint([
+                    'current_service' => $service,
+                    'step' => 'states',
+                    'last_state_id' => $lastProcessedId,
+                    'last_city_id' => null,
+                    'last_area_id' => null,
+                ]);
+
+                // Log error but continue
+                if ($skipped <= 5) {
+                    $this->newLine();
+                    $this->error("  ❌ Error processing state {$state->id}: ".$e->getMessage());
+                }
+            }
+        }
 
         $bar->finish();
         $this->newLine(2);
+        $this->info("  ✅ States: {$created} created, {$skipped} skipped");
 
-        // Verify actual database count
-        $actualPageCount = Page::where('page_type', 'area')
-            ->where('area_id', '>', 0)
-            ->count();
-
-        $pagesAdded = $actualPageCount - $existingPagesBefore;
-
-        $this->info("  ✅ Areas: {$created} created, {$updated} updated, {$skipped} skipped");
-        $this->info("  📊 Total area pages in database: {$actualPageCount} (Added: {$pagesAdded})");
-
-        if ($created > 0 && $pagesAdded != $created) {
-            $this->warn("  ⚠️  Warning: Created count ({$created}) doesn't match database increase ({$pagesAdded})");
-        }
-
-        if ($errors > 0) {
-            $this->warn("  ⚠️  {$errors} errors encountered during processing");
-        }
-
-        if ($lastProcessedId > 0) {
-            $this->info("  📍 Last processed area ID: {$lastProcessedId}");
-        }
-
-        return [$created, $updated, $skipped];
+        return [$created, $skipped];
     }
 
     /**
-     * Generate area page content - Fresh SEO optimized content
+     * Process cities and create pages for the service
      */
-    private function generateAreaPageContent($area, $stateName): string
+    private function processCities($user, $service, $checkpoint = null): array
     {
+        $created = 0;
+        $skipped = 0;
+
+        $query = City::where('status', 1);
+
+        // Resume from last processed city if checkpoint exists and matches current service
+        if ($checkpoint && isset($checkpoint['current_service']) && $checkpoint['current_service'] === $service && isset($checkpoint['last_city_id'])) {
+            $query->where('id', '>', $checkpoint['last_city_id']);
+        }
+
+        $cities = $query->orderBy('id', 'asc')->get();
+        $totalCities = $cities->count();
+
+        $this->info("Found {$totalCities} active cities to process for ".ucfirst($service));
+        $this->newLine();
+
+        if ($totalCities == 0) {
+            $this->warn('No active cities found.');
+
+            return [0, 0];
+        }
+
+        $bar = $this->output->createProgressBar($totalCities);
+        $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
+        $bar->start();
+
+        $lastProcessedId = ($checkpoint && isset($checkpoint['current_service']) && $checkpoint['current_service'] === $service)
+            ? ($checkpoint['last_city_id'] ?? 0)
+            : 0;
+
+        foreach ($cities as $city) {
+            // Get state for city
+            $state = $city->state;
+            if (! $state) {
+                $skipped++;
+                $bar->advance();
+
+                continue;
+            }
+
+            try {
+                DB::beginTransaction();
+
+                // Generate SEO-friendly slug: "web-development-in-mumbai"
+                $slug = $this->generateSlug($service, $state->name, $city->city_name, null);
+
+                // Check if page already exists - IMPROVED: Check by slug AND service pattern
+                $pageExists = Page::where('slug', $slug)
+                    ->where('page_type', 'city')
+                    ->where('city_id', $city->id)
+                    ->exists();
+
+                if ($pageExists) {
+                    $skipped++;
+                    $bar->advance();
+                    DB::rollBack();
+
+                    continue;
+                }
+
+                // Ensure unique slug (add postfix if duplicate)
+                $slug = $this->ensureUniqueSlug($slug);
+
+                // Generate content
+                $title = ucfirst($service).' in '.$city->city_name.', '.$state->name.' | Professional Services';
+                $content = $this->generateCityContent($service, $city, $state);
+                $excerpt = $this->generateCityExcerpt($service, $city, $state);
+
+                // Create page
+                $page = new Page([
+                    'title' => $title,
+                    'slug' => $slug,
+                    'content' => $content,
+                    'excerpt' => $excerpt,
+                    'status' => 'published',
+                    'is_featured' => false,
+                    'state_id' => $state->id,
+                    'city_id' => $city->id,
+                    'area_id' => null,
+                    'user_id' => $user->id,
+                    'page_type' => 'city',
+                    'template' => 'city',
+                    'meta_title' => $title.' | Indsoft24',
+                    'meta_description' => $excerpt,
+                    'published_at' => now(),
+                ]);
+
+                $page->save();
+                $created++;
+                $bar->advance();
+
+                DB::commit();
+
+                // Update checkpoint after each successful city completion
+                $lastProcessedId = $city->id;
+                $this->saveCheckpoint([
+                    'current_service' => $service,
+                    'step' => 'cities',
+                    'last_state_id' => null,
+                    'last_city_id' => $lastProcessedId,
+                    'last_area_id' => null,
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $skipped++;
+                $bar->advance();
+
+                // Save checkpoint on error so we can resume
+                $this->saveCheckpoint([
+                    'current_service' => $service,
+                    'step' => 'cities',
+                    'last_state_id' => null,
+                    'last_city_id' => $lastProcessedId,
+                    'last_area_id' => null,
+                ]);
+
+                // Log error but continue
+                if ($skipped <= 5) {
+                    $this->newLine();
+                    $this->error("  ❌ Error processing city {$city->id}: ".$e->getMessage());
+                }
+            }
+        }
+
+        $bar->finish();
+        $this->newLine(2);
+        $this->info("  ✅ Cities: {$created} created, {$skipped} skipped");
+
+        return [$created, $skipped];
+    }
+
+    /**
+     * Process areas and create pages for the service
+     */
+    private function processAreas($user, $service, $checkpoint = null): array
+    {
+        $created = 0;
+        $skipped = 0;
+
+        $query = Area::where('status', 1);
+
+        // Resume from last processed area if checkpoint exists and matches current service
+        if ($checkpoint && isset($checkpoint['current_service']) && $checkpoint['current_service'] === $service && isset($checkpoint['last_area_id'])) {
+            $query->where('id', '>', $checkpoint['last_area_id']);
+        }
+
+        $areas = $query->orderBy('id', 'asc')->get();
+        $totalAreas = $areas->count();
+
+        $this->info("Found {$totalAreas} active areas to process for ".ucfirst($service));
+        $this->newLine();
+
+        if ($totalAreas == 0) {
+            $this->warn('No active areas found.');
+
+            return [0, 0];
+        }
+
+        $bar = $this->output->createProgressBar($totalAreas);
+        $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
+        $bar->start();
+
+        $lastProcessedId = ($checkpoint && isset($checkpoint['current_service']) && $checkpoint['current_service'] === $service)
+            ? ($checkpoint['last_area_id'] ?? 0)
+            : 0;
+
+        foreach ($areas as $area) {
+            // Get state and city for area
+            $state = $area->state;
+            $city = $area->city;
+
+            if (! $state) {
+                $skipped++;
+                $bar->advance();
+
+                continue;
+            }
+
+            try {
+                DB::beginTransaction();
+
+                // Generate SEO-friendly slug: "web-development-in-connaught-place"
+                $slug = $this->generateSlug($service, $state->name, $city ? $city->city_name : null, $area->name);
+
+                // Check if page already exists - IMPROVED: Check by slug AND service pattern
+                $pageExists = Page::where('slug', $slug)
+                    ->where('page_type', 'area')
+                    ->where('area_id', $area->id)
+                    ->exists();
+
+                if ($pageExists) {
+                    $skipped++;
+                    $bar->advance();
+                    DB::rollBack();
+
+                    continue;
+                }
+
+                // Ensure unique slug (add postfix if duplicate)
+                $slug = $this->ensureUniqueSlug($slug);
+
+                // Generate content
+                $location = $area->name;
+                if ($city) {
+                    $location .= ', '.$city->city_name;
+                }
+                $location .= ', '.$state->name;
+
+                $title = ucfirst($service).' in '.$location.' | Professional Services';
+                $content = $this->generateAreaContent($service, $area, $city, $state);
+                $excerpt = $this->generateAreaExcerpt($service, $area, $city, $state);
+
+                // Create page
+                $page = new Page([
+                    'title' => $title,
+                    'slug' => $slug,
+                    'content' => $content,
+                    'excerpt' => $excerpt,
+                    'status' => 'published',
+                    'is_featured' => false,
+                    'state_id' => $state->id,
+                    'city_id' => $city ? $city->id : null,
+                    'area_id' => $area->id,
+                    'user_id' => $user->id,
+                    'page_type' => 'area',
+                    'template' => 'area',
+                    'meta_title' => $title.' | Indsoft24',
+                    'meta_description' => $excerpt,
+                    'published_at' => now(),
+                ]);
+
+                $page->save();
+                $created++;
+                $bar->advance();
+
+                DB::commit();
+
+                // Update checkpoint after each successful area completion
+                $lastProcessedId = $area->id;
+                $this->saveCheckpoint([
+                    'current_service' => $service,
+                    'step' => 'areas',
+                    'last_state_id' => null,
+                    'last_city_id' => null,
+                    'last_area_id' => $lastProcessedId,
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $skipped++;
+                $bar->advance();
+
+                // Save checkpoint on error so we can resume
+                $this->saveCheckpoint([
+                    'current_service' => $service,
+                    'step' => 'areas',
+                    'last_state_id' => null,
+                    'last_city_id' => null,
+                    'last_area_id' => $lastProcessedId,
+                ]);
+
+                // Log error but continue
+                if ($skipped <= 5) {
+                    $this->newLine();
+                    $this->error("  ❌ Error processing area {$area->id}: ".$e->getMessage());
+                }
+            }
+        }
+
+        $bar->finish();
+        $this->newLine(2);
+        $this->info("  ✅ Areas: {$created} created, {$skipped} skipped");
+
+        return [$created, $skipped];
+    }
+
+    /**
+     * Generate SEO-friendly slug - ONE SERVICE PER URL
+     * Examples:
+     * - State: "web-development-in-delhi"
+     * - City: "web-development-in-mumbai"
+     * - Area: "web-development-in-connaught-place"
+     */
+    private function generateSlug($service, $stateName, $cityName = null, $areaName = null): string
+    {
+        $parts = [Str::slug($service)];
+
+        if ($areaName) {
+            $parts[] = 'in';
+            $parts[] = Str::slug($areaName);
+        } elseif ($cityName) {
+            $parts[] = 'in';
+            $parts[] = Str::slug($cityName);
+        } else {
+            $parts[] = 'in';
+            $parts[] = Str::slug($stateName);
+        }
+
+        return implode('-', $parts);
+    }
+
+    /**
+     * Ensure slug is unique by adding postfix if needed
+     * Example: "web-development-in-delhi-1" if duplicate exists
+     */
+    private function ensureUniqueSlug($slug): string
+    {
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (Page::where('slug', $slug)->exists()) {
+            $slug = $originalSlug.'-'.$counter;
+            $counter++;
+
+            // Safety limit to prevent infinite loop
+            if ($counter > 1000) {
+                $slug = $originalSlug.'-'.time();
+                break;
+            }
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Save checkpoint to file
+     */
+    private function saveCheckpoint(array $data): void
+    {
+        try {
+            $data['timestamp'] = now()->toDateTimeString();
+            Storage::put($this->checkpointFile, json_encode($data, JSON_PRETTY_PRINT));
+        } catch (\Exception $e) {
+            // Silently fail - checkpoint is not critical
+        }
+    }
+
+    /**
+     * Load checkpoint from file
+     */
+    private function loadCheckpoint(): ?array
+    {
+        try {
+            if (Storage::exists($this->checkpointFile)) {
+                $content = Storage::get($this->checkpointFile);
+                $data = json_decode($content, true);
+
+                return $data ?: null;
+            }
+        } catch (\Exception $e) {
+            // Return null if checkpoint file doesn't exist or is invalid
+        }
+
+        return null;
+    }
+
+    /**
+     * Reset checkpoint
+     */
+    private function resetCheckpoint(): void
+    {
+        try {
+            if (Storage::exists($this->checkpointFile)) {
+                Storage::delete($this->checkpointFile);
+            }
+        } catch (\Exception $e) {
+            // Silently fail
+        }
+    }
+
+    /**
+     * Generate state-level content
+     */
+    private function generateStateContent($service, $state): string
+    {
+        $serviceTitle = ucfirst($service);
+        $stateName = $state->name;
+
+        return "<h1>{$serviceTitle} in {$stateName} - Professional Services</h1>
+        
+        <p>Looking for professional <strong>{$service}</strong> services in {$stateName}, India? You've come to the right place! We offer comprehensive <strong>{$service}</strong> solutions for businesses of all sizes throughout {$stateName}.</p>
+        
+        <h2>Why Choose Our {$serviceTitle} Services in {$stateName}?</h2>
+        <p>Our expert team provides top-quality <strong>{$service}</strong> services across {$stateName}. Whether you're a startup or an established business, we deliver customized solutions that meet your specific needs.</p>
+        
+        <h3>Comprehensive {$serviceTitle} Solutions</h3>
+        <p>We specialize in providing professional <strong>{$service}</strong> services throughout {$stateName}. Our services are designed to help businesses grow and succeed in today's competitive market.</p>
+        
+        <h3>Expert Team</h3>
+        <p>Our experienced professionals understand the unique business environment in {$stateName} and provide tailored <strong>{$service}</strong> solutions that drive results.</p>
+        
+        <h2>Get Started Today</h2>
+        <p>Ready to take your business to the next level with our <strong>{$service}</strong> services in {$stateName}? Contact us today to discuss your requirements and get a customized solution.</p>
+        
+        <p>We serve clients across all cities and areas in {$stateName}, providing professional <strong>{$service}</strong> services that help businesses succeed.</p>";
+    }
+
+    /**
+     * Generate state-level excerpt
+     */
+    private function generateStateExcerpt($service, $state): string
+    {
+        return "Professional {$service} services in {$state->name}, India. Expert solutions for businesses throughout {$state->name}. Get started today!";
+    }
+
+    /**
+     * Generate city-level content
+     */
+    private function generateCityContent($service, $city, $state): string
+    {
+        $serviceTitle = ucfirst($service);
+        $cityName = $city->city_name;
+        $stateName = $state->name;
+
+        return "<h1>{$serviceTitle} in {$cityName}, {$stateName} - Professional Services</h1>
+        
+        <p>Looking for professional <strong>{$service}</strong> services in {$cityName}, {$stateName}? You've come to the right place! We offer comprehensive <strong>{$service}</strong> solutions for businesses of all sizes in {$cityName}.</p>
+        
+        <h2>Why Choose Our {$serviceTitle} Services in {$cityName}?</h2>
+        <p>Our expert team provides top-quality <strong>{$service}</strong> services in {$cityName}, {$stateName}. Whether you're a startup or an established business, we deliver customized solutions that meet your specific needs.</p>
+        
+        <h3>Comprehensive {$serviceTitle} Solutions</h3>
+        <p>We specialize in providing professional <strong>{$service}</strong> services in {$cityName}, {$stateName}. Our services are designed to help businesses grow and succeed in today's competitive market.</p>
+        
+        <h3>Expert Team</h3>
+        <p>Our experienced professionals understand the unique business environment in {$cityName} and provide tailored <strong>{$service}</strong> solutions that drive results.</p>
+        
+        <h2>Get Started Today</h2>
+        <p>Ready to take your business to the next level with our <strong>{$service}</strong> services in {$cityName}, {$stateName}? Contact us today to discuss your requirements and get a customized solution.</p>
+        
+        <p>We serve clients across all areas in {$cityName}, {$stateName}, providing professional <strong>{$service}</strong> services that help businesses succeed.</p>";
+    }
+
+    /**
+     * Generate city-level excerpt
+     */
+    private function generateCityExcerpt($service, $city, $state): string
+    {
+        return "Professional {$service} services in {$city->city_name}, {$state->name}, India. Expert solutions for businesses in {$city->city_name}. Get started today!";
+    }
+
+    /**
+     * Generate area-level content
+     */
+    private function generateAreaContent($service, $area, $city, $state): string
+    {
+        $serviceTitle = ucfirst($service);
+        $areaName = $area->name;
+        $cityName = $city ? $city->city_name : '';
+        $stateName = $state->name;
+
+        $location = $areaName;
+        if ($cityName) {
+            $location .= ", {$cityName}";
+        }
+        $location .= ", {$stateName}";
+
         $address = $area->address ? "Located at {$area->address}" : '';
-        $types = $area->types ? 'Area type: '.str_replace('|', ', ', $area->types) : '';
-        $mapLink = '';
-        if ($area->latitude && $area->longitude) {
-            $mapLink = "<p><a href='https://www.google.com/maps?q={$area->latitude},{$area->longitude}' target='_blank' rel='noopener'>Find {$area->name} on Google Maps</a></p>";
-        }
 
-        return "<h1>Complete Business Solutions in {$area->name}, {$stateName} - Web Development, App Development, Software Development & E-commerce</h1>
+        return "<h1>{$serviceTitle} in {$location} - Professional Services</h1>
         
-        <p>Looking for professional business services in {$area->name}, {$stateName}, India? You've come to the right place! {$address}. {$types}. We offer complete solutions for businesses of all sizes - from small local shops to large e-commerce stores. Whether you're starting a new business or expanding an existing one, {$area->name} provides excellent opportunities for growth.</p>
+        <p>Looking for professional <strong>{$service}</strong> services in {$location}? You've come to the right place! {$address}. We offer comprehensive <strong>{$service}</strong> solutions for businesses of all sizes in {$areaName}.</p>
         
-        <h2>Discover {$area->name}, {$stateName} - Your Business Hub</h2>
-        <p>{$area->name} is a thriving business location in {$stateName}, India. This area is home to many successful businesses, both traditional local businesses and modern online stores. With excellent connectivity, growing infrastructure, and a supportive business environment, {$area->name} is the ideal place to establish or expand your business operations.</p>
+        <h2>Why Choose Our {$serviceTitle} Services in {$areaName}?</h2>
+        <p>Our expert team provides top-quality <strong>{$service}</strong> services in {$location}. Whether you're a startup or an established business, we deliver customized solutions that meet your specific needs.</p>
         
-        <p>Our services are available to businesses in {$area->name}, throughout {$stateName}, across India, and even to international clients. We make it easy for businesses anywhere in the world to access professional services and grow their operations.</p>
+        <h3>Comprehensive {$serviceTitle} Solutions</h3>
+        <p>We specialize in providing professional <strong>{$service}</strong> services in {$location}. Our services are designed to help businesses grow and succeed in today's competitive market.</p>
         
-        {$mapLink}
+        <h3>Expert Team</h3>
+        <p>Our experienced professionals understand the unique business environment in {$areaName} and provide tailored <strong>{$service}</strong> solutions that drive results.</p>
         
-        <h2>Comprehensive Business Services for {$area->name}</h2>
-        <p>We offer a complete range of professional services to help your business succeed in {$area->name} and reach customers globally:</p>
+        <h2>Get Started Today</h2>
+        <p>Ready to take your business to the next level with our <strong>{$service}</strong> services in {$location}? Contact us today to discuss your requirements and get a customized solution.</p>
         
-        <h3>Professional Web Development Services</h3>
-        <p>Create a powerful online presence with our expert <strong>web development</strong> services. We design and build responsive websites that work perfectly on all devices - desktops, tablets, and smartphones. Our <strong>web development</strong> team specializes in creating user-friendly websites that help businesses in {$area->name} and worldwide attract more customers and increase sales. Whether you need a simple business website or a complex e-commerce platform, we deliver custom <strong>web development</strong> solutions that meet your specific needs.</p>
-        
-        <h3>Mobile App Development & iOS Development</h3>
-        <p>Reach customers on the go with our comprehensive <strong>app development</strong> services. We create mobile applications for both Android and iOS platforms, helping businesses in {$area->name} and globally connect with their customers through smartphones. Our <strong>app development</strong> expertise includes native iOS apps, Android apps, and cross-platform solutions. Specializing in <strong>iOS development</strong>, we create high-quality iPhone and iPad applications that provide excellent user experiences. With a mobile app, your customers can easily browse products, make purchases, book services, and stay connected with your business 24/7.</p>
-        
-        <h3>Custom Software Development Solutions</h3>
-        <p>Streamline your business operations with our professional <strong>software development</strong> services. We create custom software applications tailored to your business needs, helping companies in {$area->name} and across India improve efficiency and productivity. Our <strong>software development</strong> team builds scalable solutions that grow with your business - from inventory management systems to customer relationship management tools. Whether you're a local business in {$area->name} or an international company, we develop software that fits your unique requirements and helps you serve customers better.</p>
-        
-        <h3>Effective Digital Marketing Strategies</h3>
-        <p>Grow your customer base with our comprehensive <strong>digital marketing</strong> services. We help businesses in {$area->name}, throughout India, and internationally reach more customers through strategic online marketing. Our <strong>digital marketing</strong> services include search engine optimization (SEO), social media marketing, content marketing, email campaigns, pay-per-click advertising, and more. We create customized <strong>digital marketing</strong> campaigns that increase your online visibility, attract qualified leads, and drive sales. Perfect for both local businesses looking to reach customers in {$area->name} and e-commerce stores targeting customers worldwide.</p>
-        
-        <h3>Easy E-commerce Store Setup</h3>
-        <p>Start selling online today with our simple <strong>e-commerce store</strong> setup service. We make it easy for businesses in {$area->name} and everywhere else to launch their online store and start selling products to customers in India and around the world. Our <strong>e-commerce store</strong> platform supports all product categories including electronics, clothing, food items, medicines, home goods, gifts, and much more. You can set up your <strong>e-commerce store</strong> in minutes and begin accepting orders from customers locally in {$area->name}, across India, or internationally. We provide everything you need to manage inventory, process payments, and ship products efficiently.</p>
-        
-        <h3>Local Business Directory & Listing Services</h3>
-        <p>Increase your visibility with our <strong>local business</strong> directory listing. Get your business listed in our comprehensive directory to help customers in {$area->name} and surrounding areas find you easily. Our <strong>local business</strong> directory is perfect for restaurants, shops, clinics, service providers, and all types of local businesses. Listing your <strong>local business</strong> helps improve your online presence, attract more local customers, and grow your customer base in {$area->name} and nearby locations.</p>
-        
-        <h2>Why Choose {$area->name} for Your Business?</h2>
-        <p>{$area->name} in {$stateName}, India offers numerous advantages for businesses:</p>
-        <ul>
-            <li><strong>Strategic Location:</strong> Well-connected area in {$stateName} with excellent transportation links and accessibility</li>
-            <li><strong>Growing Economy:</strong> Expanding market with increasing demand for products and services</li>
-            <li><strong>Skilled Talent Pool:</strong> Access to experienced professionals in <strong>web development</strong>, <strong>app development</strong>, <strong>software development</strong>, and <strong>digital marketing</strong></li>
-            <li><strong>Business Support:</strong> Favorable environment supporting both traditional <strong>local business</strong> operations and modern <strong>e-commerce store</strong> ventures</li>
-            <li><strong>Modern Infrastructure:</strong> Reliable internet connectivity and technology infrastructure supporting <strong>web development</strong>, <strong>app development</strong>, and <strong>software development</strong> projects</li>
-            <li><strong>Market Access:</strong> Great location to serve customers in {$area->name}, throughout {$stateName}, across India, and internationally</li>
-        </ul>
-        
-        <h2>Get Started with Your Business in {$area->name}</h2>
-        <p>Ready to launch or expand your business in {$area->name}, {$stateName}? Our comprehensive services can help you succeed:</p>
-        <ul>
-            <li><strong>E-commerce Store:</strong> Set up your online store to sell products in {$area->name}, across India, and worldwide</li>
-            <li><strong>Web Development:</strong> Build a professional website that showcases your business and attracts customers</li>
-            <li><strong>App Development:</strong> Create mobile apps for iOS and Android to reach customers on their smartphones</li>
-            <li><strong>Software Development:</strong> Develop custom software solutions to streamline your business operations</li>
-            <li><strong>Digital Marketing:</strong> Implement effective marketing strategies to reach customers in {$area->name}, India, and globally</li>
-            <li><strong>Local Business Listing:</strong> Get your business listed in our directory to attract local customers</li>
-        </ul>
-        
-        <p>Our services are designed to work for businesses of all types in {$area->name}, {$stateName}, throughout India, and for international clients. We provide affordable, professional solutions that help you start or grow your business successfully.</p>
-        
-        <p>Contact us today to discover how we can help your business thrive in {$area->name}, {$stateName}, India. Whether you need <strong>web development</strong>, <strong>app development</strong>, <strong>iOS development</strong>, <strong>software development</strong>, <strong>digital marketing</strong>, or want to set up an <strong>e-commerce store</strong>, our team is ready to assist you at every step of your business journey!</p>";
+        <p>We provide professional <strong>{$service}</strong> services in {$location}, helping businesses succeed in {$areaName} and surrounding areas.</p>";
     }
 
     /**
-     * Generate area page excerpt - Fresh SEO optimized content
+     * Generate area-level excerpt
      */
-    private function generateAreaExcerpt($area, $stateName): string
+    private function generateAreaExcerpt($service, $area, $city, $state): string
     {
-        return "Professional business services in {$area->name}, {$stateName}, India. Expert web development, app development, iOS development, software development, and digital marketing solutions. Launch your e-commerce store to sell in India and worldwide, or list your local business in our directory. Complete business solutions for success.";
+        $location = $area->name;
+        if ($city) {
+            $location .= ", {$city->city_name}";
+        }
+        $location .= ", {$state->name}";
+
+        return "Professional {$service} services in {$location}, India. Expert solutions for businesses in {$area->name}. Get started today!";
     }
 }
