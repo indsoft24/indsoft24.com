@@ -6,6 +6,17 @@
         <div class="hero-background">
             <div class="hero-particles"></div>
             <div class="hero-gradient-overlay"></div>
+            <!-- Floating geometric shapes -->
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+                <div class="shape shape-4"></div>
+                <div class="shape shape-5"></div>
+                <div class="shape shape-6"></div>
+            </div>
+            <!-- Animated grid pattern -->
+            <div class="animated-grid"></div>
         </div>
         <div class="hero-container" style="padding-top: 80px;">
             <div class="hero-content">
@@ -104,6 +115,15 @@
     </section>
 
 <section id="services" class="services">
+    <div class="section-bg-animation services-bg">
+        <div class="services-particles"></div>
+        <div class="services-shapes">
+            <div class="service-shape shape-circle-1"></div>
+            <div class="service-shape shape-triangle-1"></div>
+            <div class="service-shape shape-square-1"></div>
+            <div class="service-shape shape-circle-2"></div>
+        </div>
+    </div>
     <div class="container">
         <div class="section-header">
             <div class="section-badge">
@@ -221,6 +241,21 @@
 <!-- Featured Projects Section -->
 @if($featuredProjects->count() > 0)
 <section id="projects" class="featured-projects py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="section-bg-animation projects-bg">
+        <div class="projects-particles"></div>
+        <div class="projects-waves">
+            <div class="wave wave-1"></div>
+            <div class="wave wave-2"></div>
+            <div class="wave wave-3"></div>
+        </div>
+        <div class="projects-stars">
+            <div class="star star-1"></div>
+            <div class="star star-2"></div>
+            <div class="star star-3"></div>
+            <div class="star star-4"></div>
+            <div class="star star-5"></div>
+        </div>
+    </div>
     <div class="container">
         <div class="section-header text-center text-white mb-5">
             <div class="section-badge" style="background: rgba(255, 255, 255, 0.2); color: white;">
@@ -320,6 +355,22 @@
 
 
     <section id="about" class="about">
+        <div class="section-bg-animation about-bg">
+            <div class="about-grid-pattern"></div>
+            <div class="about-orbits">
+                <div class="orbit orbit-1"></div>
+                <div class="orbit orbit-2"></div>
+                <div class="orbit orbit-3"></div>
+            </div>
+            <div class="about-dots">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="dot dot-4"></div>
+                <div class="dot dot-5"></div>
+                <div class="dot dot-6"></div>
+            </div>
+        </div>
         <div class="container">
             <div class="about-content">
                 <div class="about-text">
@@ -521,6 +572,22 @@ document.addEventListener('DOMContentLoaded', function() {
 @endpush
 
     <section id="contact" class="contact">
+        <div class="section-bg-animation contact-bg">
+            <div class="contact-gradient-mesh"></div>
+            <div class="contact-bubbles">
+                <div class="bubble bubble-1"></div>
+                <div class="bubble bubble-2"></div>
+                <div class="bubble bubble-3"></div>
+                <div class="bubble bubble-4"></div>
+                <div class="bubble bubble-5"></div>
+                <div class="bubble bubble-6"></div>
+            </div>
+            <div class="contact-lines">
+                <div class="line line-1"></div>
+                <div class="line line-2"></div>
+                <div class="line line-3"></div>
+            </div>
+        </div>
         <div class="container">
             <div class="section-header">
                 <div class="section-badge">
