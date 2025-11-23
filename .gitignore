@@ -51,3 +51,5 @@ public/images/posts/*
 *.bak
 *.backup
 
+# Demo
+public/demo.site
