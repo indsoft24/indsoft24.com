@@ -13,6 +13,7 @@ class Lead extends Model
         'name',
         'email',
         'phone',
+        'service',
         'company',
         'message',
         'source',

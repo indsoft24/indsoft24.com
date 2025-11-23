@@ -151,6 +151,13 @@
                     <p class="text-muted">Use the search form above to find pages and content.</p>
                 </div>
             @endif
+            
+            <!-- Lead Form Section -->
+            <div class="row mt-5">
+                <div class="col-md-6 offset-md-3">
+                    @include('components.lead-form')
+                </div>
+            </div>
         </div>
     </div>
 </div>

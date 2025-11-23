@@ -9,10 +9,45 @@
 @section('content')
 <div class="container" style="margin-top: 80px;">
     <div class="row">
-        <div class="col-12">
+        <div class="col-md-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('cms.states') }}" class="text-decoration-none">States</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('cms.state.pages', $city->state) }}" class="text-decoration-none">{{ $city->state->name }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('cms.state.cities', $city->state) }}" class="text-decoration-none">Cities</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ $city->city_name }}</li>
+                </ol>
+            </nav>
+
             <div class="page-header mb-4">
                 <h1>{{ $city->city_name }}, {{ $city->state->name }}</h1>
                 <p class="lead">Browse pages and content for {{ $city->city_name }}, {{ $city->state->name }}</p>
+            </div>
+
+            <!-- Navigation Links Section -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="fas fa-sitemap me-2"></i>Explore {{ $city->city_name }}</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <a href="{{ route('cms.city.areas', $city) }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-map-pin me-2"></i>Browse Areas
+                                <span class="badge bg-primary ms-2">{{ $city->activeAreas()->count() }}</span>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ route('cms.state.cities', $city->state) }}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-city me-2"></i>All Cities in {{ $city->state->name }}
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ route('cms.state.pages', $city->state) }}" class="btn btn-outline-info w-100">
+                                <i class="fas fa-building me-2"></i>State Businesses
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             @if($pages->count() > 0)
@@ -64,6 +99,11 @@
                     <p class="text-muted">Check back later for new content.</p>
                 </div>
             @endif
+        </div>
+        
+        <!-- Lead Form Sidebar -->
+        <div class="col-md-4">
+            @include('components.lead-form')
         </div>
     </div>
 </div>

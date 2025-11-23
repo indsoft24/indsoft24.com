@@ -345,7 +345,13 @@
             </div>
 
             <div class="col-lg-3 col-md-12">
-                <div class="newsletter-signup">
+                <div class="footer-section">
+                    <h4>Business Directory</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ route('cms.states') }}"><i class="fas fa-map-marked-alt me-1"></i>Browse by State</a></li>
+                    </ul>
+                </div>
+                <div class="newsletter-signup mt-4">
                     <h5>Newsletter</h5>
                     <p>Subscribe to get latest updates</p>
                     <form class="newsletter-form" method="POST" action="{{ route('newsletter.subscribe') }}">

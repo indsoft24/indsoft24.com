@@ -12,6 +12,7 @@ class State extends Model
 
     protected $fillable = [
         'name',
+        'slug',
         'status',
         'country_id',
         'is_state_or_ut',
@@ -82,14 +83,80 @@ class State extends Model
      */
     public function getRouteKeyName()
     {
-        return 'name';
+        return 'slug';
     }
 
     /**
-     * Get slug attribute
+     * Get the route key value (auto-generate slug if missing)
      */
-    public function getSlugAttribute()
+    public function getRouteKey()
     {
-        return Str::slug($this->name);
+        // Auto-generate slug if missing
+        if (empty($this->slug) && ! empty($this->name)) {
+            $this->slug = static::generateUniqueSlug($this);
+            // Use update to bypass model events but ensure save
+            \Illuminate\Support\Facades\DB::table('states')
+                ->where('id', $this->id)
+                ->update(['slug' => $this->slug]);
+            // Refresh the model
+            $this->refresh();
+        }
+
+        return $this->slug ?? $this->getAttribute('slug');
+    }
+
+    /**
+     * Boot the model
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($state) {
+            if (empty($state->slug)) {
+                $state->slug = static::generateUniqueSlug($state);
+            }
+        });
+
+        static::updating(function ($state) {
+            // Generate slug if missing (regardless of whether name changed)
+            if (empty($state->slug)) {
+                $state->slug = static::generateUniqueSlug($state);
+            }
+            // Regenerate slug if name changed and we want to update it
+            elseif ($state->isDirty('name')) {
+                // Optionally regenerate slug when name changes
+                // Uncomment the line below if you want slugs to update when name changes
+                // $state->slug = static::generateUniqueSlug($state);
+            }
+        });
+    }
+
+    /**
+     * Generate a unique slug for the state
+     */
+    public static function generateUniqueSlug($state)
+    {
+        if (empty($state->name)) {
+            return 'state-'.($state->id ?? time());
+        }
+
+        $baseSlug = Str::slug($state->name);
+
+        // First try: just the base slug
+        if (! static::where('slug', $baseSlug)->where('id', '!=', $state->id ?? 0)->exists()) {
+            return $baseSlug;
+        }
+
+        // If duplicate, add numeric suffix
+        $counter = 1;
+        $slug = $baseSlug.'-'.$counter;
+
+        while (static::where('slug', $slug)->where('id', '!=', $state->id ?? 0)->exists()) {
+            $counter++;
+            $slug = $baseSlug.'-'.$counter;
+        }
+
+        return $slug;
     }
 }

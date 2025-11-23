@@ -115,6 +115,18 @@
                         <span>Areas</span>
                     </a>
                 </li>
+
+                <!-- SEO Section -->
+                <li class="menu-section">
+                    <span>SEO & Tools</span>
+                </li>
+                
+                <li class="menu-item {{ request()->routeIs('admin.sitemap.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.sitemap.index') }}">
+                        <i class="fas fa-sitemap"></i>
+                        <span>Sitemap</span>
+                    </a>
+                </li>
                 
                 <li class="menu-item">
                     <a href="{{ route('home') }}" target="_blank">

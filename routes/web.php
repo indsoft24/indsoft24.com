@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\LeadController as AdminLeadController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
+use App\Http\Controllers\Admin\SitemapController as AdminSitemapController;
 use App\Http\Controllers\Admin\StateController;
 use App\Http\Controllers\Admin\SubscriberController;
 use App\Http\Controllers\Admin\TagController;
@@ -172,5 +173,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Utilities
         Route::post('posts/upload-image', [PostController::class, 'uploadImage'])->name('posts.uploadImage');
         Route::post('pages/upload-image', [PageController::class, 'uploadImage'])->name('pages.uploadImage');
+
+        // Sitemap Management
+        Route::prefix('sitemap')->name('sitemap.')->group(function () {
+            Route::get('/', [AdminSitemapController::class, 'index'])->name('index');
+            Route::post('/clear-cache', [AdminSitemapController::class, 'clearCache'])->name('clearCache');
+            Route::get('/preview', [AdminSitemapController::class, 'preview'])->name('preview');
+        });
     });
 });

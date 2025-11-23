@@ -20,8 +20,10 @@
             <!-- Breadcrumb -->
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-decoration-none">Home</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('cms.states') }}" class="text-decoration-none">States</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ $state->name }}</li>
+                    <li class="breadcrumb-item"><a href="{{ route('cms.state.pages', $state) }}" class="text-decoration-none">{{ $state->name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Cities</li>
                 </ol>
             </nav>
 
@@ -29,6 +31,34 @@
             <div class="text-center mb-5">
                 <h1 class="display-4 fw-bold text-primary mb-3">Cities in {{ $state->name }}</h1>
                 <p class="lead fs-4 text-muted">Discover businesses and e-commerce opportunities across {{ $cities->count() }} cities in {{ $state->name }}</p>
+            </div>
+
+            <!-- Navigation Links Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3"><i class="fas fa-sitemap me-2"></i>Explore {{ $state->name }}</h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <a href="{{ route('cms.state.pages', $state) }}" class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-building me-2"></i>State Businesses
+                                    </a>
+                                </div>
+                                <div class="col-md-4">
+                                    <a href="{{ route('cms.states') }}" class="btn btn-outline-secondary w-100">
+                                        <i class="fas fa-map-marked-alt me-2"></i>All States
+                                    </a>
+                                </div>
+                                <div class="col-md-4">
+                                    <a href="{{ route('cms.search') }}" class="btn btn-outline-info w-100">
+                                        <i class="fas fa-search me-2"></i>Search Businesses
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- E-commerce Banner -->
@@ -175,6 +205,13 @@
                     <a href="#" class="btn btn-primary btn-lg">
                         <i class="fas fa-rocket me-2"></i>Start Your E-commerce Journey Today
                     </a>
+                </div>
+            </div>
+            
+            <!-- Lead Form Section -->
+            <div class="row mt-5">
+                <div class="col-md-6 offset-md-3">
+                    @include('components.lead-form')
                 </div>
             </div>
         </div>

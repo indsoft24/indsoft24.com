@@ -18,6 +18,14 @@
 <div class="container" style="margin-top: 80px;">
     <div class="row">
         <div class="col-12">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Business Directory</li>
+                </ol>
+            </nav>
+
             <div class="page-header mb-5">
                 <h1 class="display-4 fw-bold text-primary mb-3">Browse Businesses by State</h1>
                 <p class="lead fs-4 text-muted mb-4">Discover local businesses, e-commerce stores, and services across {{ $states->count() }} states in India</p>
@@ -33,6 +41,29 @@
                             <a href="{{ route('e-commerce') }}" class="btn btn-light btn-lg">
                                 <i class="fas fa-rocket me-2"></i>Start Your Store
                             </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Navigation -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3"><i class="fas fa-sitemap me-2"></i>Quick Navigation</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <a href="{{ route('cms.search') }}" class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-search me-2"></i>Search All Businesses
+                                    </a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="{{ route('home') }}" class="btn btn-outline-secondary w-100">
+                                        <i class="fas fa-home me-2"></i>Back to Home
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -102,6 +133,13 @@
                     <p class="text-muted">Please add some states to get started.</p>
                 </div>
             @endif
+            
+            <!-- Lead Form Section -->
+            <div class="row mt-5">
+                <div class="col-md-6 offset-md-3">
+                    @include('components.lead-form')
+                </div>
+            </div>
             
             <!-- E-commerce Information Section -->
             <div class="row mt-5">

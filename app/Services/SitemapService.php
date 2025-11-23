@@ -228,6 +228,12 @@ class SitemapService
                     'changefreq' => 'weekly',
                     'priority' => '0.7',
                 ],
+                [
+                    'loc' => $this->getBaseUrl() . '/cms/search',
+                    'lastmod' => now()->toAtomString(),
+                    'changefreq' => 'daily',
+                    'priority' => '0.6',
+                ],
             ];
 
             return $this->buildSitemap($urls);
@@ -386,15 +392,27 @@ class SitemapService
                 ->select('name', 'updated_at')
                 ->get();
 
-            $urls = $states->map(function ($state) {
-                $slug = \Illuminate\Support\Str::slug($state->name);
-                return [
-                    'loc' => $this->getBaseUrl() . '/cms/state/' . $slug,
+            $urls = [];
+            foreach ($states as $state) {
+                // State route uses 'slug' as route key
+                $stateSlug = $state->slug ?? \Illuminate\Support\Str::slug($state->name);
+                
+                // Add state pages URL
+                $urls[] = [
+                    'loc' => $this->getBaseUrl() . '/cms/state/' . $stateSlug,
                     'lastmod' => $state->updated_at->toAtomString(),
                     'changefreq' => 'weekly',
                     'priority' => '0.7',
                 ];
-            })->toArray();
+                
+                // Add state cities URL
+                $urls[] = [
+                    'loc' => $this->getBaseUrl() . '/cms/state/' . $stateSlug . '/cities',
+                    'lastmod' => $state->updated_at->toAtomString(),
+                    'changefreq' => 'weekly',
+                    'priority' => '0.6',
+                ];
+            }
 
             return $this->buildSitemap($urls);
         });
@@ -420,12 +438,23 @@ class SitemapService
 
             $urls = [];
             foreach ($cities as $city) {
-                $slug = \Illuminate\Support\Str::slug($city->city_name);
+                // City route uses 'slug' as route key
+                $citySlug = $city->slug ?? \Illuminate\Support\Str::slug($city->city_name);
+                
+                // Add city pages URL
                 $urls[] = [
-                    'loc' => $this->getBaseUrl() . '/cms/city/' . $slug,
+                    'loc' => $this->getBaseUrl() . '/cms/city/' . $citySlug,
                     'lastmod' => $city->updated_at->toAtomString(),
                     'changefreq' => 'weekly',
                     'priority' => '0.6',
+                ];
+                
+                // Add city areas URL
+                $urls[] = [
+                    'loc' => $this->getBaseUrl() . '/cms/city/' . $citySlug . '/areas',
+                    'lastmod' => $city->updated_at->toAtomString(),
+                    'changefreq' => 'weekly',
+                    'priority' => '0.5',
                 ];
             }
 

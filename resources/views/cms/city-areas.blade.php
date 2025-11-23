@@ -20,9 +20,12 @@
             <!-- Breadcrumb -->
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-decoration-none">Home</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('cms.states') }}" class="text-decoration-none">States</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('cms.state.cities', $city->state) }}" class="text-decoration-none">{{ $city->state->name }}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ $city->city_name }}</li>
+                    <li class="breadcrumb-item"><a href="{{ route('cms.state.pages', $city->state) }}" class="text-decoration-none">{{ $city->state->name }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('cms.state.cities', $city->state) }}" class="text-decoration-none">Cities</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('cms.city.pages', $city) }}" class="text-decoration-none">{{ $city->city_name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Areas</li>
                 </ol>
             </nav>
 
@@ -30,6 +33,34 @@
             <div class="text-center mb-5">
                 <h1 class="display-4 fw-bold text-primary mb-3">Areas in {{ $city->city_name }}</h1>
                 <p class="lead fs-4 text-muted">Discover businesses and e-commerce opportunities across {{ $areas->count() }} areas in {{ $city->city_name }}, {{ $city->state->name }}</p>
+            </div>
+
+            <!-- Navigation Links Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3"><i class="fas fa-sitemap me-2"></i>Explore {{ $city->city_name }}</h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <a href="{{ route('cms.city.pages', $city) }}" class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-building me-2"></i>City Businesses
+                                    </a>
+                                </div>
+                                <div class="col-md-4">
+                                    <a href="{{ route('cms.state.cities', $city->state) }}" class="btn btn-outline-secondary w-100">
+                                        <i class="fas fa-city me-2"></i>All Cities in {{ $city->state->name }}
+                                    </a>
+                                </div>
+                                <div class="col-md-4">
+                                    <a href="{{ route('cms.state.pages', $city->state) }}" class="btn btn-outline-info w-100">
+                                        <i class="fas fa-map-marked-alt me-2"></i>State Businesses
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- E-commerce Banner -->
@@ -188,6 +219,11 @@
                     </a>
                 </div>
             </div>
+        </div>
+        
+        <!-- Lead Form Sidebar -->
+        <div class="col-md-4">
+            @include('components.lead-form')
         </div>
     </div>
 </div>
