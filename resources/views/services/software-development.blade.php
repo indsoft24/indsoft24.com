@@ -182,17 +182,24 @@
 
     @push('styles')
         <style>
-            .pricing-card { background: #fff; border-radius: 20px; padding: 30px 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); position: relative; overflow: hidden; transition: all 0.3s ease; }
+            /* Remove border radius from hero section */
+            .achievement-badge {
+                border-radius: 0 !important;
+            }
+
+            .pricing-card { background: #fff; border-radius: 0; padding: 30px 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); position: relative; overflow: hidden; transition: all 0.3s ease; }
             .pricing-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); }
             .pricing-card.featured { border: 2px solid #0d6efd; transform: scale(1.05); z-index: 2; }
-            .icon-box { width: 70px; height: 70px; margin: 0 auto; border-radius: 50%; background: #e9f2ff; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #0d6efd; transition: all 0.3s ease; }
+            .icon-box { width: 70px; height: 70px; margin: 0 auto; border-radius: 0; background: #e9f2ff; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #0d6efd; transition: all 0.3s ease; }
             .pricing-card:hover .icon-box { background: #0d6efd; color: #fff; }
-            .price-tag { font-size: 1.5rem; font-weight: 700; margin: 15px 0; color: #333; position: relative; display: inline-block; padding: 5px 15px; border-radius: 8px; background: #f8f9fa; }
+            .price-tag { font-size: 1.5rem; font-weight: 700; margin: 15px 0; color: #333; position: relative; display: inline-block; padding: 5px 15px; border-radius: 0; background: #f8f9fa; }
             .price-tag.highlight { background: #0d6efd; color: #fff; }
             .price-tag .currency { font-size: 1rem; }
             .pricing-card ul li { margin: 8px 0; font-size: 0.95rem; }
             .hover-shadow { transition: all 0.3s ease-in-out; }
             .hover-shadow:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); }
+            .card { border-radius: 0 !important; }
+            .btn { border-radius: 0 !important; }
         </style>
     @endpush
 @endsection
