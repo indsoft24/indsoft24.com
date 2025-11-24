@@ -173,9 +173,18 @@ class CityController extends Controller
     {
         $stateId = $request->get('state_id');
         $cities = City::where('state_id', $stateId)
-            ->where('is_active', true)
+            ->active()
             ->orderBy('city_name')
-            ->get(['id', 'name']);
+            ->get(['id', 'city_name']);
+
+        // Map to ensure consistent response format
+        $cities = $cities->map(function($city) {
+            return [
+                'id' => $city->id,
+                'city_name' => $city->city_name,
+                'name' => $city->city_name, // Alias for compatibility
+            ];
+        });
 
         return response()->json($cities);
     }

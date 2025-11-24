@@ -206,7 +206,7 @@ class AreaController extends Controller
     {
         $cityId = $request->get('city_id');
         $areas = Area::where('city_id', $cityId)
-            ->where('is_active', true)
+            ->active()
             ->orderBy('name')
             ->get(['id', 'name']);
 

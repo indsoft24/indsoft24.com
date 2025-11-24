@@ -151,6 +151,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('cities', CityController::class);
         Route::resource('areas', AreaController::class);
         Route::resource('pages', PageController::class);
+        Route::post('pages/bulk-action', [PageController::class, 'bulkAction'])->name('pages.bulkAction');
+        Route::get('pages/export', [PageController::class, 'export'])->name('pages.export');
+        Route::post('pages/{page}/duplicate', [PageController::class, 'duplicate'])->name('pages.duplicate');
+        Route::post('pages/{page}/quick-status', [PageController::class, 'quickUpdateStatus'])->name('pages.quickStatus');
+        Route::post('pages/{page}/toggle-featured', [PageController::class, 'quickToggleFeatured'])->name('pages.toggleFeatured');
 
         // AJAX routes for CMS
         Route::get('cities/by-state', [CityController::class, 'getByState'])->name('cities.byState');

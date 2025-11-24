@@ -65,16 +65,61 @@ class PageController extends Controller
             $query->where('page_type', $request->page_type);
         }
 
+        // Filter by featured
+        if ($request->has('featured') && $request->featured !== '') {
+            $query->where('is_featured', $request->featured == '1');
+        }
+
+        // Filter by date range
+        if ($request->has('date_from') && $request->date_from !== '') {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->has('date_to') && $request->date_to !== '') {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
         // Search
         if ($request->has('search') && $request->search !== '') {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', '%'.$request->search.'%')
-                    ->orWhere('content', 'like', '%'.$request->search.'%')
-                    ->orWhere('excerpt', 'like', '%'.$request->search.'%');
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('title', 'like', '%'.$searchTerm.'%')
+                    ->orWhere('content', 'like', '%'.$searchTerm.'%')
+                    ->orWhere('excerpt', 'like', '%'.$searchTerm.'%')
+                    ->orWhere('slug', 'like', '%'.$searchTerm.'%')
+                    ->orWhereHas('state', function ($stateQuery) use ($searchTerm) {
+                        $stateQuery->where('name', 'like', '%'.$searchTerm.'%');
+                    })
+                    ->orWhereHas('city', function ($cityQuery) use ($searchTerm) {
+                        $cityQuery->where('city_name', 'like', '%'.$searchTerm.'%');
+                    })
+                    ->orWhereHas('area', function ($areaQuery) use ($searchTerm) {
+                        $areaQuery->where('name', 'like', '%'.$searchTerm.'%');
+                    });
             });
         }
 
-        $pages = $query->orderBy('created_at', 'desc')->paginate(15);
+        // Sort options
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $allowedSorts = ['created_at', 'updated_at', 'published_at', 'title', 'views_count'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $perPage = $request->get('per_page', 15);
+        $pages = $query->paginate($perPage)->appends($request->query());
+        
+        // Statistics
+        $stats = [
+            'total' => Page::count(),
+            'published' => Page::where('status', 'published')->count(),
+            'draft' => Page::where('status', 'draft')->count(),
+            'archived' => Page::where('status', 'archived')->count(),
+            'featured' => Page::where('is_featured', true)->count(),
+            'total_views' => Page::sum('views_count'),
+        ];
         
         // Limit dropdown options to prevent memory exhaustion
         $states = State::active()
@@ -82,18 +127,42 @@ class PageController extends Controller
             ->orderBy('name')
             ->limit(500)
             ->get();
-        $cities = City::active()
-            ->select('id', 'city_name')
-            ->orderBy('city_name')
-            ->limit(500)
-            ->get();
-        $areas = Area::active()
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->limit(500)
-            ->get();
+        
+        // Only load cities if state is selected
+        $cities = collect();
+        if ($request->has('state') && $request->state !== '') {
+            $cities = City::active()
+                ->where('state_id', $request->state)
+                ->select('id', 'city_name')
+                ->orderBy('city_name')
+                ->limit(500)
+                ->get();
+        } else {
+            $cities = City::active()
+                ->select('id', 'city_name')
+                ->orderBy('city_name')
+                ->limit(500)
+                ->get();
+        }
+        
+        // Only load areas if city is selected
+        $areas = collect();
+        if ($request->has('city') && $request->city !== '') {
+            $areas = Area::active()
+                ->where('city_id', $request->city)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->limit(500)
+                ->get();
+        } else {
+            $areas = Area::active()
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->limit(500)
+                ->get();
+        }
 
-        return view('admin.cms.pages.index', compact('pages', 'states', 'cities', 'areas'));
+        return view('admin.cms.pages.index', compact('pages', 'states', 'cities', 'areas', 'stats'));
     }
 
     /**
@@ -290,5 +359,226 @@ class PageController extends Controller
         }
 
         return response()->json(['success' => false]);
+    }
+
+    /**
+     * Bulk actions on pages
+     */
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|in:delete,publish,draft,archive,unarchive,feature,unfeature',
+            'page_ids' => 'required|array',
+            'page_ids.*' => 'exists:pages,id',
+        ]);
+
+        $pageIds = $request->page_ids;
+        $action = $request->action;
+        $count = 0;
+
+        switch ($action) {
+            case 'delete':
+                foreach ($pageIds as $pageId) {
+                    $page = Page::find($pageId);
+                    if ($page) {
+                        if ($page->featured_image && file_exists(public_path($page->featured_image))) {
+                            unlink(public_path($page->featured_image));
+                        }
+                        $page->delete();
+                        $count++;
+                    }
+                }
+                $message = "{$count} page(s) deleted successfully!";
+                break;
+
+            case 'publish':
+                $count = Page::whereIn('id', $pageIds)->update([
+                    'status' => 'published',
+                    'published_at' => now(),
+                ]);
+                $message = "{$count} page(s) published successfully!";
+                break;
+
+            case 'draft':
+                $count = Page::whereIn('id', $pageIds)->update(['status' => 'draft']);
+                $message = "{$count} page(s) moved to draft successfully!";
+                break;
+
+            case 'archive':
+                $count = Page::whereIn('id', $pageIds)->update(['status' => 'archived']);
+                $message = "{$count} page(s) archived successfully!";
+                break;
+
+            case 'unarchive':
+                $count = Page::whereIn('id', $pageIds)->update(['status' => 'draft']);
+                $message = "{$count} page(s) unarchived successfully!";
+                break;
+
+            case 'feature':
+                $count = Page::whereIn('id', $pageIds)->update(['is_featured' => true]);
+                $message = "{$count} page(s) featured successfully!";
+                break;
+
+            case 'unfeature':
+                $count = Page::whereIn('id', $pageIds)->update(['is_featured' => false]);
+                $message = "{$count} page(s) unfeatured successfully!";
+                break;
+
+            default:
+                return redirect()->back()->with('error', 'Invalid action!');
+        }
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    /**
+     * Export pages to CSV
+     */
+    public function export(Request $request)
+    {
+        $query = Page::with(['state', 'city', 'area', 'user']);
+
+        // Apply same filters as index
+        if ($request->has('state') && $request->state !== '') {
+            $query->where('state_id', $request->state);
+        }
+        if ($request->has('city') && $request->city !== '') {
+            $query->where('city_id', $request->city);
+        }
+        if ($request->has('area') && $request->area !== '') {
+            $query->where('area_id', $request->area);
+        }
+        if ($request->has('status') && $request->status !== '') {
+            $query->where('status', $request->status);
+        }
+        if ($request->has('page_type') && $request->page_type !== '') {
+            $query->where('page_type', $request->page_type);
+        }
+        if ($request->has('search') && $request->search !== '') {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('title', 'like', '%'.$searchTerm.'%')
+                    ->orWhere('content', 'like', '%'.$searchTerm.'%')
+                    ->orWhere('excerpt', 'like', '%'.$searchTerm.'%');
+            });
+        }
+
+        $pages = $query->orderBy('created_at', 'desc')->get();
+
+        $filename = 'pages_export_'.date('Y-m-d_His').'.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($pages) {
+            $file = fopen('php://output', 'w');
+            
+            // CSV Headers
+            fputcsv($file, [
+                'ID',
+                'Title',
+                'Slug',
+                'Status',
+                'Page Type',
+                'Template',
+                'Featured',
+                'State',
+                'City',
+                'Area',
+                'Author',
+                'Views',
+                'Created At',
+                'Published At',
+            ]);
+
+            // CSV Data
+            foreach ($pages as $page) {
+                fputcsv($file, [
+                    $page->id,
+                    $page->title,
+                    $page->slug,
+                    $page->status,
+                    $page->page_type,
+                    $page->template,
+                    $page->is_featured ? 'Yes' : 'No',
+                    $page->state ? $page->state->name : '',
+                    $page->city ? $page->city->city_name : '',
+                    $page->area ? $page->area->name : '',
+                    $page->user ? $page->user->name : '',
+                    $page->views_count,
+                    $page->created_at->format('Y-m-d H:i:s'),
+                    $page->published_at ? $page->published_at->format('Y-m-d H:i:s') : '',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Duplicate a page
+     */
+    public function duplicate(Request $request, Page $page)
+    {
+        $newPage = $page->replicate();
+        $newPage->title = $page->title.' (Copy)';
+        $newPage->slug = Str::slug($newPage->title).'-'.time();
+        $newPage->status = 'draft';
+        $newPage->is_featured = false;
+        $newPage->views_count = 0;
+        $newPage->published_at = null;
+        $newPage->user_id = auth()->id();
+        $newPage->save();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Page duplicated successfully!',
+                'redirect' => route('admin.pages.edit', $newPage),
+            ]);
+        }
+
+        return redirect()->route('admin.pages.edit', $newPage)
+            ->with('success', 'Page duplicated successfully!');
+    }
+
+    /**
+     * Quick status update
+     */
+    public function quickUpdateStatus(Request $request, Page $page)
+    {
+        $request->validate([
+            'status' => 'required|in:draft,published,archived',
+        ]);
+
+        $page->status = $request->status;
+        if ($request->status === 'published' && !$page->published_at) {
+            $page->published_at = now();
+        }
+        $page->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status updated successfully!',
+            'status' => $page->status,
+        ]);
+    }
+
+    /**
+     * Quick toggle featured
+     */
+    public function quickToggleFeatured(Page $page)
+    {
+        $page->is_featured = !$page->is_featured;
+        $page->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => $page->is_featured ? 'Page featured!' : 'Page unfeatured!',
+            'is_featured' => $page->is_featured,
+        ]);
     }
 }

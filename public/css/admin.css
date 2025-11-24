@@ -209,6 +209,10 @@
     flex: 1;
     background: #f8f9fa;
     min-height: 100vh;
+    width: calc(100% - var(--sidebar-width));
+    max-width: calc(100% - var(--sidebar-width));
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 /* Top Navigation */
@@ -260,6 +264,10 @@
 /* Page Content */
 .page-content {
     padding: 30px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .dashboard-header {
@@ -505,10 +513,14 @@
 
     .main-content {
         margin-left: 0;
+        width: 100%;
+        max-width: 100%;
     }
 
     .page-content {
-        padding: 20px;
+        padding: 15px;
+        width: 100%;
+        max-width: 100%;
     }
 
     .stats-card .card-body {
@@ -520,6 +532,18 @@
         margin-right: 0;
         margin-bottom: 15px;
     }
+}
+
+/* Prevent horizontal scroll */
+html,
+body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+.admin-wrapper {
+    overflow-x: hidden;
+    max-width: 100%;
 }
 
 /* Animation Classes */

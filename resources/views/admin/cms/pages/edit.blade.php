@@ -134,13 +134,16 @@
                                             <label for="city_id">City</label>
                                             <select class="form-control @error('city_id') is-invalid @enderror" 
                                                     id="city_id" name="city_id">
-                                                <option value="">Select City</option>
-                                                @foreach($cities as $city)
-                                                    <option value="{{ $city->id }}" {{ old('city_id', $page->city_id) == $city->id ? 'selected' : '' }}>
-                                                        {{ $city->city_name }}
-                                                    </option>
-                                                @endforeach
+                                                <option value="">Select City (Select State First)</option>
+                                                @if(old('state_id', $page->state_id))
+                                                    @foreach($cities->where('state_id', old('state_id', $page->state_id)) as $city)
+                                                        <option value="{{ $city->id }}" {{ old('city_id', $page->city_id) == $city->id ? 'selected' : '' }}>
+                                                            {{ $city->city_name }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
                                             </select>
+                                            <small class="form-text text-muted">Select a state first to load cities</small>
                                             @error('city_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -150,13 +153,16 @@
                                             <label for="area_id">Area</label>
                                             <select class="form-control @error('area_id') is-invalid @enderror" 
                                                     id="area_id" name="area_id">
-                                                <option value="">Select Area</option>
-                                                @foreach($areas as $area)
-                                                    <option value="{{ $area->id }}" {{ old('area_id', $page->area_id) == $area->id ? 'selected' : '' }}>
-                                                        {{ $area->name }}
-                                                    </option>
-                                                @endforeach
+                                                <option value="">Select Area (Select City First)</option>
+                                                @if(old('city_id', $page->city_id))
+                                                    @foreach($areas->where('city_id', old('city_id', $page->city_id)) as $area)
+                                                        <option value="{{ $area->id }}" {{ old('area_id', $page->area_id) == $area->id ? 'selected' : '' }}>
+                                                            {{ $area->name }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
                                             </select>
+                                            <small class="form-text text-muted">Select a city first to load areas</small>
                                             @error('area_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -298,5 +304,85 @@
             CKEDITOR.instances[instance].updateElement();
         }
     });
+
+    // Dynamic city loading based on state
+    const currentStateId = '{{ old('state_id', $page->state_id) }}';
+    const currentCityId = '{{ old('city_id', $page->city_id) }}';
+    const currentAreaId = '{{ old('area_id', $page->area_id) }}';
+
+    $('#state_id').on('change', function() {
+        const stateId = $(this).val();
+        const citySelect = $('#city_id');
+        const areaSelect = $('#area_id');
+        
+        citySelect.html('<option value="">Loading cities...</option>');
+        areaSelect.html('<option value="">Select City First</option>');
+        
+        if (stateId) {
+            $.ajax({
+                url: '{{ route('admin.cities.byState') }}',
+                method: 'GET',
+                data: { state_id: stateId },
+                success: function(cities) {
+                    citySelect.html('<option value="">Select City</option>');
+                    if (cities.length > 0) {
+                        cities.forEach(function(city) {
+                            const selected = city.id == currentCityId && stateId == currentStateId ? 'selected' : '';
+                            citySelect.append(`<option value="${city.id}" ${selected}>${city.city_name || city.name}</option>`);
+                        });
+                    } else {
+                        citySelect.html('<option value="">No cities found</option>');
+                    }
+                },
+                error: function() {
+                    citySelect.html('<option value="">Error loading cities</option>');
+                }
+            });
+        } else {
+            citySelect.html('<option value="">Select State First</option>');
+        }
+    });
+
+    // Dynamic area loading based on city
+    $('#city_id').on('change', function() {
+        const cityId = $(this).val();
+        const areaSelect = $('#area_id');
+        
+        areaSelect.html('<option value="">Loading areas...</option>');
+        
+        if (cityId) {
+            $.ajax({
+                url: '{{ route('admin.areas.byCity') }}',
+                method: 'GET',
+                data: { city_id: cityId },
+                success: function(areas) {
+                    areaSelect.html('<option value="">Select Area</option>');
+                    if (areas.length > 0) {
+                        areas.forEach(function(area) {
+                            const selected = area.id == currentAreaId && cityId == currentCityId ? 'selected' : '';
+                            areaSelect.append(`<option value="${area.id}" ${selected}>${area.name}</option>`);
+                        });
+                    } else {
+                        areaSelect.html('<option value="">No areas found</option>');
+                    }
+                },
+                error: function() {
+                    areaSelect.html('<option value="">Error loading areas</option>');
+                }
+            });
+        } else {
+            areaSelect.html('<option value="">Select City First</option>');
+        }
+    });
+
+    // Load cities/areas on page load if state/city is already selected
+    if (currentStateId) {
+        $('#state_id').trigger('change');
+    }
+    if (currentCityId) {
+        setTimeout(function() {
+            $('#city_id').trigger('change');
+        }, 500);
+    }
 </script>
 @endpush
