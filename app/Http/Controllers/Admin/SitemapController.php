@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Services\SitemapService;
-use App\Post;
-use App\Page;
-use App\State;
-use App\City;
 use App\Area;
 use App\Category;
-use App\Tag;
+use App\City;
+use App\Http\Controllers\Controller;
+use App\Page;
+use App\Post;
 use App\Project;
+use App\Services\SitemapService;
+use App\State;
+use App\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -31,7 +31,7 @@ class SitemapController extends Controller
     public function index()
     {
         $baseUrl = rtrim(config('app.url'), '/');
-        
+
         // Get sitemap statistics
         $stats = [
             'total_posts' => Post::published()->count(),
@@ -44,12 +44,13 @@ class SitemapController extends Controller
             'total_projects' => Project::published()->count(),
         ];
 
-        // Calculate sitemap file counts
+        // Calculate sitemap file counts (using 25,000 URLs per sitemap as per XML sitemap standard)
+        $maxUrlsPerSitemap = 25000;
         $sitemapCounts = [
-            'posts' => ceil($stats['total_posts'] / 50000),
-            'pages' => ceil($stats['total_pages'] / 50000),
-            'cities' => ceil($stats['total_cities'] / 50000),
-            'areas' => ceil($stats['total_areas'] / 50000),
+            'posts' => ceil($stats['total_posts'] / $maxUrlsPerSitemap),
+            'pages' => ceil($stats['total_pages'] / $maxUrlsPerSitemap),
+            'cities' => ceil($stats['total_cities'] / $maxUrlsPerSitemap),
+            'areas' => ceil($stats['total_areas'] / $maxUrlsPerSitemap),
         ];
 
         // Check cache status
@@ -64,26 +65,26 @@ class SitemapController extends Controller
 
         // Build sitemap URLs
         $sitemapUrls = [
-            'index' => $baseUrl . '/sitemap.xml',
-            'static' => $baseUrl . '/sitemap-static.xml',
-            'states' => $baseUrl . '/sitemap-states.xml',
-            'categories' => $baseUrl . '/sitemap-categories.xml',
-            'tags' => $baseUrl . '/sitemap-tags.xml',
-            'projects' => $baseUrl . '/sitemap-projects.xml',
+            'index' => $baseUrl.'/sitemap.xml',
+            'static' => $baseUrl.'/sitemap-static.xml',
+            'states' => $baseUrl.'/sitemap-states.xml',
+            'categories' => $baseUrl.'/sitemap-categories.xml',
+            'tags' => $baseUrl.'/sitemap-tags.xml',
+            'projects' => $baseUrl.'/sitemap-projects.xml',
         ];
 
         // Add paginated sitemaps
         for ($i = 1; $i <= $sitemapCounts['posts']; $i++) {
-            $sitemapUrls['posts_' . $i] = $baseUrl . "/sitemap-posts-{$i}.xml";
+            $sitemapUrls['posts_'.$i] = $baseUrl."/sitemap-posts-{$i}.xml";
         }
         for ($i = 1; $i <= $sitemapCounts['pages']; $i++) {
-            $sitemapUrls['pages_' . $i] = $baseUrl . "/sitemap-pages-{$i}.xml";
+            $sitemapUrls['pages_'.$i] = $baseUrl."/sitemap-pages-{$i}.xml";
         }
         for ($i = 1; $i <= $sitemapCounts['cities']; $i++) {
-            $sitemapUrls['cities_' . $i] = $baseUrl . "/sitemap-cities-{$i}.xml";
+            $sitemapUrls['cities_'.$i] = $baseUrl."/sitemap-cities-{$i}.xml";
         }
         for ($i = 1; $i <= $sitemapCounts['areas']; $i++) {
-            $sitemapUrls['areas_' . $i] = $baseUrl . "/sitemap-areas-{$i}.xml";
+            $sitemapUrls['areas_'.$i] = $baseUrl."/sitemap-areas-{$i}.xml";
         }
 
         return view('admin.sitemap.index', compact('stats', 'sitemapCounts', 'cacheStatus', 'sitemapUrls', 'baseUrl'));
@@ -96,12 +97,12 @@ class SitemapController extends Controller
     {
         try {
             $this->sitemapService->clearCache();
-            
+
             return redirect()->route('admin.sitemap.index')
                 ->with('success', 'Sitemap cache cleared successfully! Sitemaps will be regenerated on next access.');
         } catch (\Exception $e) {
             return redirect()->route('admin.sitemap.index')
-                ->with('error', 'Failed to clear cache: ' . $e->getMessage());
+                ->with('error', 'Failed to clear cache: '.$e->getMessage());
         }
     }
 
@@ -156,4 +157,3 @@ class SitemapController extends Controller
         }
     }
 }
-
