@@ -14,8 +14,75 @@
 <meta name="twitter:description" content="{{ $metaDescription }}">
 @endsection
 
+@php
+    $heroImage = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=400&fit=crop';
+    $defaultImage = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=400&fit=crop';
+@endphp
+@push('styles')
+<style>
+    .states-page {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        line-height: 1.8;
+    }
+    .hero-section {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%), url('{{ $heroImage }}');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 4rem 2rem;
+        border-radius: 15px;
+        margin-bottom: 3rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    .hero-section h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        margin-bottom: 1rem;
+    }
+    .hero-section .lead {
+        font-size: 1.5rem;
+        font-weight: 400;
+        opacity: 0.95;
+    }
+    .state-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        height: 100%;
+    }
+    .state-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    }
+    .state-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    .content-section {
+        background: #fff;
+        border-radius: 15px;
+        padding: 2.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 2.5rem 1.5rem;
+        }
+        .hero-section h1 {
+            font-size: 2rem;
+        }
+        .hero-section .lead {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
-<div class="container" style="margin-top: 80px;">
+<div class="container states-page" style="margin-top: 80px;">
     <div class="row">
         <div class="col-12">
             <!-- Breadcrumb -->
@@ -26,19 +93,20 @@
                 </ol>
             </nav>
 
-            <div class="page-header mb-5">
-                <h1 class="display-4 fw-bold text-primary mb-3">Browse Businesses by State</h1>
-                <p class="lead fs-4 text-muted mb-4">Discover local businesses, e-commerce stores, and services across {{ $states->count() }} states in India</p>
+            <!-- Hero Section -->
+            <div class="hero-section text-center">
+                <h1>Browse Businesses by State</h1>
+                <p class="lead mb-4">Discover local businesses, e-commerce stores, and services across {{ $states->count() }} states in India</p>
                 
                 <!-- E-commerce Information Banner -->
-                <div class="alert alert-info border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="alert border-0 shadow-sm mb-0" style="background: rgba(255,255,255,0.95); color: #2c3e50;">
                     <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h5 class="mb-2"><i class="fas fa-store me-2"></i>Ready to Start Your Online Store?</h5>
+                        <div class="col-md-8 text-start">
+                            <h5 class="mb-2 fw-bold"><i class="fas fa-store me-2 text-primary"></i>Ready to Start Your Online Store?</h5>
                             <p class="mb-0">We help businesses across all industries set up professional e-commerce stores. From pharmaceuticals to textiles, hardware to software, real estate to florists - we've got you covered!</p>
                         </div>
-                        <div class="col-md-4 text-end">
-                            <a href="{{ route('e-commerce') }}" class="btn btn-light btn-lg">
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <a href="{{ route('e-commerce') }}" class="btn btn-primary btn-lg">
                                 <i class="fas fa-rocket me-2"></i>Start Your Store
                             </a>
                         </div>
@@ -72,37 +140,39 @@
             @if($states->count() > 0)
                 <div class="row">
                     @foreach($states as $state)
+                        @php
+                            $stateImageUrl = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=200&fit=crop&q=80';
+                            $stateImageFallback = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=200&fit=crop&q=80';
+                        @endphp
                         <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card h-100 shadow-sm border-0">
+                            <div class="card state-card shadow-sm">
+                                <img src="{{ $stateImageUrl }}" 
+                                     class="state-image" 
+                                     alt="{{ $state->name }} Business Directory"
+                                     onerror="this.src='{{ $stateImageFallback }}'">
                                 <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="bg-primary rounded-circle p-3 me-3">
-                                            <i class="fas fa-map-marked-alt text-white"></i>
-                                        </div>
-                                        <div>
-                                            <h5 class="card-title mb-1">
-                                                <a href="{{ route('cms.state.pages', $state) }}" class="text-decoration-none text-dark">
-                                                    {{ $state->name }}
-                                                </a>
-                                            </h5>
-                                            <small class="text-muted">Business Directory</small>
-                                        </div>
-                                    </div>
+                                    <h5 class="card-title fw-bold mb-3">
+                                        <a href="{{ route('cms.state.pages', $state) }}" class="text-decoration-none text-dark">
+                                            {{ $state->name }}
+                                        </a>
+                                    </h5>
                                     
-                                    <p class="card-text text-muted mb-3">
-                                        Discover local businesses, e-commerce stores, and services in {{ $state->name }}. 
-                                        From traditional shops to modern online stores, find everything you need.
+                                    <p class="card-text text-muted mb-3" style="font-size: 0.95rem; line-height: 1.6;">
+                                        Explore {{ $state->published_pages_count }} businesses and e-commerce stores across 
+                                        {{ $state->cities()->count() }} cities in {{ $state->name }}. From traditional 
+                                        brick-and-mortar establishments to modern digital platforms, discover comprehensive 
+                                        business solutions tailored to your needs.
                                     </p>
                                     
-                                    <div class="row text-center mb-3">
+                                    <div class="row text-center mb-3 g-2">
                                         <div class="col-6">
-                                            <div class="border-end">
-                                                <h6 class="text-primary mb-1">{{ $state->published_pages_count }}</h6>
+                                            <div class="border-end pe-2">
+                                                <h6 class="text-primary mb-1 fw-bold">{{ number_format($state->published_pages_count) }}</h6>
                                                 <small class="text-muted">Businesses</small>
                                             </div>
                                         </div>
                                         <div class="col-6">
-                                            <h6 class="text-success mb-1">{{ $state->cities()->count() }}</h6>
+                                            <h6 class="text-success mb-1 fw-bold">{{ number_format($state->cities()->count()) }}</h6>
                                             <small class="text-muted">Cities</small>
                                         </div>
                                     </div>
@@ -133,6 +203,39 @@
                     <p class="text-muted">Please add some states to get started.</p>
                 </div>
             @endif
+
+            <div class="content-section mt-5">
+                <h2 class="h3 fw-bold mb-4">High-Intent Commercial Keywords for India</h2>
+                <p class="text-muted mb-4">
+                    Integrate the following search phrases on your home, service, and location pages to capture buyers who are ready to hire a technology partner.
+                </p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Best web development company in Noida</li>
+                            <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Custom software development company India</li>
+                            <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Mobile app development agency Noida</li>
+                            <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Top IT services company in Delhi NCR</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Enterprise software solutions provider</li>
+                            <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Affordable website design services India</li>
+                            <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Professional SEO services in Noida</li>
+                            <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Hire dedicated developers India</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Custom CRM development services</li>
+                            <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>E-commerce website development company</li>
+                            <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Software company near me (Noida Sector 62)</li>
+                            <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>IT consulting firms in Noida</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
             
             <!-- Lead Form Section -->
             <div class="row mt-5">

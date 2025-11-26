@@ -20,9 +20,104 @@
                 </ol>
             </nav>
 
-            <div class="page-header mb-4">
+            @php
+                $cityHeroImage = 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=400&fit=crop';
+                $cityHeroFallback = 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&h=400&fit=crop';
+            @endphp
+            @push('styles')
+            <style>
+                .city-pages-header {
+                    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%), url('{{ $cityHeroImage }}');
+                    background-size: cover;
+                    background-position: center;
+                    color: white;
+                    padding: 3rem 2rem;
+                    border-radius: 15px;
+                    margin-bottom: 2rem;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                }
+                .city-pages-header h1 {
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                }
+                .content-section {
+                    background: white;
+                    padding: 2.5rem;
+                    border-radius: 15px;
+                    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+                    margin-bottom: 2rem;
+                }
+                .content-section h2 {
+                    font-size: 2rem;
+                    font-weight: 700;
+                    color: #2c3e50;
+                    margin-bottom: 1.5rem;
+                    border-bottom: 3px solid #667eea;
+                    padding-bottom: 0.5rem;
+                }
+                @media (max-width: 768px) {
+                    .city-pages-header {
+                        padding: 2rem 1.5rem;
+                    }
+                    .city-pages-header h1 {
+                        font-size: 1.75rem;
+                    }
+                    .content-section {
+                        padding: 1.5rem;
+                    }
+                }
+            </style>
+            @endpush
+            <div class="city-pages-header">
                 <h1>{{ $city->city_name }}, {{ $city->state->name }}</h1>
-                <p class="lead">Browse pages and content for {{ $city->city_name }}, {{ $city->state->name }}</p>
+                <p class="lead mb-0">Discover Local Businesses and E-commerce Opportunities in {{ $city->city_name }}</p>
+            </div>
+
+            <!-- Content Section -->
+            <div class="content-section">
+                <h2>About {{ $city->city_name }}</h2>
+                <p style="font-size: 1.1rem; line-height: 1.9; color: #4a5568;">
+                    Welcome to {{ $city->city_name }}, a vibrant city located in {{ $city->state->name }}. 
+                    This dynamic urban center is home to a diverse range of businesses, from traditional establishments 
+                    to modern e-commerce platforms. {{ $city->city_name }} offers excellent opportunities for both 
+                    entrepreneurs and established businesses looking to expand their reach.
+                </p>
+                <p style="font-size: 1.1rem; line-height: 1.9; color: #4a5568;">
+                    The business ecosystem in {{ $city->city_name }} is characterized by innovation, growth, and 
+                    a strong commitment to customer service. Local businesses here benefit from strategic location 
+                    advantages, excellent connectivity, and a supportive community that values quality products and services.
+                </p>
+            </div>
+
+            <div class="content-section">
+                <h2>SEO Keywords That Convert in {{ $city->city_name }}</h2>
+                <p class="text-muted mb-4">
+                    Include the keyword ideas below on your landing pages, meta descriptions, and FAQs to capture decision makers inside {{ $city->city_name }} and the wider {{ $city->state->name }} region.
+                </p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="fas fa-key text-primary me-2"></i>Best web development company in {{ $city->city_name }}</li>
+                            <li class="mb-2"><i class="fas fa-key text-primary me-2"></i>Mobile app development agency {{ $city->city_name }}</li>
+                            <li class="mb-2"><i class="fas fa-key text-primary me-2"></i>Professional SEO services in {{ $city->city_name }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="fas fa-key text-primary me-2"></i>Responsive web design services {{ $city->city_name }}</li>
+                            <li class="mb-2"><i class="fas fa-key text-primary me-2"></i>Custom software development company {{ $city->state->name }}</li>
+                            <li class="mb-2"><i class="fas fa-key text-primary me-2"></i>E-commerce website development company {{ $city->city_name }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="fas fa-key text-primary me-2"></i>Education website development {{ $city->state->name }}</li>
+                            <li class="mb-2"><i class="fas fa-key text-primary me-2"></i>School/College management software {{ $city->city_name }}</li>
+                            <li class="mb-2"><i class="fas fa-key text-primary me-2"></i>Hire dedicated developers {{ $city->state->name }}</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
             <!-- Navigation Links Section -->
@@ -53,36 +148,46 @@
             @if($pages->count() > 0)
                 <div class="row">
                     @foreach($pages as $page)
+                        @php
+                            $pageImage = $page->featured_image 
+                                ? asset($page->featured_image) 
+                                : 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=250&fit=crop';
+                            $fallbackImage = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=250&fit=crop';
+                        @endphp
                         <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card h-100">
-                                @if($page->featured_image)
-                                    <img src="{{ asset($page->featured_image) }}" class="card-img-top" alt="{{ $page->title }}" style="height: 200px; object-fit: cover;">
-                                @endif
-                                <div class="card-body">
-                                    <h5 class="card-title">
-                                        <a href="{{ route('cms.page', $page->slug) }}" class="text-decoration-none">
-                                            {{ $page->title }}
-                                        </a>
-                                    </h5>
-                                    <p class="card-text">{{ $page->excerpt }}</p>
-                                    <div class="d-flex justify-content-between align-items-center">
+                            <div class="card h-100 shadow-sm border-0" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                                <img src="{{ $pageImage }}" 
+                                     class="card-img-top" 
+                                     alt="{{ $page->title }} in {{ $city->city_name }}"
+                                     style="height: 250px; object-fit: cover;"
+                                     onerror="this.src='{{ $fallbackImage }}'">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-bold mb-0">
+                                            <a href="{{ route('cms.page', $page->slug) }}" class="text-decoration-none text-dark">
+                                                {{ $page->title }}
+                                            </a>
+                                        </h5>
+                                        @if($page->is_featured)
+                                            <span class="badge bg-warning text-dark">Featured</span>
+                                        @endif
+                                    </div>
+                                    <p class="card-text text-muted flex-grow-1" style="font-size: 0.95rem; line-height: 1.6;">
+                                        {{ $page->excerpt ?: Str::limit(strip_tags($page->content), 120) }}
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
                                         <small class="text-muted">
                                             @if($page->area)
-                                                {{ $page->area->name }}
+                                                <i class="fas fa-map-marker-alt me-1"></i>{{ $page->area->name }}
                                             @endif
                                         </small>
                                         <small class="text-muted">
-                                            <i class="fas fa-eye"></i> {{ $page->views_count }}
+                                            <i class="fas fa-eye me-1"></i>{{ number_format($page->views_count) }}
                                         </small>
                                     </div>
-                                </div>
-                                <div class="card-footer">
-                                    <a href="{{ route('cms.page', $page->slug) }}" class="btn btn-primary btn-sm">
-                                        Read More
+                                    <a href="{{ route('cms.page', $page->slug) }}" class="btn btn-primary w-100">
+                                        <i class="fas fa-arrow-right me-2"></i>Read More
                                     </a>
-                                    @if($page->is_featured)
-                                        <span class="badge bg-warning text-dark ms-2">Featured</span>
-                                    @endif
                                 </div>
                             </div>
                         </div>
