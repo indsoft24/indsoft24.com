@@ -76,33 +76,73 @@
                 </div>
             </div>
 
+            <div class="card border-0 shadow-sm mb-5">
+                <div class="card-body p-4">
+                    <h2 class="h4 fw-bold mb-3">Local SEO Phrases for {{ $state->name }}</h2>
+                    <p class="text-muted mb-3">
+                        Rank for local intent searches by weaving these phrases into your copy when you mention {{ $state->name }} or specific cities.
+                    </p>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2"><i class="fas fa-location-dot text-primary me-2"></i>Website designers in {{ $state->name }} Sector 62</li>
+                                <li class="mb-2"><i class="fas fa-location-dot text-primary me-2"></i>Software company near me ({{ $state->name }})</li>
+                                <li class="mb-2"><i class="fas fa-location-dot text-primary me-2"></i>Web development agency in Delhi NCR</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2"><i class="fas fa-location-dot text-primary me-2"></i>Android app developers in {{ $state->name }}</li>
+                                <li class="mb-2"><i class="fas fa-location-dot text-primary me-2"></i>IT consulting firms in {{ $state->name }}</li>
+                                <li class="mb-2"><i class="fas fa-location-dot text-primary me-2"></i>Small business website design Delhi NCR</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2"><i class="fas fa-location-dot text-primary me-2"></i>Coaching institute website design {{ $state->name }}</li>
+                                <li class="mb-2"><i class="fas fa-location-dot text-primary me-2"></i>Educational website development {{ $state->name }}</li>
+                                <li class="mb-2"><i class="fas fa-location-dot text-primary me-2"></i>Student information system software {{ $state->name }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             @if($cities->count() > 0)
                 <div class="row">
                     @foreach($cities as $city)
+                        @php
+                            $cityImage = 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=250&fit=crop';
+                            $cityImageFallback = 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400&h=250&fit=crop';
+                        @endphp
                         <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card h-100 shadow-sm border-0">
-                                <div class="card-body text-center">
-                                    <div class="mb-3">
-                                        <i class="fas fa-city fa-3x text-primary"></i>
-                                    </div>
-                                    <h5 class="card-title mb-3">
+                            <div class="card h-100 shadow-sm border-0" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                                <img src="{{ $cityImage }}" 
+                                     class="card-img-top" 
+                                     alt="{{ $city->city_name }}, {{ $state->name }}"
+                                     style="height: 200px; object-fit: cover;"
+                                     onerror="this.src='{{ $cityImageFallback }}'">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title mb-3 fw-bold">
                                         <a href="{{ route('cms.city.pages', $city) }}" class="text-decoration-none text-dark">
                                             {{ $city->city_name }}
                                         </a>
                                     </h5>
-                                    <p class="card-text text-muted mb-3">
-                                        <i class="fas fa-map-marker-alt me-2"></i>{{ $city->city_name }}, {{ $state->name }}
+                                    <p class="card-text text-muted mb-3 flex-grow-1" style="font-size: 0.95rem; line-height: 1.6;">
+                                        Explore {{ $city->published_pages_count }} businesses in {{ $city->city_name }}, 
+                                        {{ $state->name }}. Discover local shops, e-commerce stores, and services 
+                                        across various industries and sectors.
                                     </p>
                                     
-                                    <div class="row text-center mb-3">
+                                    <div class="row text-center mb-3 g-2">
                                         <div class="col-6">
-                                            <div class="border-end">
-                                                <h6 class="text-primary mb-1">{{ $city->published_pages_count }}</h6>
+                                            <div class="border-end pe-2">
+                                                <h6 class="text-primary mb-1 fw-bold">{{ number_format($city->published_pages_count) }}</h6>
                                                 <small class="text-muted">Businesses</small>
                                             </div>
                                         </div>
                                         <div class="col-6">
-                                            <h6 class="text-success mb-1">Active</h6>
+                                            <h6 class="text-success mb-1 fw-bold">Active</h6>
                                             <small class="text-muted">E-commerce Ready</small>
                                         </div>
                                     </div>
