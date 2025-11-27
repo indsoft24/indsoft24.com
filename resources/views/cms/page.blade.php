@@ -10,16 +10,17 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="{{ url()->current() }}">
 @php
-    $pageImage = $page->featured_image 
-        ? asset($page->featured_image) 
-        : 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=600&fit=crop';
-    $defaultImage = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop';
+    $pageImage = $page->featured_image ? asset($page->featured_image) : '';
 @endphp
+@if($pageImage)
 <meta property="og:image" content="{{ $pageImage }}">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ $pageImage }}">
+@else
+<meta name="twitter:card" content="summary">
+@endif
 <meta name="twitter:title" content="{{ $metaTitle }}">
 <meta name="twitter:description" content="{{ $metaDescription }}">
-<meta name="twitter:image" content="{{ $pageImage }}">
 @push('styles')
 <style>
     .page-content {
@@ -56,7 +57,8 @@
     }
     .page-featured-image img {
         width: 100%;
-        height: 500px;
+        height: auto;
+        max-height: 500px;
         object-fit: cover;
     }
     .page-content-body {
@@ -105,9 +107,6 @@
         .page-content-body {
             padding: 1.5rem;
             font-size: 1rem;
-        }
-        .page-featured-image img {
-            height: 300px;
         }
         .page-meta {
             flex-direction: column;
@@ -161,11 +160,13 @@
                     </div>
                 </header>
 
+                @if($page->featured_image)
                 <div class="page-featured-image">
-                    <img src="{{ $pageImage }}" 
+                    <img src="{{ asset($page->featured_image) }}" 
                          alt="{{ $page->title }} - {{ $page->location }}"
-                         onerror="this.src='{{ $defaultImage }}'">
+                         class="img-fluid rounded">
                 </div>
+                @endif
 
                 <div class="page-content-body">
                     {!! $page->content !!}

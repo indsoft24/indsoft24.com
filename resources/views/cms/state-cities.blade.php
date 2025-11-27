@@ -111,17 +111,8 @@
             @if($cities->count() > 0)
                 <div class="row">
                     @foreach($cities as $city)
-                        @php
-                            $cityImage = 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=250&fit=crop';
-                            $cityImageFallback = 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400&h=250&fit=crop';
-                        @endphp
                         <div class="col-md-6 col-lg-4 mb-4">
                             <div class="card h-100 shadow-sm border-0" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                                <img src="{{ $cityImage }}" 
-                                     class="card-img-top" 
-                                     alt="{{ $city->city_name }}, {{ $state->name }}"
-                                     style="height: 200px; object-fit: cover;"
-                                     onerror="this.src='{{ $cityImageFallback }}'">
                                 <div class="card-body d-flex flex-column">
                                     <h5 class="card-title mb-3 fw-bold">
                                         <a href="{{ route('cms.city.pages', $city) }}" class="text-decoration-none text-dark">

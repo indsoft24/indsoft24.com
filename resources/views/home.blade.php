@@ -188,7 +188,7 @@
                         </ul>
                     </div>
                     <div class="service-footer">
-                        <a href="#contact" class="service-link" aria-label="Learn more about Mobile Applications">
+                        <a href="{{ route('services.app') }}" class="service-link" aria-label="Learn more about Mobile Applications">
                             <span>Learn More</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -216,7 +216,7 @@
                         </ul>
                     </div>
                     <div class="service-footer">
-                        <a href="#contact" class="service-link" aria-label="Learn more about Custom Software">
+                        <a href="{{ route('services.software') }}" class="service-link" aria-label="Learn more about Custom Software">
                             <span>Learn More</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>

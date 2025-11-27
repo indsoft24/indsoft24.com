@@ -12,10 +12,6 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ $metaTitle }}">
 <meta name="twitter:description" content="{{ $metaDescription }}">
-@php
-    $unsplashImage = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=600&fit=crop';
-    $defaultImage = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop';
-@endphp
 @push('styles')
 <style>
     .cms-page {
@@ -41,14 +37,6 @@
         font-size: 1.25rem;
         font-weight: 400;
         opacity: 0.95;
-    }
-    .hero-image {
-        width: 100%;
-        height: 400px;
-        object-fit: cover;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        margin-bottom: 2rem;
     }
     .content-section {
         background: white;
@@ -99,9 +87,6 @@
         .content-section {
             padding: 1.5rem;
         }
-        .hero-image {
-            height: 250px;
-        }
     }
 </style>
 @endpush
@@ -132,12 +117,6 @@
                 <h1>{{ $area->name }}, {{ $cityName }}</h1>
                 <p class="lead mb-0">Discover Local Businesses and E-commerce Opportunities in {{ $area->name }}, {{ $cityName }}, {{ $stateName }}</p>
             </div>
-
-            <!-- Hero Image -->
-            <img src="{{ $unsplashImage }}" 
-                 alt="{{ $area->name }}, {{ $cityName }} - Business Directory" 
-                 class="hero-image"
-                 onerror="this.src='{{ $defaultImage }}'">
 
             <!-- Content Section -->
             <div class="content-section">
@@ -248,16 +227,12 @@
                     @foreach($pages as $page)
                         <div class="col-md-6 col-lg-4 mb-4">
                             <div class="card h-100 shadow-sm">
-                                @php
-                                    $pageImage = $page->featured_image 
-                                        ? asset($page->featured_image) 
-                                        : 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=250&fit=crop';
-                                    $fallbackImage = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=250&fit=crop';
-                                @endphp
-                                <img src="{{ $pageImage }}" 
+                                @if($page->featured_image)
+                                <img src="{{ asset($page->featured_image) }}" 
                                      class="card-img-top" 
                                      alt="{{ $page->title }} in {{ $area->name }}"
-                                     onerror="this.src='{{ $fallbackImage }}'">
+                                     style="height: 250px; object-fit: cover;">
+                                @endif
                                 <div class="card-body d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <h5 class="card-title fw-bold mb-0">

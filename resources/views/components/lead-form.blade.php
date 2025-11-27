@@ -195,6 +195,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Ensure modal sits directly under <body> so Bootstrap z-index behaves consistently
+    let leadModal = document.getElementById('leadFormModal');
+    if (leadModal && leadModal.parentElement !== document.body) {
+        document.body.appendChild(leadModal);
+    }
+
     // Common form submission handler
     function handleFormSubmit(form, submitBtn, messageDiv, modal = null) {
         form.addEventListener('submit', function(e) {
@@ -283,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalForm = document.getElementById('leadFormModalForm');
     const modalSubmitBtn = document.getElementById('leadFormModalSubmit');
     const modalMessageDiv = document.getElementById('leadFormModalMessage');
-    const leadModal = document.getElementById('leadFormModal');
+    leadModal = document.getElementById('leadFormModal');
     
     if (modalForm && modalSubmitBtn && modalMessageDiv) {
         handleFormSubmit(modalForm, modalSubmitBtn, modalMessageDiv, leadModal);
