@@ -98,19 +98,14 @@
                         </div>
                         <div class="row">
                             @foreach($pages as $page)
-                                @php
-                                    $pageImage = $page->featured_image 
-                                        ? asset($page->featured_image) 
-                                        : 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=250&fit=crop';
-                                    $fallbackImage = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=250&fit=crop';
-                                @endphp
                                 <div class="col-md-6 col-lg-4 mb-4">
                                     <div class="card h-100 shadow-sm border-0" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                                        <img src="{{ $pageImage }}" 
+                                        @if($page->featured_image)
+                                        <img src="{{ asset($page->featured_image) }}" 
                                              class="card-img-top" 
                                              alt="{{ $page->title }}"
-                                             style="height: 250px; object-fit: cover;"
-                                             onerror="this.src='{{ $fallbackImage }}'">
+                                             style="height: 250px; object-fit: cover;">
+                                        @endif
                                         <div class="card-body d-flex flex-column">
                                             <h5 class="card-title fw-bold mb-2">
                                                 <a href="{{ route('cms.page', $page) }}" class="text-decoration-none text-dark">

@@ -108,17 +108,8 @@
             @if($areas->count() > 0)
                 <div class="row">
                     @foreach($areas as $area)
-                        @php
-                            $areaImage = 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400&h=250&fit=crop';
-                            $areaImageFallback = 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400&h=250&fit=crop';
-                        @endphp
                         <div class="col-md-6 col-lg-4 mb-4">
                             <div class="card h-100 shadow-sm border-0" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                                <img src="{{ $areaImage }}" 
-                                     class="card-img-top" 
-                                     alt="{{ $area->name }}, {{ $city->city_name }}"
-                                     style="height: 200px; object-fit: cover;"
-                                     onerror="this.src='{{ $areaImageFallback }}'">
                                 <div class="card-body d-flex flex-column">
                                     <h5 class="card-title mb-3 fw-bold">
                                         <a href="{{ route('cms.area.pages', $area) }}" class="text-decoration-none text-dark">

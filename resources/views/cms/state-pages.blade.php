@@ -18,16 +18,10 @@
 <div class="container" style="margin-top: 80px;">
     <div class="row">
         <div class="col-md-8">
-            @php
-                $stateHeroImage = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=400&fit=crop';
-                $stateHeroFallback = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=400&fit=crop';
-            @endphp
             @push('styles')
             <style>
                 .state-pages-header {
-                    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%), url('{{ $stateHeroImage }}');
-                    background-size: cover;
-                    background-position: center;
+                    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
                     color: white;
                     padding: 3rem 2rem;
                     border-radius: 15px;
@@ -143,21 +137,14 @@
             @if($pages->count() > 0)
                 <div class="row">
                     @foreach($pages as $page)
-                        @php
-                            $pageImage = $page->featured_image 
-                                ? asset($page->featured_image) 
-                                : 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=250&fit=crop';
-                            $fallbackImage = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=250&fit=crop';
-                        @endphp
                         <div class="col-md-6 col-lg-4 mb-4">
                             <div class="card h-100 shadow-sm border-0" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                                <img src="{{ $pageImage }}" 
+                                @if($page->featured_image)
+                                <img src="{{ asset($page->featured_image) }}" 
                                      class="card-img-top" 
                                      alt="{{ $page->title }} in {{ $state->name }}"
-                                     style="height: 250px; object-fit: cover;"
-                                     onerror="this.src='{{ $fallbackImage }}'"
-                                     onmouseover="this.style.transform='scale(1.05)'"
-                                     onmouseout="this.style.transform='scale(1)'">
+                                     style="height: 250px; object-fit: cover;">
+                                @endif
                                 <div class="card-body d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <h5 class="card-title mb-0 fw-bold">

@@ -14,10 +14,6 @@
 <meta name="twitter:description" content="{{ $metaDescription }}">
 @endsection
 
-@php
-    $heroImage = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=400&fit=crop';
-    $defaultImage = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=400&fit=crop';
-@endphp
 @push('styles')
 <style>
     .states-page {
@@ -25,9 +21,7 @@
         line-height: 1.8;
     }
     .hero-section {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%), url('{{ $heroImage }}');
-        background-size: cover;
-        background-position: center;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
         color: white;
         padding: 4rem 2rem;
         border-radius: 15px;
@@ -55,11 +49,6 @@
     .state-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-    }
-    .state-image {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
     }
     .content-section {
         background: #fff;
@@ -140,16 +129,8 @@
             @if($states->count() > 0)
                 <div class="row">
                     @foreach($states as $state)
-                        @php
-                            $stateImageUrl = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=200&fit=crop&q=80';
-                            $stateImageFallback = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=200&fit=crop&q=80';
-                        @endphp
                         <div class="col-md-6 col-lg-4 mb-4">
                             <div class="card state-card shadow-sm">
-                                <img src="{{ $stateImageUrl }}" 
-                                     class="state-image" 
-                                     alt="{{ $state->name }} Business Directory"
-                                     onerror="this.src='{{ $stateImageFallback }}'">
                                 <div class="card-body">
                                     <h5 class="card-title fw-bold mb-3">
                                         <a href="{{ route('cms.state.pages', $state) }}" class="text-decoration-none text-dark">

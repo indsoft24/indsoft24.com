@@ -20,16 +20,10 @@
                 </ol>
             </nav>
 
-            @php
-                $cityHeroImage = 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=400&fit=crop';
-                $cityHeroFallback = 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&h=400&fit=crop';
-            @endphp
             @push('styles')
             <style>
                 .city-pages-header {
-                    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%), url('{{ $cityHeroImage }}');
-                    background-size: cover;
-                    background-position: center;
+                    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
                     color: white;
                     padding: 3rem 2rem;
                     border-radius: 15px;
@@ -148,19 +142,14 @@
             @if($pages->count() > 0)
                 <div class="row">
                     @foreach($pages as $page)
-                        @php
-                            $pageImage = $page->featured_image 
-                                ? asset($page->featured_image) 
-                                : 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=250&fit=crop';
-                            $fallbackImage = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=250&fit=crop';
-                        @endphp
                         <div class="col-md-6 col-lg-4 mb-4">
                             <div class="card h-100 shadow-sm border-0" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                                <img src="{{ $pageImage }}" 
+                                @if($page->featured_image)
+                                <img src="{{ asset($page->featured_image) }}" 
                                      class="card-img-top" 
                                      alt="{{ $page->title }} in {{ $city->city_name }}"
-                                     style="height: 250px; object-fit: cover;"
-                                     onerror="this.src='{{ $fallbackImage }}'">
+                                     style="height: 250px; object-fit: cover;">
+                                @endif
                                 <div class="card-body d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <h5 class="card-title fw-bold mb-0">
