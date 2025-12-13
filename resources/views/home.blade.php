@@ -18,7 +18,7 @@
             <!-- Animated grid pattern -->
             <div class="animated-grid"></div>
         </div>
-        <div class="hero-container" style="padding-top: 80px;">
+        <div class="hero-container" style="padding-top: 106px;">
             <div class="hero-content">
                 <div class="hero-badge">
                     <i class="fas fa-star"></i>

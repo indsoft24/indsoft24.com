@@ -32,6 +32,36 @@
   gtag('config', 'G-VZ3GFH5YLS');
 </script>
 <body class="@if(request()->is('blog*')) blog-page @endif">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <span class="top-bar-welcome">
+                    <i class="fas fa-hand-wave"></i>
+                    Welcome to Indsoft24
+                </span>
+            </div>
+            <div class="top-bar-center">
+                <a href="tel:+917520744870" class="top-bar-link">
+                    <i class="fas fa-phone"></i>
+                    <span class="top-bar-text desktop-text">+91 75207 44870</span>
+                    <span class="top-bar-text mobile-text">+91 75207</span>
+                </a>
+                <a href="mailto:indsoft24@gmail.com" class="top-bar-link">
+                    <i class="fas fa-envelope"></i>
+                    <span class="top-bar-text desktop-text">indsoft24@gmail.com</span>
+                    <span class="top-bar-text mobile-text">Email</span>
+                </a>
+            </div>
+            <div class="top-bar-right">
+                <a href="#" class="top-bar-consultation" data-bs-toggle="modal" data-bs-target="#getInTouchModal">
+                    <i class="fas fa-comments"></i>
+                    <span class="desktop-text">Get Free Consultation</span>
+                    <span class="mobile-text">Consultation</span>
+                </a>
+            </div>
+        </div>
+    </div>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -64,6 +94,7 @@
                 
                 <a href="{{ route('about') }}" class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}">About</a>
                 <a href="{{ route('blog.index') }}" class="nav-link {{ request()->routeIs('blog*') ? 'active' : '' }}">Blog</a>
+                <a href="{{ route('contact') }}" class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 <a href="{{ route('e-commerce') }}" class="nav-link {{ request()->routeIs('e-commerce') ? 'active' : '' }}">e commerce</a>
             </div>
             
@@ -157,7 +188,7 @@
                     <span>About Us</span>
                 </a>
 
-                <a href="#contact" class="sidebar-item">
+                <a href="{{ route('contact') }}" class="sidebar-item {{ request()->routeIs('contact') ? 'active' : '' }}">
                     <i class="fas fa-envelope"></i>
                     <span>Contact Us</span>
                 </a>
@@ -312,7 +343,7 @@
                                 <li><a href="{{ route('home') }}#services">Services</a></li>
                                 <li><a href="{{ route('about') }}">About Us</a></li>
                                 <li><a href="{{ route('blog.index') }}">Blog</a></li>
-                                <li><a data-bs-toggle="modal" data-bs-target="#getInTouchModal" style="cursor:pointer">Contact</a></li>
+                                <li><a href="{{ route('contact') }}">Contact</a></li>
                             </ul>
                         </div>
                     </div>
@@ -322,10 +353,10 @@
                             <h4>Services</h4>
                             <ul class="footer-links">
                                 <li><a href="{{ route('services.web') }}">Web Development</a></li>
-                                <li><a href="#">Mobile Apps</a></li>
-                                <li><a href="#">Custom Software</a></li>
-                                <li><a href="#">UI/UX Design</a></li>
-                                <li><a href="#">Consulting</a></li>
+                                <li><a href="{{ route('services.app') }}">Mobile Apps</a></li>
+                                <li><a href="{{ route('services.software') }}">Custom Software</a></li>
+                                <li><a href="{{ route('services.index') }}">UI/UX Design</a></li>
+                                <li><a href="{{ route('services.index') }}">Consulting</a></li>
                             </ul>
                         </div>
                     </div>
@@ -440,48 +471,110 @@
 </script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const contactForm = document.getElementById("contactForm");
-    const submitBtn = contactForm.querySelector("button[type='submit']");
+    // Only target the modal contact form, not the contact page form
+    const modal = document.getElementById('getInTouchModal');
+    if (modal) {
+        const contactForm = modal.querySelector("form[id='contactForm']");
+        if (contactForm) {
+            const submitBtn = contactForm.querySelector("button[type='submit']");
 
-    contactForm.addEventListener("submit", function (e) {
-        e.preventDefault();
+            contactForm.addEventListener("submit", function (e) {
+                e.preventDefault();
 
-        // Disable button and change text
-        submitBtn.disabled = true;
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = "Sending...";
+                // Disable button and change text
+                submitBtn.disabled = true;
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = "Sending...";
 
-        let formData = new FormData(contactForm);
+                let formData = new FormData(contactForm);
 
-        fetch(contactForm.action, {
-            method: "POST",
-            body: formData,
-            headers: { "X-Requested-With": "XMLHttpRequest" }
-        })
-        .then(response => response.json())
-        .then(data => {
-            let modal = bootstrap.Modal.getInstance(document.getElementById('getInTouchModal'));
-            if (modal) modal.hide();
-            contactForm.reset();
+                fetch(contactForm.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    let modalInstance = bootstrap.Modal.getInstance(document.getElementById('getInTouchModal'));
+                    if (modalInstance) modalInstance.hide();
+                    contactForm.reset();
 
-            if (data.success) {
-                toastr.success(data.message || "Message sent successfully!");
+                    if (data.success) {
+                        toastr.success(data.message || "Message sent successfully!");
+                    } else {
+                        toastr.error(data.message || "Something went wrong!");
+                    }
+                })
+                .catch(err => {
+                    let modalInstance = bootstrap.Modal.getInstance(document.getElementById('getInTouchModal'));
+                    if (modalInstance) modalInstance.hide();
+
+                    toastr.error("An error occurred. Please try again.");
+                })
+                .finally(() => {
+                    // Re-enable button and restore text
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                });
+            });
+        }
+    }
+
+    // Top Bar Scroll Behavior - Show/Hide on scroll
+    const topBar = document.querySelector('.top-bar');
+    const navbar = document.querySelector('.navbar');
+    let lastScrollTop = 0;
+    let scrollThreshold = 10; // Minimum scroll distance to trigger hide/show
+
+    if (topBar && navbar) {
+        // Function to update navbar position based on top bar visibility
+        const updateNavbarPosition = (isTopBarVisible) => {
+            if (isTopBarVisible) {
+                navbar.classList.remove('top-zero');
+                navbar.classList.add('top-bar-visible');
             } else {
-                toastr.error(data.message || "Something went wrong!");
+                navbar.classList.remove('top-bar-visible');
+                navbar.classList.add('top-zero');
             }
-        })
-        .catch(err => {
-            let modal = bootstrap.Modal.getInstance(document.getElementById('getInTouchModal'));
-            if (modal) modal.hide();
+        };
 
-            toastr.error("An error occurred. Please try again.");
-        })
-        .finally(() => {
-            // Re-enable button and restore text
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-        });
-    });
+        // Initialize navbar position on page load
+        updateNavbarPosition(true);
+
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // At the top of the page, always show the top bar
+            if (scrollTop <= scrollThreshold) {
+                topBar.classList.remove('hidden');
+                updateNavbarPosition(true);
+                lastScrollTop = scrollTop;
+                return;
+            }
+
+            // Scrolling down - hide top bar
+            if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+                topBar.classList.add('hidden');
+                updateNavbarPosition(false);
+            } 
+            // Scrolling up - show top bar
+            else if (scrollTop < lastScrollTop) {
+                topBar.classList.remove('hidden');
+                updateNavbarPosition(true);
+            }
+
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }, { passive: true });
+
+        // Handle window resize to adjust navbar position
+        window.addEventListener('resize', function() {
+            if (!topBar.classList.contains('hidden')) {
+                updateNavbarPosition(true);
+            } else {
+                updateNavbarPosition(false);
+            }
+        }, { passive: true });
+    }
 });
 
 </script>
