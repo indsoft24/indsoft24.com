@@ -21,6 +21,27 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @stack('styles')
+    <style>
+        /* Get In Touch Modal z-index and compact styling */
+        #getInTouchModal {
+            z-index: 99999 !important;
+        }
+        #getInTouchModal .modal-backdrop {
+            z-index: 99998 !important;
+        }
+        #getInTouchModal.modal.show {
+            z-index: 99999 !important;
+        }
+        #getInTouchModal .modal-header {
+            padding: 0.75rem 1rem;
+        }
+        #getInTouchModal .modal-header .modal-title {
+            font-size: 1rem;
+        }
+        #getInTouchModal .modal-body {
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-VZ3GFH5YLS"></script>
@@ -264,7 +285,7 @@
     <!-- contact popup -->
     <!-- Get In Touch Modal -->
 <div class="modal fade" id="getInTouchModal" tabindex="-1" role="dialog" aria-labelledby="getInTouchModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-dialog-centered modal-md" role="document">
     <div class="modal-content shadow-lg rounded-3">
       <div class="modal-header bg-primary text-white">
         <h5 class="modal-title" id="getInTouchModalLabel">Get in Touch</h5>
@@ -273,33 +294,33 @@
 
       <form id="contactForm" method="POST" action="{{ route('contact.store') }}">
         @csrf
-        <div class="modal-body">
+        <div class="modal-body" style="padding: 1rem;">
           <!-- Honeypot field (hidden from users) -->
           <input type="text" name="website" style="display:none">
 
           <div class="form-group mb-3">
-            <label for="name">Your Name</label>
-            <input type="text" class="form-control" name="name" placeholder="Enter your name" required>
+            <label for="name" class="small fw-semibold">Your Name</label>
+            <input type="text" class="form-control form-control-sm" name="name" placeholder="Enter your name" required>
           </div>
 
           <div class="form-group mb-3">
-            <label for="email">Your Email</label>
-            <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
+            <label for="email" class="small fw-semibold">Your Email</label>
+            <input type="email" class="form-control form-control-sm" name="email" placeholder="Enter your email" required>
           </div>
 
           <div class="form-group mb-3">
-            <label for="subject">Subject</label>
-            <input type="text" class="form-control" name="subject" placeholder="Enter subject" required>
+            <label for="subject" class="small fw-semibold">Subject</label>
+            <input type="text" class="form-control form-control-sm" name="subject" placeholder="Enter subject" required>
           </div>
 
           <div class="form-group mb-3">
-            <label for="message">Message</label>
-            <textarea class="form-control" name="message" rows="4" placeholder="Write your message..." required></textarea>
+            <label for="message" class="small fw-semibold">Message</label>
+            <textarea class="form-control form-control-sm" name="message" rows="3" placeholder="Write your message..." required></textarea>
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary w-100">Send Message</button>
+        <div class="modal-footer" style="padding: 0.75rem 1rem;">
+          <button type="submit" class="btn btn-primary btn-sm w-100">Send Message</button>
         </div>
       </form>
     </div>

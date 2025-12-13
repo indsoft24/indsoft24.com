@@ -3131,7 +3131,7 @@ body{font-family:'Inter',sans-serif;line-height:1.6;color:#333;overflow-x:hidden
 /* Keep CMS modal above the overlay and dim the background only */
 #leadFormModal,
 #leadFormModal .modal-dialog {
-    z-index: 1060;
+    z-index: 99999;
 }
 
 .modal-backdrop.show {
