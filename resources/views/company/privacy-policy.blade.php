@@ -1,14 +1,50 @@
 @extends('layouts.app')
 
-@section('title', 'Privacy Policy - Indsoft24.com')
+@section('title', 'Privacy Policy - Indsoft24.com | Your Data Protection Rights')
+
+@section('meta')
+<meta name="description" content="Read Indsoft24's privacy policy. We protect your data while you enjoy our free blog posting platform and digital services including website development, app development, and digital marketing.">
+<meta name="keywords" content="privacy policy, data protection, Indsoft24 privacy, free blog platform privacy">
+@endsection
+
+@push('styles')
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .policy-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-top: 70px;
+        animation: fadeInUp 1s ease-out;
+    }
+    
+    .policy-benefits {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin: 40px 0;
+        animation: fadeInUp 1s ease-out;
+    }
+</style>
+@endpush
 
 @section('content')
 <div class="policy-page">
     <section class="policy-header">
         <div class="container">
             <h1 class="display-4 fw-bold">Privacy Policy</h1>
-            <p class="lead text-muted">Your privacy is important to us. Here's how we handle your data.</p>
-            <p class="text-muted"><small>Last Updated: {{ date('F d, Y') }}</small></p>
+            <p class="lead" style="opacity: 0.95;">Your privacy is important to us. Here's how we handle your data.</p>
+            <p style="opacity: 0.9;"><small>Last Updated: {{ date('F d, Y') }}</small></p>
         </div>
     </section>
 
@@ -72,6 +108,51 @@
                         <h2 class="mt-2">8. Contact Us</h2>
                         <p>If you have any questions about this Privacy Policy, please contact us by visiting the contact section on our homepage.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Benefits Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="policy-benefits">
+                <div class="text-center mb-4">
+                    <h2 class="display-5 fw-bold text-primary mb-3">Enjoy Our Services with Complete Privacy</h2>
+                    <p class="lead text-muted">We protect your data while you use our comprehensive digital solutions</p>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-3 text-center">
+                        <i class="fas fa-globe fa-3x text-primary mb-3"></i>
+                        <h5 class="fw-bold">Website Development</h5>
+                    </div>
+                    <div class="col-md-6 col-lg-3 text-center">
+                        <i class="fas fa-mobile-alt fa-3x text-success mb-3"></i>
+                        <h5 class="fw-bold">App Development</h5>
+                    </div>
+                    <div class="col-md-6 col-lg-3 text-center">
+                        <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                        <h5 class="fw-bold">Digital Marketing</h5>
+                    </div>
+                    <div class="col-md-6 col-lg-3 text-center">
+                        <i class="fas fa-blog fa-3x text-warning mb-3"></i>
+                        <h5 class="fw-bold">Free Blog Platform</h5>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <p class="mb-3">Plus: Software Development, Social Media Marketing, Creative Services, and more!</p>
+                    @auth
+                        <a href="{{ route('user.blog.create') }}" class="btn btn-primary btn-lg me-2">
+                            <i class="fas fa-blog me-2"></i>Start Blogging Free
+                        </a>
+                    @else
+                        <a href="{{ route('auth.google') }}" class="btn btn-primary btn-lg me-2">
+                            <i class="fab fa-google me-2"></i>Login & Start Blogging
+                        </a>
+                    @endauth
+                    <a href="{{ route('about') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-info-circle me-2"></i>Learn More
+                    </a>
                 </div>
             </div>
         </div>

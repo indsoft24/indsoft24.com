@@ -1,14 +1,80 @@
 @extends('layouts.app')
 
-@section('title', 'Contact Us - Indsoft24')
+@section('title', 'Contact Us - Indsoft24 | Get Free Consultation for Digital Solutions')
+
+@section('meta')
+<meta name="description" content="Contact Indsoft24 for website development, app development, digital marketing, social media marketing, and creative services. Also enjoy free blog posting to share your content and earn money.">
+<meta name="keywords" content="contact Indsoft24, website development services, app development, digital marketing, free blog posting, contact digital agency">
+@endsection
+
+@push('styles')
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+    
+    .contact-benefits-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 50px 30px;
+        margin: 40px 0;
+        color: white;
+        animation: fadeInUp 1s ease-out;
+    }
+    
+    .benefit-item {
+        text-align: center;
+        padding: 20px;
+        animation: fadeInUp 0.8s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .benefit-item:nth-child(1) { animation-delay: 0.1s; }
+    .benefit-item:nth-child(2) { animation-delay: 0.2s; }
+    .benefit-item:nth-child(3) { animation-delay: 0.3s; }
+    .benefit-item:nth-child(4) { animation-delay: 0.4s; }
+    
+    .benefit-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .contact-info-card {
+        animation: fadeInUp 0.8s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .contact-info-card:nth-child(1) { animation-delay: 0.1s; }
+    .contact-info-card:nth-child(2) { animation-delay: 0.2s; }
+    .contact-info-card:nth-child(3) { animation-delay: 0.3s; }
+</style>
+@endpush
 
 @section('content')
 <div class="contact-page" style="margin-top: 106px; padding: 40px 0;">
     <div class="container">
         <!-- Page Header -->
-        <div class="text-center mb-5">
+        <div class="text-center mb-5" style="animation: fadeInUp 1s ease-out;">
             <h1 class="display-4 fw-bold mb-3">Get in Touch</h1>
             <p class="lead text-muted">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+            <p class="text-muted">Get free consultation for all our digital solutions including website development, app development, digital marketing, and more!</p>
         </div>
 
         <div class="row g-4">
@@ -43,6 +109,69 @@
                     <h4 class="contact-info-title">Visit Us</h4>
                     <p class="contact-info-text">Our office location</p>
                     <p class="contact-info-link">Noida, Uttar Pradesh, India</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefits Section -->
+        <div class="contact-benefits-section">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold mb-3">Why Contact Indsoft24?</h2>
+                <p class="lead mb-0" style="opacity: 0.95;">We offer comprehensive digital solutions and a free platform for creators</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Website Development</h5>
+                        <p class="mb-0 small" style="opacity: 0.9;">Professional, responsive websites that convert</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">App Development</h5>
+                        <p class="mb-0 small" style="opacity: 0.9;">Android & iOS apps for your business</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Digital Marketing</h5>
+                        <p class="mb-0 small" style="opacity: 0.9;">SEO, Google Ads, Social Media Marketing</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-blog"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Free Blog Platform</h5>
+                        <p class="mb-0 small" style="opacity: 0.9;">Post blogs for free and earn money</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p class="mb-3">We also offer: Software Development, Creative Services, Social Media Marketing, and more!</p>
+                <div>
+                    @auth
+                        <a href="{{ route('user.blog.create') }}" class="btn btn-light btn-lg me-2">
+                            <i class="fas fa-blog me-2"></i>Start Blogging Free
+                        </a>
+                    @else
+                        <a href="{{ route('auth.google') }}" class="btn btn-light btn-lg me-2">
+                            <i class="fab fa-google me-2"></i>Login & Start Blogging
+                        </a>
+                    @endauth
+                    <a href="{{ route('about') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-info-circle me-2"></i>Learn More
+                    </a>
                 </div>
             </div>
         </div>
