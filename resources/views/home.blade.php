@@ -18,7 +18,7 @@
             <!-- Animated grid pattern -->
             <div class="animated-grid"></div>
         </div>
-        <div class="hero-container" style="padding-top: 80px;">
+        <div class="hero-container" style="padding-top: 106px;">
             <div class="hero-content">
                 <div class="hero-badge">
                     <i class="fas fa-star"></i>
@@ -188,7 +188,7 @@
                         </ul>
                     </div>
                     <div class="service-footer">
-                        <a href="#contact" class="service-link" aria-label="Learn more about Mobile Applications">
+                        <a href="{{ route('services.app') }}" class="service-link" aria-label="Learn more about Mobile Applications">
                             <span>Learn More</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -216,7 +216,7 @@
                         </ul>
                     </div>
                     <div class="service-footer">
-                        <a href="#contact" class="service-link" aria-label="Learn more about Custom Software">
+                        <a href="{{ route('services.software') }}" class="service-link" aria-label="Learn more about Custom Software">
                             <span>Learn More</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>

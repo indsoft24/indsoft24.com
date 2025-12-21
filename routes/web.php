@@ -72,6 +72,7 @@ Route::prefix('projects')->name('projects.')->group(function () {
 // Company Pages
 Route::view('/about-us', 'company.about')->name('about');
 Route::view('/our-team', 'company.team')->name('team');
+Route::view('/contact-us', 'company.contact')->name('contact');
 Route::view('/privacy-policy', 'company.privacy-policy')->name('privacy.policy');
 Route::view('/terms-conditions', 'company.terms-and-conditions')->name('terms.conditions');
 Route::view('/cookie-policy', 'company.cookie-policy')->name('cookie.policy');

@@ -52,12 +52,41 @@
 <div class="container" style="margin-top: 80px;">
     <div class="row">
         <div class="col-md-8">
-            <div class="page-header mb-5">
+            @push('styles')
+            <style>
+                .state-pages-header {
+                    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+                    color: white;
+                    padding: 3rem 2rem;
+                    border-radius: 15px;
+                    margin-bottom: 2rem;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                }
+                .state-pages-header h1 {
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                }
+                .state-pages-header .lead {
+                    font-size: 1.25rem;
+                    opacity: 0.95;
+                }
+                @media (max-width: 768px) {
+                    .state-pages-header {
+                        padding: 2rem 1.5rem;
+                    }
+                    .state-pages-header h1 {
+                        font-size: 1.75rem;
+                    }
+                }
+            </style>
+            @endpush
+            <div class="state-pages-header">
                 <nav aria-label="breadcrumb" class="mb-3">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-decoration-none">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('cms.states') }}" class="text-decoration-none">States</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">{{ $state->name }}</li>
+                    <ol class="breadcrumb bg-white bg-opacity-25 rounded px-3 py-2 d-inline-block">
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-white text-decoration-none">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('cms.states') }}" class="text-white text-decoration-none">States</a></li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">{{ $state->name }}</li>
                     </ol>
                 </nav>
                 
@@ -67,14 +96,14 @@
                 </p>
                 
                 <!-- E-commerce Banner -->
-                <div class="alert alert-success border-0 shadow-sm mb-4">
+                <div class="alert border-0 shadow-sm mb-0" style="background: rgba(255,255,255,0.95); color: #2c3e50;">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h5 class="mb-2"><i class="fas fa-store me-2"></i>Start Your Online Store in {{ $state->name }}</h5>
+                            <h5 class="mb-2 fw-bold"><i class="fas fa-store me-2 text-primary"></i>Start Your Online Store in {{ $state->name }}</h5>
                             <p class="mb-0">Join successful businesses in {{ $state->name }} with our comprehensive e-commerce solutions. Perfect for all industries!</p>
                         </div>
-                        <div class="col-md-4 text-end">
-                            <a href="{{ route('e-commerce') }}" class="btn btn-success btn-lg">
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <a href="{{ route('e-commerce') }}" class="btn btn-primary btn-lg">
                                 <i class="fas fa-rocket me-2"></i>Launch Store
                             </a>
                         </div>
@@ -488,17 +517,16 @@
                 <div class="row">
                     @foreach($pages as $page)
                         <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card h-100 shadow-sm border-0">
+                            <div class="card h-100 shadow-sm border-0" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
                                 @if($page->featured_image)
-                                    <img src="{{ asset($page->featured_image) }}" class="card-img-top" alt="{{ $page->title }}" style="height: 200px; object-fit: cover;">
-                                @else
-                                    <div class="card-img-top bg-gradient d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                        <i class="fas fa-building text-white" style="font-size: 3rem;"></i>
-                                    </div>
+                                <img src="{{ asset($page->featured_image) }}" 
+                                     class="card-img-top" 
+                                     alt="{{ $page->title }} in {{ $state->name }}"
+                                     style="height: 250px; object-fit: cover;">
                                 @endif
-                                <div class="card-body">
+                                <div class="card-body d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="card-title mb-0">
+                                        <h5 class="card-title mb-0 fw-bold">
                                             <a href="{{ route('cms.page', $page) }}" class="text-decoration-none text-dark">
                                                 {{ $page->title }}
                                             </a>
@@ -508,19 +536,19 @@
                                         @endif
                                     </div>
                                     
-                                    <p class="card-text text-muted mb-3">
-                                        {{ $page->excerpt ?: Str::limit(strip_tags($page->content), 120) }}
+                                    <p class="card-text text-muted mb-3 flex-grow-1" style="font-size: 0.95rem; line-height: 1.6;">
+                                        {{ $page->excerpt ?: Str::limit(strip_tags($page->content), 150) }}
                                     </p>
                                     
-                                    <div class="row text-center mb-3">
+                                    <div class="row text-center mb-3 g-2">
                                         <div class="col-6">
-                                            <div class="border-end">
-                                                <h6 class="text-primary mb-1">{{ $page->views_count }}</h6>
+                                            <div class="border-end pe-2">
+                                                <h6 class="text-primary mb-1 fw-bold">{{ number_format($page->views_count) }}</h6>
                                                 <small class="text-muted">Views</small>
                                             </div>
                                         </div>
                                         <div class="col-6">
-                                            <h6 class="text-success mb-1">{{ ucfirst($page->page_type) }}</h6>
+                                            <h6 class="text-success mb-1 fw-bold">{{ ucfirst($page->page_type) }}</h6>
                                             <small class="text-muted">Type</small>
                                         </div>
                                     </div>
@@ -546,7 +574,7 @@
                                 <div class="card-footer bg-light border-0">
                                     <small class="text-muted">
                                         <i class="fas fa-calendar me-1"></i>
-                                        {{ $page->published_at->format('M d, Y') }}
+                                        {{ $page->published_at->format('F d, Y') }}
                                     </small>
                                 </div>
                             </div>

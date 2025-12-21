@@ -78,41 +78,65 @@
                 </div>
             </div>
 
+            <div class="card border-0 shadow-sm mb-5">
+                <div class="card-body p-4">
+                    <h2 class="h4 fw-bold mb-3">Neighborhood-Level Searches for {{ $city->city_name }}</h2>
+                    <p class="text-muted mb-4">
+                        When you optimize pages for specific areas in {{ $city->city_name }}, weave in these long-tail keywords that people use while searching for tech partners nearby.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2"><i class="fas fa-map-pin text-primary me-2"></i>Website designers in {{ $city->city_name }} Sector 62</li>
+                                <li class="mb-2"><i class="fas fa-map-pin text-primary me-2"></i>Software company near me {{ $city->city_name }}</li>
+                                <li class="mb-2"><i class="fas fa-map-pin text-primary me-2"></i>Android app developers in {{ $city->city_name }}</li>
+                                <li class="mb-2"><i class="fas fa-map-pin text-primary me-2"></i>Small business website design {{ $city->state->name }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2"><i class="fas fa-map-pin text-primary me-2"></i>Coaching institute website design {{ $city->city_name }}</li>
+                                <li class="mb-2"><i class="fas fa-map-pin text-primary me-2"></i>Online exam portal development {{ $city->state->name }}</li>
+                                <li class="mb-2"><i class="fas fa-map-pin text-primary me-2"></i>Inventory management software development {{ $city->state->name }}</li>
+                                <li class="mb-2"><i class="fas fa-map-pin text-primary me-2"></i>Cloud-based software solutions {{ $city->state->name }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             @if($areas->count() > 0)
                 <div class="row">
                     @foreach($areas as $area)
                         <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card h-100 shadow-sm border-0">
-                                <div class="card-body text-center">
-                                    <div class="mb-3">
-                                        <i class="fas fa-map-pin fa-3x text-primary"></i>
-                                    </div>
-                                    <h5 class="card-title mb-3">
+                            <div class="card h-100 shadow-sm border-0" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title mb-3 fw-bold">
                                         <a href="{{ route('cms.area.pages', $area) }}" class="text-decoration-none text-dark">
                                             {{ $area->name }}
                                         </a>
                                     </h5>
-                                    <p class="card-text text-muted mb-3">
-                                        <i class="fas fa-map-marker-alt me-2"></i>{{ $area->name }}, {{ $city->city_name }}
+                                    <p class="card-text text-muted mb-3 flex-grow-1" style="font-size: 0.95rem; line-height: 1.6;">
+                                        <i class="fas fa-map-marker-alt me-2 text-primary"></i>{{ $area->name }}, {{ $city->city_name }}
                                     </p>
                                     
                                     @if($area->address)
                                         <p class="card-text mb-3">
                                             <small class="text-muted">
-                                                <i class="fas fa-location-dot me-2"></i>{{ Str::limit($area->address, 50) }}
+                                                <i class="fas fa-location-dot me-2"></i>{{ Str::limit($area->address, 60) }}
                                             </small>
                                         </p>
                                     @endif
                                     
-                                    <div class="row text-center mb-3">
+                                    <div class="row text-center mb-3 g-2">
                                         <div class="col-6">
-                                            <div class="border-end">
-                                                <h6 class="text-primary mb-1">{{ $area->published_pages_count }}</h6>
+                                            <div class="border-end pe-2">
+                                                <h6 class="text-primary mb-1 fw-bold">{{ number_format($area->published_pages_count) }}</h6>
                                                 <small class="text-muted">Businesses</small>
                                             </div>
                                         </div>
                                         <div class="col-6">
-                                            <h6 class="text-success mb-1">Active</h6>
+                                            <h6 class="text-success mb-1 fw-bold">Active</h6>
                                             <small class="text-muted">E-commerce Ready</small>
                                         </div>
                                     </div>
