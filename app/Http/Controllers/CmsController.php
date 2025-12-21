@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Area;
 use App\City;
 use App\Page;
+use App\Post;
 use App\State;
 use Illuminate\Http\Request;
 
@@ -30,10 +31,43 @@ class CmsController extends Controller
             ->orderBy('published_at', 'desc')
             ->paginate(10);
 
-        $metaTitle = "Businesses in {$state->name} | Local Directory & E-commerce Stores | ".config('app.name');
-        $metaDescription = "Discover local businesses, e-commerce stores, and services in {$state->name}. Find everything from traditional shops to modern online stores. Perfect for all industries including pharmaceuticals, textiles, hardware, software, real estate, and more.";
+        // Get cities for the state (for dynamic content)
+        $cities = $state->activeCities()
+            ->select('id', 'city_name')
+            ->orderBy('city_name')
+            ->get();
 
-        return view('cms.state-pages', compact('state', 'pages', 'metaTitle', 'metaDescription'));
+        // Get major cities (top 5-10 cities)
+        $majorCities = $cities->take(10);
+        $majorCitiesList = $majorCities->pluck('city_name')->toArray();
+        $majorCitiesString = $majorCities->take(5)->pluck('city_name')->implode(', ');
+        
+        // Get capital city (first city or most popular)
+        $capitalCity = $majorCities->first() ? $majorCities->first()->city_name : $state->name;
+
+        // Enhanced SEO meta tags
+        $metaTitle = "Digital Growth & IT Services in {$state->name} – Website, App & Digital Marketing Solutions | ".config('app.name');
+        $metaDescription = "Grow your business digitally in {$state->name}. Professional website development, mobile app development, digital marketing, SEO, and social media marketing services. Serving businesses in {$majorCitiesString} and across {$state->name}.";
+
+        // Get random blog posts
+        $blogPosts = Post::published()
+            ->with(['category', 'user'])
+            ->inRandomOrder()
+            ->limit(6)
+            ->get();
+
+        return view('cms.state-pages', compact(
+            'state', 
+            'pages', 
+            'metaTitle', 
+            'metaDescription', 
+            'blogPosts',
+            'cities',
+            'majorCities',
+            'majorCitiesList',
+            'majorCitiesString',
+            'capitalCity'
+        ));
     }
 
     /**
@@ -60,10 +94,47 @@ class CmsController extends Controller
             ->orderBy('published_at', 'desc')
             ->paginate(10);
 
-        $metaTitle = "Pages in {$city->city_name}, {$city->state->name} | ".config('app.name');
-        $metaDescription = "Browse all pages and content for {$city->city_name}, {$city->state->name}.";
+        // Get areas for the city
+        $areas = $city->activeAreas()
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
 
-        return view('cms.city-pages', compact('city', 'pages', 'metaTitle', 'metaDescription'));
+        // Get top areas (for content)
+        $topAreas = $areas->take(5);
+        $topAreasList = $topAreas->pluck('name')->toArray();
+        $topAreasString = $topAreas->take(3)->pluck('name')->implode(', ');
+        
+        // Get a primary area (first area)
+        $primaryArea = $topAreas->first() ? $topAreas->first()->name : $city->city_name;
+        
+        // Get nearby areas (if available in city model)
+        $nearbyArea = $topAreas->skip(1)->first() ? $topAreas->skip(1)->first()->name : $primaryArea;
+
+        // Enhanced SEO meta tags
+        $metaTitle = "Website Development & Digital Marketing Services in {$city->city_name}, {$city->state->name} | ".config('app.name');
+        $metaDescription = "Grow your business online in {$city->city_name}. Professional website development, mobile app development, digital marketing, SEO, and social media marketing services in {$city->city_name}, {$city->state->name}.";
+
+        // Get random blog posts
+        $blogPosts = Post::published()
+            ->with(['category', 'user'])
+            ->inRandomOrder()
+            ->limit(6)
+            ->get();
+
+        return view('cms.city-pages', compact(
+            'city', 
+            'pages', 
+            'metaTitle', 
+            'metaDescription', 
+            'blogPosts',
+            'areas',
+            'topAreas',
+            'topAreasList',
+            'topAreasString',
+            'primaryArea',
+            'nearbyArea'
+        ));
     }
 
     /**
@@ -99,10 +170,42 @@ class CmsController extends Controller
         $cityName = $area->city()->first() ? $area->city()->first()->city_name : $area->city;
         $stateName = $area->state()->first() ? $area->state()->first()->name : $area->state;
 
-        $metaTitle = "Pages in {$area->name}, {$cityName} | ".config('app.name');
-        $metaDescription = "Browse all pages and content for {$area->name}, {$cityName}, {$stateName}.";
+        // Get nearby areas in the same city
+        $nearbyAreas = [];
+        if ($area->city_id) {
+            $nearbyAreas = Area::active()
+                ->where('city_id', $area->city_id)
+                ->where('id', '!=', $area->id)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->take(5)
+                ->get();
+        }
+        
+        $nearbyAreaName = $nearbyAreas->first() ? $nearbyAreas->first()->name : $area->name;
 
-        return view('cms.area-pages', compact('area', 'pages', 'metaTitle', 'metaDescription', 'cityName', 'stateName'));
+        // Enhanced SEO meta tags
+        $metaTitle = "Website Development & Digital Marketing Services in {$area->name}, {$cityName} | ".config('app.name');
+        $metaDescription = "Grow your business online in {$area->name}, {$cityName}. Professional website development, mobile app development, digital marketing, SEO, and social media marketing services in {$area->name}, {$cityName}, {$stateName}.";
+
+        // Get random blog posts
+        $blogPosts = Post::published()
+            ->with(['category', 'user'])
+            ->inRandomOrder()
+            ->limit(6)
+            ->get();
+
+        return view('cms.area-pages', compact(
+            'area', 
+            'pages', 
+            'metaTitle', 
+            'metaDescription', 
+            'cityName', 
+            'stateName', 
+            'blogPosts',
+            'nearbyAreas',
+            'nearbyAreaName'
+        ));
     }
 
     /**
@@ -149,7 +252,14 @@ class CmsController extends Controller
             ->limit(5)
             ->get();
 
-        return view('cms.page', compact('page', 'relatedPages', 'metaTitle', 'metaDescription'));
+        // Get random blog posts
+        $blogPosts = Post::published()
+            ->with(['category', 'user'])
+            ->inRandomOrder()
+            ->limit(6)
+            ->get();
+
+        return view('cms.page', compact('page', 'relatedPages', 'metaTitle', 'metaDescription', 'blogPosts'));
     }
 
     /**
@@ -167,7 +277,14 @@ class CmsController extends Controller
         $metaTitle = 'Business Directory by State | Find Local Businesses & E-commerce Stores | '.config('app.name');
         $metaDescription = 'Discover businesses, e-commerce stores, and services across states in India. From pharmaceuticals to textiles, hardware to software - find everything you need.';
 
-        return view('cms.states', compact('states', 'metaTitle', 'metaDescription'));
+        // Get random blog posts
+        $blogPosts = Post::published()
+            ->with(['category', 'user'])
+            ->inRandomOrder()
+            ->limit(6)
+            ->get();
+
+        return view('cms.states', compact('states', 'metaTitle', 'metaDescription', 'blogPosts'));
     }
 
     /**
@@ -183,7 +300,14 @@ class CmsController extends Controller
         $metaTitle = "Cities in {$state->name} | Business Directory & E-commerce Opportunities | ".config('app.name');
         $metaDescription = "Discover business opportunities and e-commerce solutions across {$cities->count()} cities in {$state->name}. Find local businesses, services, and set up your online store in any city.";
 
-        return view('cms.state-cities', compact('state', 'cities', 'metaTitle', 'metaDescription'));
+        // Get random blog posts
+        $blogPosts = Post::published()
+            ->with(['category', 'user'])
+            ->inRandomOrder()
+            ->limit(6)
+            ->get();
+
+        return view('cms.state-cities', compact('state', 'cities', 'metaTitle', 'metaDescription', 'blogPosts'));
     }
 
     /**
@@ -203,7 +327,14 @@ class CmsController extends Controller
         $metaTitle = "Areas in {$city->city_name}, {$city->state->name} | Business Directory & E-commerce Opportunities | ".config('app.name');
         $metaDescription = "Discover business opportunities and e-commerce solutions across {$areas->count()} areas in {$city->city_name}, {$city->state->name}. Find local businesses, services, and set up your online store in any area.";
 
-        return view('cms.city-areas', compact('city', 'areas', 'metaTitle', 'metaDescription'));
+        // Get random blog posts
+        $blogPosts = Post::published()
+            ->with(['category', 'user'])
+            ->inRandomOrder()
+            ->limit(6)
+            ->get();
+
+        return view('cms.city-areas', compact('city', 'areas', 'metaTitle', 'metaDescription', 'blogPosts'));
     }
 
     /**
@@ -276,6 +407,13 @@ class CmsController extends Controller
         $metaTitle = 'Search Pages | '.config('app.name');
         $metaDescription = 'Search through all published pages and content.';
 
-        return view('cms.search', compact('pages', 'states', 'cities', 'areas', 'metaTitle', 'metaDescription'));
+        // Get random blog posts
+        $blogPosts = Post::published()
+            ->with(['category', 'user'])
+            ->inRandomOrder()
+            ->limit(6)
+            ->get();
+
+        return view('cms.search', compact('pages', 'states', 'cities', 'areas', 'metaTitle', 'metaDescription', 'blogPosts'));
     }
 }

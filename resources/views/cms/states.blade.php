@@ -195,3 +195,10 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+@include('components.blog-section')
+@include('components.blog-cta-section')
+@endsection

@@ -37,7 +37,7 @@ class PageController extends Controller
             },
             'user' => function ($q) {
                 $q->select('id', 'name');
-            }
+            },
         ]);
 
         // Filter by state
@@ -72,10 +72,10 @@ class PageController extends Controller
 
         // Filter by date range
         if ($request->has('date_from') && $request->date_from !== '') {
-            $query->whereDate('created_at', '>=', $request->date_from);
+            $query->where('created_at', '>=', $request->date_from.' 00:00:00');
         }
         if ($request->has('date_to') && $request->date_to !== '') {
-            $query->whereDate('created_at', '<=', $request->date_to);
+            $query->where('created_at', '<=', $request->date_to.' 23:59:59');
         }
 
         // Search
@@ -110,7 +110,7 @@ class PageController extends Controller
 
         $perPage = $request->get('per_page', 15);
         $pages = $query->paginate($perPage)->appends($request->query());
-        
+
         // Statistics
         $stats = [
             'total' => Page::count(),
@@ -120,14 +120,14 @@ class PageController extends Controller
             'featured' => Page::where('is_featured', true)->count(),
             'total_views' => Page::sum('views_count'),
         ];
-        
+
         // Limit dropdown options to prevent memory exhaustion
         $states = State::active()
             ->select('id', 'name')
             ->orderBy('name')
             ->limit(500)
             ->get();
-        
+
         // Only load cities if state is selected
         $cities = collect();
         if ($request->has('state') && $request->state !== '') {
@@ -144,7 +144,7 @@ class PageController extends Controller
                 ->limit(500)
                 ->get();
         }
-        
+
         // Only load areas if city is selected
         $areas = collect();
         if ($request->has('city') && $request->city !== '') {
@@ -247,7 +247,7 @@ class PageController extends Controller
             },
             'user' => function ($q) {
                 $q->select('id', 'name');
-            }
+            },
         ]);
 
         return view('admin.cms.pages.show', compact('page'));
@@ -438,32 +438,76 @@ class PageController extends Controller
     {
         $query = Page::with(['state', 'city', 'area', 'user']);
 
-        // Apply same filters as index
+        // Apply same filters as index method
+        // Filter by state
         if ($request->has('state') && $request->state !== '') {
             $query->where('state_id', $request->state);
         }
+
+        // Filter by city
         if ($request->has('city') && $request->city !== '') {
             $query->where('city_id', $request->city);
         }
+
+        // Filter by area
         if ($request->has('area') && $request->area !== '') {
             $query->where('area_id', $request->area);
         }
+
+        // Filter by status
         if ($request->has('status') && $request->status !== '') {
             $query->where('status', $request->status);
         }
+
+        // Filter by page type
         if ($request->has('page_type') && $request->page_type !== '') {
             $query->where('page_type', $request->page_type);
         }
+
+        // Filter by featured
+        if ($request->has('featured') && $request->featured !== '') {
+            $query->where('is_featured', $request->featured == '1');
+        }
+
+        // Filter by date range
+        if ($request->has('date_from') && $request->date_from !== '') {
+            $query->where('created_at', '>=', $request->date_from.' 00:00:00');
+        }
+        if ($request->has('date_to') && $request->date_to !== '') {
+            $query->where('created_at', '<=', $request->date_to.' 23:59:59');
+        }
+
+        // Search - same as index method
         if ($request->has('search') && $request->search !== '') {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'like', '%'.$searchTerm.'%')
                     ->orWhere('content', 'like', '%'.$searchTerm.'%')
-                    ->orWhere('excerpt', 'like', '%'.$searchTerm.'%');
+                    ->orWhere('excerpt', 'like', '%'.$searchTerm.'%')
+                    ->orWhere('slug', 'like', '%'.$searchTerm.'%')
+                    ->orWhereHas('state', function ($stateQuery) use ($searchTerm) {
+                        $stateQuery->where('name', 'like', '%'.$searchTerm.'%');
+                    })
+                    ->orWhereHas('city', function ($cityQuery) use ($searchTerm) {
+                        $cityQuery->where('city_name', 'like', '%'.$searchTerm.'%');
+                    })
+                    ->orWhereHas('area', function ($areaQuery) use ($searchTerm) {
+                        $areaQuery->where('name', 'like', '%'.$searchTerm.'%');
+                    });
             });
         }
 
-        $pages = $query->orderBy('created_at', 'desc')->get();
+        // Sort options - same as index method
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $allowedSorts = ['created_at', 'updated_at', 'published_at', 'title', 'views_count'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $pages = $query->get();
 
         $filename = 'pages_export_'.date('Y-m-d_His').'.csv';
         $headers = [
@@ -473,7 +517,7 @@ class PageController extends Controller
 
         $callback = function () use ($pages) {
             $file = fopen('php://output', 'w');
-            
+
             // CSV Headers
             fputcsv($file, [
                 'ID',
@@ -555,7 +599,7 @@ class PageController extends Controller
         ]);
 
         $page->status = $request->status;
-        if ($request->status === 'published' && !$page->published_at) {
+        if ($request->status === 'published' && ! $page->published_at) {
             $page->published_at = now();
         }
         $page->save();
@@ -572,7 +616,7 @@ class PageController extends Controller
      */
     public function quickToggleFeatured(Page $page)
     {
-        $page->is_featured = !$page->is_featured;
+        $page->is_featured = ! $page->is_featured;
         $page->save();
 
         return response()->json([
