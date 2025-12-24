@@ -26,6 +26,8 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ContactTestLeadController;
 // --- CMS Controllers ---
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +36,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
+Route::view('/profiles', 'profiles.details')->name('profiles.store');
+Route::post('/contact', [ContactTestLeadController::class, 'store']);
+
+
+
 
 Route::post('/logout', function () {
     Auth::logout();
