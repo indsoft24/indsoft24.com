@@ -24,7 +24,7 @@
 <section class="py-5">
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 mx-auto">
+            <div class="col-lg-10 mx-auto">
                 <div class="text-center mb-4">
                     <div class="mb-3">
                         <span class="badge fs-6 px-3 py-2" style="background-color: {{ $post->category->color }}">
