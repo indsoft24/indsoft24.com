@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container py-5">
-    <div class="row justify-content-center">
+    <div class="row justify-content-center pt-5">
         <div class="col-lg-8">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
@@ -64,7 +64,7 @@
                             <i class="fas fa-file-text me-2"></i>Content
                         </h5>
                         <div class="content-text">
-                            {!! nl2br(e($post->content)) !!}
+                            {!! $post->content !!}
                         </div>
                     </div>
                 </div>
@@ -108,6 +108,82 @@
 
 .content-text p {
     margin-bottom: 1rem;
+}
+
+.content-text h1,
+.content-text h2,
+.content-text h3,
+.content-text h4,
+.content-text h5,
+.content-text h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+    font-weight: bold;
+}
+
+.content-text h1 {
+    font-size: 2em;
+}
+
+.content-text h2 {
+    font-size: 1.75em;
+}
+
+.content-text h3 {
+    font-size: 1.5em;
+}
+
+.content-text h4 {
+    font-size: 1.25em;
+}
+
+.content-text h5 {
+    font-size: 1.1em;
+}
+
+.content-text h6 {
+    font-size: 1em;
+}
+
+.content-text ul,
+.content-text ol {
+    margin: 1em 0;
+    padding-left: 2em;
+}
+
+.content-text li {
+    margin: 0.5em 0;
+}
+
+.content-text table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.5em 0;
+    border: 1px solid #ddd;
+}
+
+.content-text table td,
+.content-text table th {
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    text-align: left;
+}
+
+.content-text table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+
+.content-text strong {
+    font-weight: bold;
+}
+
+.content-text em {
+    font-style: italic;
+}
+
+.content-text u {
+    text-decoration: underline;
 }
 </style>
 

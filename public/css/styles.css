@@ -88,7 +88,7 @@ body{font-family:'Inter',sans-serif;line-height:1.6;color:#333;overflow-x:hidden
 .logo-img{height:50px;width:auto;max-width:200px;object-fit:contain;transition:all 0.3s ease;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.1));margin-bottom:12px}
 .logo-link:hover .logo-img{transform:scale(1.05);filter:drop-shadow(0 4px 12px rgba(0,0,0,0.15))}
 
-.nav-menu{display:flex;gap:40px;align-items:center;margin-left:auto;margin-right:20px}
+.nav-menu{display:flex;gap:25px;align-items:center;margin-left:auto;margin-right:20px}
 .nav-auth{display:flex;gap:15px;align-items:center;margin-left:auto;flex-shrink:0}
 
 /* Desktop/Mobile Visibility */
@@ -192,6 +192,9 @@ body{font-family:'Inter',sans-serif;line-height:1.6;color:#333;overflow-x:hidden
 .auth-link i {
     font-size: 0.9rem;
 }
+.mt-5 {
+    margin-top: 4rem !important;
+}
 
 .nav-link {
     text-decoration: none;
@@ -200,7 +203,7 @@ body{font-family:'Inter',sans-serif;line-height:1.6;color:#333;overflow-x:hidden
     font-size: 1rem;
     transition: all 0.3s ease;
     position: relative;
-    padding: 8px 16px;
+    padding: 0px 5px;
     border-radius: 8px;
     letter-spacing: 0.3px;
 }

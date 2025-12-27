@@ -224,9 +224,10 @@ class PostController extends Controller
 
         $categories = Category::active()->get();
         $tags = Tag::active()->get();
+        $selectedTags = $post->tags->pluck('id')->toArray();
 
         $view = $isUserBlog ? 'user.blog.edit' : 'admin.posts.edit';
-        return view($view, compact('post', 'categories', 'tags'));
+        return view($view, compact('post', 'categories', 'tags', 'selectedTags'));
     }
 
     /**
