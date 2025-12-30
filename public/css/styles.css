@@ -2280,6 +2280,7 @@ body{font-family:'Inter',sans-serif;line-height:1.6;color:#333;overflow-x:hidden
     will-change: transform;
     animation: visualFadeIn 1s ease-out 0.5s forwards;
     opacity: 0;
+    margin-top: 1rem;
 }
 
 @keyframes visualFadeIn {

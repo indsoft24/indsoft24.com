@@ -23,7 +23,10 @@ use App\Http\Controllers\CmsController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ImageConverterController;
+use App\Http\Controllers\ImageToPdfController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\PdfToImageController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ProjectController;
@@ -87,9 +90,21 @@ Route::view('/web-development', 'services.web-development')->name('services.web'
 Route::view('/app-development', 'services.app-development')->name('services.app');
 Route::view('/software-development', 'services.software-development')->name('services.software');
 Route::view('/seo-services', 'services.seo-services')->name('services.seo');
+Route::view('/digital-marketing', 'services.digital-marketing')->name('services.digital-marketing');
+Route::view('/social-media-marketing', 'services.social-media-marketing')->name('services.social-media-marketing');
 
 // E-commerce Page
 Route::view('/e-commerce', 'e-commerce.index')->name('e-commerce');
+
+// Tools Pages
+Route::prefix('tools')->name('tools.')->group(function () {
+    Route::get('/jpg-to-pdf', [ImageToPdfController::class, 'index'])->name('jpg-to-pdf');
+    Route::post('/jpg-to-pdf/convert', [ImageToPdfController::class, 'convert'])->name('jpg-to-pdf.convert');
+    Route::get('/pdf-to-image', [PdfToImageController::class, 'index'])->name('pdf-to-image');
+    Route::post('/pdf-to-image/convert', [PdfToImageController::class, 'convert'])->name('pdf-to-image.convert');
+    Route::get('/image-converter', [ImageConverterController::class, 'index'])->name('image-converter');
+    Route::post('/image-converter/convert', [ImageConverterController::class, 'convert'])->name('image-converter.convert');
+});
 
 // --- Sitemap Routes ---
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');

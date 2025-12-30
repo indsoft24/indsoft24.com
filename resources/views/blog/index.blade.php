@@ -54,7 +54,10 @@
                         <img src="{{ asset($post->featured_image) }}" 
                              class="card-img-top" 
                              alt="{{ $post->title }}"
-                             style="height: 200px; object-fit: cover;">
+                             style="height: 200px; object-fit: cover;"
+                             loading="lazy"
+                             width="400"
+                             height="200">
                     @else
                         <div class="card-img-top bg-gradient-primary d-flex align-items-center justify-content-center" 
                              style="height: 200px;">
@@ -131,7 +134,10 @@
                                     <img src="{{ asset($post->featured_image) }}" 
                                          class="card-img-top" 
                                          alt="{{ $post->title }}"
-                                         style="height: 180px; object-fit: cover;">
+                                         style="height: 180px; object-fit: cover;"
+                                         loading="lazy"
+                                         width="400"
+                                         height="180">
                                 @else
                                     <div class="card-img-top bg-gradient-secondary d-flex align-items-center justify-content-center" 
                                          style="height: 180px;">

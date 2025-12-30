@@ -7,19 +7,62 @@
     <title>@yield('title', 'Indsoft24.com - Innovative Software Solutions')</title>
     <link rel="canonical" href="{{ $canonicalUrl ?? url()->current() }}" />
     <meta name="description" content="{{ Str::limit($metaDescription ?? 'Empowering businesses with cutting-edge technology and innovative software solutions. Discover insights on web development, mobile apps, and more.', 150, '') }}">
+    
+    <!-- Resource Hints for Performance -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="{{ asset('css/styles.css') }}" as="style">
+    <link rel="preload" href="{{ asset('images/Indsoft24.png') }}" as="image">
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/Indsoft24.png') }}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
+    
+    <!-- Critical CSS - Inline for faster rendering -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></noscript>
+    
+    <!-- Main Stylesheet -->
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+    
+    <!-- Conditional Stylesheets -->
     @if(request()->is('blog*'))
-        <link rel="stylesheet" href="{{ asset('css/blog-styles.css') }}">
+        <link rel="preload" href="{{ asset('css/blog-styles.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="{{ asset('css/blog-styles.css') }}"></noscript>
     @endif
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    
+    <!-- Non-Critical CSS - Load asynchronously -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"></noscript>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></noscript>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"></noscript>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Optimized Font Loading -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <style>
+        /* Font fallback to prevent FOIT */
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+        /* Apply Inter when loaded */
+        @font-face {
+            font-family: 'Inter';
+            font-display: swap;
+        }
+    </style>
     @stack('styles')
     <style>
         /* Get In Touch Modal z-index and compact styling */
@@ -42,15 +85,34 @@
             font-size: 0.9rem;
         }
     </style>
+    
+    <!-- Async CSS Loading Script -->
+    <script>
+        // Handle async CSS loading
+        (function() {
+            var links = document.querySelectorAll('link[media="print"][onload]');
+            links.forEach(function(link) {
+                link.onload = function() {
+                    this.media = 'all';
+                };
+            });
+        })();
+    </script>
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VZ3GFH5YLS"></script>
+<!-- Google Analytics - Deferred for Performance -->
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-VZ3GFH5YLS');
+  // Defer Google Analytics loading
+  window.addEventListener('load', function() {
+    var script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://www.googletagmanager.com/gtag/js?id=G-VZ3GFH5YLS';
+    document.head.appendChild(script);
+    
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VZ3GFH5YLS');
+  });
 </script>
 <body class="@if(request()->is('blog*')) blog-page @endif">
     <!-- Top Bar -->
@@ -89,7 +151,7 @@
             <!-- Logo - Left Side -->
             <div class="nav-logo">
                 <a href="{{ route('home') }}" class="logo-link">
-                    <img src="{{ asset('images/Indsoft24.png') }}" alt="Indsoft24.com Logo" class="logo-img">
+                    <img src="{{ asset('images/Indsoft24.png') }}" alt="Indsoft24.com Logo" class="logo-img" width="150" height="50" loading="eager">
                 </a>
             </div>
             
@@ -106,10 +168,12 @@
                     <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
                         <li><a class="dropdown-item" href="{{ route('services.index') }}"><i class="fas fa-th me-2"></i>All Services</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{{ route('services.web') }}">Web Development</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.app') }}">App Development</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.software') }}">Software Development</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.seo') }}">SEO Optimization</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.web') }}"><i class="fas fa-globe me-2"></i>Web Development</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.app') }}"><i class="fas fa-mobile-alt me-2"></i>App Development</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.software') }}"><i class="fas fa-cogs me-2"></i>Software Development</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.seo') }}"><i class="fas fa-search me-2"></i>SEO Optimization</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.digital-marketing') }}"><i class="fas fa-bullhorn me-2"></i>Digital Marketing</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.social-media-marketing') }}"><i class="fas fa-share-alt me-2"></i>Social Media Marketing</a></li>
                     </ul>
                 </div>
                 
@@ -200,6 +264,14 @@
                         <a href="{{ route('services.seo') }}" class="sidebar-dropdown-item">
                             <i class="fas fa-search"></i>
                             <span>SEO Optimization</span>
+                        </a>
+                        <a href="{{ route('services.digital-marketing') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Digital Marketing</span>
+                        </a>
+                        <a href="{{ route('services.social-media-marketing') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-share-alt"></i>
+                            <span>Social Media Marketing</span>
                         </a>
                     </div>
                 </div>
@@ -299,23 +371,34 @@
           <input type="text" name="website" style="display:none">
 
           <div class="form-group mb-3">
-            <label for="name" class="small fw-semibold">Your Name</label>
-            <input type="text" class="form-control form-control-sm" name="name" placeholder="Enter your name" required>
+            <label for="name" class="small fw-semibold">Your Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-sm" name="name" id="contact_name" placeholder="Enter your name" required pattern="[a-zA-Z\s]+" maxlength="255" title="Name can only contain letters and spaces">
+            <div class="invalid-feedback" style="display: none;">Name can only contain letters and spaces.</div>
           </div>
 
           <div class="form-group mb-3">
-            <label for="email" class="small fw-semibold">Your Email</label>
-            <input type="email" class="form-control form-control-sm" name="email" placeholder="Enter your email" required>
+            <label for="email" class="small fw-semibold">Your Email <span class="text-danger">*</span></label>
+            <input type="email" class="form-control form-control-sm" name="email" id="contact_email" placeholder="Enter your email" required maxlength="255">
+            <div class="invalid-feedback" style="display: none;">Please enter a valid email address.</div>
           </div>
 
           <div class="form-group mb-3">
-            <label for="subject" class="small fw-semibold">Subject</label>
-            <input type="text" class="form-control form-control-sm" name="subject" placeholder="Enter subject" required>
+            <label for="phone" class="small fw-semibold">Phone Number <span class="text-danger">*</span></label>
+            <input type="tel" class="form-control form-control-sm" name="phone" id="contact_phone" placeholder="Enter your phone number" required pattern="[0-9\+\-\s\(\)]+" maxlength="20" title="Phone number contains invalid characters">
+            <div class="invalid-feedback" style="display: none;">Phone number contains invalid characters.</div>
           </div>
 
           <div class="form-group mb-3">
-            <label for="message" class="small fw-semibold">Message</label>
-            <textarea class="form-control form-control-sm" name="message" rows="3" placeholder="Write your message..." required></textarea>
+            <label for="subject" class="small fw-semibold">Subject <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-sm" name="subject" id="contact_subject" placeholder="Enter subject" required maxlength="255" pattern="[a-zA-Z0-9\s\-\.\,\!\?]+" title="Subject contains invalid characters">
+            <div class="invalid-feedback" style="display: none;">Subject contains invalid characters.</div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="message" class="small fw-semibold">Message <span class="text-danger">*</span></label>
+            <textarea class="form-control form-control-sm" name="message" id="contact_message" rows="3" placeholder="Write your message..." required minlength="10" maxlength="1000"></textarea>
+            <div class="invalid-feedback" style="display: none;">Message must be at least 10 characters long.</div>
+            <small class="form-text text-muted">Minimum 10 characters required</small>
           </div>
         </div>
 
@@ -336,7 +419,7 @@
             <div class="col-lg-4 col-md-12">
                 <div class="footer-section footer-brand">
                     <div class="footer-logo">
-                        <img src="{{ asset('images/Indsoft24.png') }}" alt="Indsoft24.com Logo" class="footer-logo-img">
+                        <img src="{{ asset('images/Indsoft24.png') }}" alt="Indsoft24.com Logo" class="footer-logo-img" width="150" height="50" loading="lazy">
                     </div>
                     <p class="footer-description">
                         Empowering businesses with cutting-edge technology solutions.
@@ -376,8 +459,9 @@
                                 <li><a href="{{ route('services.web') }}">Web Development</a></li>
                                 <li><a href="{{ route('services.app') }}">Mobile Apps</a></li>
                                 <li><a href="{{ route('services.software') }}">Custom Software</a></li>
-                                <li><a href="{{ route('services.index') }}">UI/UX Design</a></li>
-                                <li><a href="{{ route('services.index') }}">Consulting</a></li>
+                                <li><a href="{{ route('services.seo') }}">SEO Optimization</a></li>
+                                <li><a href="{{ route('services.digital-marketing') }}">Digital Marketing</a></li>
+                                <li><a href="{{ route('services.social-media-marketing') }}">Social Media Marketing</a></li>
                             </ul>
                         </div>
                     </div>
@@ -429,12 +513,13 @@
 </footer>
 
 
-   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script src="{{ asset('js/script.js') }}"></script>
+   <!-- Scripts - Deferred for Performance -->
+   <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+<script src="{{ asset('js/script.js') }}" defer></script>
 
 <script>
     toastr.options = {
@@ -499,8 +584,93 @@ document.addEventListener("DOMContentLoaded", function () {
         if (contactForm) {
             const submitBtn = contactForm.querySelector("button[type='submit']");
 
+            // Clear validation errors when modal is shown
+            modal.addEventListener('show.bs.modal', function() {
+                contactForm.querySelectorAll('.is-invalid').forEach(el => {
+                    el.classList.remove('is-invalid');
+                });
+                contactForm.querySelectorAll('.invalid-feedback').forEach(el => {
+                    el.style.display = 'none';
+                });
+            });
+
+            // Client-side validation
+            function validateField(field) {
+                const value = field.value.trim();
+                let isValid = true;
+                let errorMessage = '';
+
+                // Remove previous validation classes
+                field.classList.remove('is-invalid', 'is-valid');
+                const feedback = field.parentElement.querySelector('.invalid-feedback');
+                if (feedback) feedback.style.display = 'none';
+
+                // Check if required field is empty
+                if (field.hasAttribute('required') && !value) {
+                    isValid = false;
+                    errorMessage = 'This field is required.';
+                } else if (value) {
+                    // Validate based on field type
+                    if (field.type === 'email' && !field.validity.valid) {
+                        isValid = false;
+                        errorMessage = 'Please enter a valid email address.';
+                    } else if (field.name === 'name' && !/^[a-zA-Z\s]+$/.test(value)) {
+                        isValid = false;
+                        errorMessage = 'Name can only contain letters and spaces.';
+                    } else if (field.name === 'phone' && !/^[0-9\+\-\s\(\)]+$/.test(value)) {
+                        isValid = false;
+                        errorMessage = 'Phone number contains invalid characters.';
+                    } else if (field.name === 'subject' && !/^[a-zA-Z0-9\s\-\.\,\!\?]+$/.test(value)) {
+                        isValid = false;
+                        errorMessage = 'Subject contains invalid characters.';
+                    } else if (field.name === 'message' && value.length < 10) {
+                        isValid = false;
+                        errorMessage = 'Message must be at least 10 characters long.';
+                    } else {
+                        field.classList.add('is-valid');
+                    }
+                }
+
+                // Show validation feedback
+                if (!isValid) {
+                    field.classList.add('is-invalid');
+                    if (feedback) {
+                        feedback.textContent = errorMessage;
+                        feedback.style.display = 'block';
+                    }
+                }
+
+                return isValid;
+            }
+
+            // Add real-time validation on blur
+            contactForm.querySelectorAll('input, textarea').forEach(field => {
+                field.addEventListener('blur', function() {
+                    validateField(this);
+                });
+
+                field.addEventListener('input', function() {
+                    if (this.classList.contains('is-invalid')) {
+                        validateField(this);
+                    }
+                });
+            });
+
             contactForm.addEventListener("submit", function (e) {
                 e.preventDefault();
+
+                // Validate all fields
+                let isValid = true;
+                contactForm.querySelectorAll('input[required], textarea[required]').forEach(field => {
+                    if (!validateField(field)) {
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    toastr.error("Please correct the errors in the form.");
+                    return;
+                }
 
                 // Disable button and change text
                 submitBtn.disabled = true;
@@ -512,13 +682,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 fetch(contactForm.action, {
                     method: "POST",
                     body: formData,
-                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                    headers: { 
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw { status: response.status, data: data };
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     let modalInstance = bootstrap.Modal.getInstance(document.getElementById('getInTouchModal'));
                     if (modalInstance) modalInstance.hide();
                     contactForm.reset();
+                    contactForm.querySelectorAll('.is-valid').forEach(el => {
+                        el.classList.remove('is-valid');
+                    });
 
                     if (data.success) {
                         toastr.success(data.message || "Message sent successfully!");
@@ -527,10 +710,25 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 })
                 .catch(err => {
-                    let modalInstance = bootstrap.Modal.getInstance(document.getElementById('getInTouchModal'));
-                    if (modalInstance) modalInstance.hide();
-
-                    toastr.error("An error occurred. Please try again.");
+                    // Handle validation errors
+                    if (err.data && err.data.errors) {
+                        Object.keys(err.data.errors).forEach(fieldName => {
+                            const field = contactForm.querySelector(`[name="${fieldName}"]`);
+                            if (field) {
+                                field.classList.add('is-invalid');
+                                const feedback = field.parentElement.querySelector('.invalid-feedback');
+                                if (feedback) {
+                                    feedback.textContent = err.data.errors[fieldName][0];
+                                    feedback.style.display = 'block';
+                                }
+                            }
+                        });
+                        toastr.error("Please correct the errors in the form.");
+                    } else {
+                        let modalInstance = bootstrap.Modal.getInstance(document.getElementById('getInTouchModal'));
+                        if (modalInstance) modalInstance.hide();
+                        toastr.error(err.data?.message || "An error occurred. Please try again.");
+                    }
                 })
                 .finally(() => {
                     // Re-enable button and restore text
