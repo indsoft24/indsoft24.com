@@ -65,15 +65,67 @@ class BlogController extends Controller
         $isLiked = auth()->check() ? $post->likes()->where('user_id', auth()->id())->exists() : false;
     
         $relatedPosts = Post::published()
+                            ->with(['category', 'user'])
                             ->where('category_id', $post->category_id)
                             ->where('id', '!=', $post->id)
                             ->limit(3)
                             ->get();
     
         $recentPosts = Post::published()
+                           ->with(['category', 'user'])
                            ->where('id', '!=', $post->id)
-                           ->recent(5)
+                           ->orderBy('published_at', 'desc')
+                           ->limit(5)
                            ->get();
+        
+        // Get next and previous posts
+        $nextPost = Post::published()
+                       ->with('category')
+                       ->where('published_at', '>', $post->published_at)
+                       ->orderBy('published_at', 'asc')
+                       ->first();
+        
+        $previousPost = Post::published()
+                           ->with('category')
+                           ->where('published_at', '<', $post->published_at)
+                           ->orderBy('published_at', 'desc')
+                           ->first();
+        
+        // Get promotional/featured posts for sidebar (excluding current post)
+        $promotionalPosts = Post::published()
+                               ->with('category')
+                               ->featured()
+                               ->where('id', '!=', $post->id)
+                               ->orderBy('published_at', 'desc')
+                               ->limit(3)
+                               ->get();
+        
+        // If we don't have enough featured posts, fill with recent popular posts
+        if ($promotionalPosts->count() < 3) {
+            $additionalPosts = Post::published()
+                                  ->with('category')
+                                  ->where('id', '!=', $post->id)
+                                  ->whereNotIn('id', $promotionalPosts->pluck('id'))
+                                  ->orderBy('views_count', 'desc')
+                                  ->limit(3 - $promotionalPosts->count())
+                                  ->get();
+            $promotionalPosts = $promotionalPosts->merge($additionalPosts);
+        }
+        
+        // Get additional recent posts for navigation (excluding current, next, previous, and already in recentPosts)
+        $excludeIds = collect([$post->id])->merge($recentPosts->pluck('id'));
+        if ($nextPost) {
+            $excludeIds->push($nextPost->id);
+        }
+        if ($previousPost) {
+            $excludeIds->push($previousPost->id);
+        }
+        $additionalRecentPosts = Post::published()
+                                    ->with('category')
+                                    ->whereNotIn('id', $excludeIds->toArray())
+                                    ->orderBy('published_at', 'desc')
+                                    ->limit(4)
+                                    ->get();
     
         // --- ADD THESE VARIABLES ---
         $metaTitle = $post->meta_title ?: $post->title . ' | ' . config('app.name');
@@ -85,7 +137,11 @@ class BlogController extends Controller
             'recentPosts', 
             'isLiked', 
             'metaTitle', 
-            'metaDescription'
+            'metaDescription',
+            'nextPost',
+            'previousPost',
+            'promotionalPosts',
+            'additionalRecentPosts'
         ));
     }
 

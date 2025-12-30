@@ -535,6 +535,85 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Contact Form Submission
+    const contactForm = document.getElementById('contactForm');
+    const contactFormMessage = document.getElementById('contactFormMessage');
+    
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = contactForm.querySelector('.btn-submit');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Sending...</span><i class="fas fa-spinner fa-spin ms-2"></i>';
+            
+            // Clear previous messages
+            contactFormMessage.textContent = '';
+            contactFormMessage.className = 'form-message';
+            
+            const formData = new FormData(contactForm);
+            
+            fetch(contactForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    contactFormMessage.className = 'form-message success';
+                    contactFormMessage.textContent = data.message || 'Thank you for your message! We will get back to you soon.';
+                    contactForm.reset();
+                    
+                    // Scroll to message
+                    contactFormMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    
+                    // Show success toast
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success(data.message || 'Thank you for your message! We will get back to you soon.');
+                    }
+                } else {
+                    contactFormMessage.className = 'form-message error';
+                    let errorMessage = data.message || 'Something went wrong. Please try again.';
+                    
+                    // Display validation errors if available
+                    if (data.errors) {
+                        const errorList = Object.values(data.errors).flat().join(', ');
+                        errorMessage = errorMessage + (errorList ? ' ' + errorList : '');
+                    }
+                    
+                    contactFormMessage.textContent = errorMessage;
+                    
+                    // Scroll to message
+                    contactFormMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error(errorMessage);
+                    }
+                }
+            })
+            .catch(error => {
+                contactFormMessage.className = 'form-message error';
+                contactFormMessage.textContent = 'An error occurred. Please try again later.';
+                
+                // Scroll to message
+                contactFormMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('An error occurred. Please try again later.');
+                }
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        });
+    }
+    
     // Swiper initialization
     const featuredProjectsSwiper = new Swiper('.featured-projects-swiper', {
         slidesPerView: 1,
@@ -658,15 +737,23 @@ document.addEventListener('DOMContentLoaded', function() {
                                     value="{{ old('email') }}" required>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="subject">Subject <i class="fas fa-tag"></i></label>
-                            <input type="text" id="subject" name="subject" placeholder="What's this about?"
-                                value="{{ old('subject') }}" required>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">Phone Number <i class="fas fa-phone"></i></label>
+                                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number (optional)"
+                                    value="{{ old('phone') }}" pattern="[0-9\+\-\s\(\)]+">
+                            </div>
+                            <div class="form-group">
+                                <label for="subject">Subject <i class="fas fa-tag"></i></label>
+                                <input type="text" id="subject" name="subject" placeholder="What's this about?"
+                                    value="{{ old('subject') }}" required>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="message">Message <i class="fas fa-comment"></i></label>
                             <textarea id="message" name="message" placeholder="Tell us about your project..." rows="5" required>{{ old('message') }}</textarea>
                         </div>
+                        <div class="form-message mt-3" id="contactFormMessage"></div>
                         <button type="submit" class="btn btn-primary btn-submit">
                             <span>Send Message</span>
                             <i class="fas fa-paper-plane"></i>
