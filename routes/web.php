@@ -34,8 +34,8 @@ use Illuminate\Support\Facades\Route;
 
 // --- Main Public Routes ---
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
-Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
+Route::post('/contact-lead-store', [ContactController::class, 'store'])->name('contact.store');
+Route::post('/leads-store', [LeadController::class, 'store'])->name('leads.store');
 
 Route::post('/logout', function () {
     Auth::logout();
