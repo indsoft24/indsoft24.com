@@ -220,7 +220,26 @@
                                 </div>
                             </div>
 
-                            <div class="col-12">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="phone" class="form-label">
+                                        <i class="fas fa-phone me-1"></i>Phone Number <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="tel" 
+                                           class="form-control @error('phone') is-invalid @enderror" 
+                                           id="phone" 
+                                           name="phone" 
+                                           value="{{ old('phone') }}" 
+                                           required
+                                           pattern="[0-9\+\-\s\(\)]+"
+                                           placeholder="Enter your phone number">
+                                    @error('phone')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="subject" class="form-label">Subject <span class="text-danger">*</span></label>
                                     <input type="text" 
@@ -252,6 +271,7 @@
                             </div>
 
                             <div class="col-12">
+                                <div class="form-message mb-3" id="contactPageFormMessage" style="display: none;"></div>
                                 <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
                                     <span class="btn-text">Send Message</span>
                                     <span class="btn-loader" style="display: none;">
@@ -442,6 +462,28 @@
     outline: none;
 }
 
+.form-message {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    text-align: center;
+    display: none;
+}
+
+.form-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    display: block;
+}
+
+.form-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    display: block;
+}
+
 .btn-primary {
     background: linear-gradient(135deg, #3498db, #2980b9);
     border: none;
@@ -613,6 +655,13 @@ document.addEventListener('DOMContentLoaded', function() {
         isSubmitting = true;
         const formData = new FormData(form);
         
+        // Hide previous messages
+        const messageDiv = document.getElementById('contactPageFormMessage');
+        if (messageDiv) {
+            messageDiv.style.display = 'none';
+            messageDiv.textContent = '';
+        }
+        
         // Show loading state
         if (btnText) btnText.style.display = 'none';
         if (btnLoader) btnLoader.style.display = 'inline-block';
@@ -629,7 +678,17 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
+            const messageDiv = document.getElementById('contactPageFormMessage');
+            
             if (data.success) {
+                // Show success message in form
+                if (messageDiv) {
+                    messageDiv.className = 'form-message success';
+                    messageDiv.textContent = data.message || 'Thank you for your message! We will get back to you soon.';
+                    messageDiv.style.display = 'block';
+                    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+                
                 // Show success message using toastr (consistent with site)
                 if (typeof toastr !== 'undefined') {
                     toastr.success(data.message || 'Thank you for your message! We will get back to you soon.');
@@ -646,7 +705,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Reset form
                 form.reset();
             } else {
-                // Show error message
+                // Show error message in form
+                if (messageDiv) {
+                    messageDiv.className = 'form-message error';
+                    let errorMessage = data.message || 'There was an error sending your message. Please try again.';
+                    
+                    // Display validation errors if available
+                    if (data.errors) {
+                        const errorList = Object.values(data.errors).flat().join(', ');
+                        errorMessage = errorMessage + (errorList ? ' ' + errorList : '');
+                    }
+                    
+                    messageDiv.textContent = errorMessage;
+                    messageDiv.style.display = 'block';
+                    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+                
+                // Show error message using toastr
                 if (typeof toastr !== 'undefined') {
                     toastr.error(data.message || 'There was an error sending your message. Please try again.');
                 } else if (typeof Swal !== 'undefined') {
@@ -663,6 +738,16 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error:', error);
+            const messageDiv = document.getElementById('contactPageFormMessage');
+            
+            // Show error message in form
+            if (messageDiv) {
+                messageDiv.className = 'form-message error';
+                messageDiv.textContent = 'An error occurred. Please try again later.';
+                messageDiv.style.display = 'block';
+                messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
             if (typeof toastr !== 'undefined') {
                 toastr.error('There was an error sending your message. Please try again.');
             } else if (typeof Swal !== 'undefined') {
