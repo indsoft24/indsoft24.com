@@ -87,6 +87,39 @@
     padding: 25px 20px !important;
 }
 
+.service-card.compact {
+    padding: 20px 18px !important;
+}
+
+.service-card.compact .service-icon {
+    width: 60px !important;
+    height: 60px !important;
+    margin-bottom: 15px !important;
+}
+
+.service-card.compact .service-icon i {
+    font-size: 1.8rem !important;
+}
+
+.service-card.compact h3 {
+    font-size: 1.2rem !important;
+    margin-bottom: 10px !important;
+}
+
+.service-card.compact p {
+    font-size: 0.85rem !important;
+    line-height: 1.5 !important;
+    margin-bottom: 12px !important;
+}
+
+.service-card.compact .service-features {
+    display: none !important;
+}
+
+.service-card.compact .service-footer {
+    margin-top: 12px !important;
+}
+
 .service-card h3 {
     font-size: 1.3rem !important;
     margin-bottom: 12px !important;

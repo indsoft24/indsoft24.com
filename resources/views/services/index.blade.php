@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Professional IT Services in India | Web Development, Mobile Apps, Software & SEO | IndSoft24')
-@section('meta_description', 'Comprehensive IT services in India: Custom web development, mobile app development, enterprise software solutions, and SEO services. Expert team delivering cutting-edge technology solutions for businesses.')
-@section('meta_keywords', 'web development services, mobile app development, custom software development, SEO services, IT services India, website development, app development, software solutions, digital services')
+@section('title', 'Professional IT Services in India | Web Development, Mobile Apps, Digital Marketing & SEO | IndSoft24')
+@section('meta_description', 'Comprehensive IT services in India: Custom web development, mobile app development, enterprise software solutions, digital marketing, social media marketing, and SEO services. Expert team delivering cutting-edge technology solutions for businesses.')
+@section('meta_keywords', 'web development services, mobile app development, custom software development, digital marketing services, social media marketing, SEO services, IT services India, website development, app development, software solutions, digital services, online marketing, SMM services')
 
 @section('content')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -25,15 +25,15 @@
         <!-- Animated grid pattern -->
         <div class="animated-grid"></div>
     </div>
-    <div class="container text-center" style="position: relative; z-index: 3;">
-        <h1 class="display-4 fw-bold mb-3">Our Professional IT Services</h1>
-        <p class="lead mb-4">
-            Comprehensive technology solutions to transform your business. From web development to mobile apps, 
-            custom software to SEO optimization — we deliver excellence.
-        </p>
-        <a data-bs-toggle="modal" data-bs-target="#getInTouchModal" style="cursor:pointer"
-            class="btn btn-warning btn-lg">Get Free Consultation</a>
-    </div>
+        <div class="container text-center" style="position: relative; z-index: 3;">
+            <h1 class="display-4 fw-bold mb-3">Our Professional IT & Digital Marketing Services</h1>
+            <p class="lead mb-4">
+                Comprehensive technology and marketing solutions to transform your business. From web development to mobile apps, 
+                custom software to digital marketing, social media marketing, and SEO optimization — we deliver excellence.
+            </p>
+            <a data-bs-toggle="modal" data-bs-target="#getInTouchModal" style="cursor:pointer"
+                class="btn btn-warning btn-lg">Get Free Consultation</a>
+        </div>
 </section>
 
 <!-- Services Grid Section -->
@@ -46,7 +46,7 @@
 
         <div class="row g-4">
             <!-- Web Development Service -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <div class="service-card-modern h-100">
                     <div class="service-icon-wrapper">
                         <i class="fas fa-globe"></i>
@@ -73,7 +73,7 @@
             </div>
 
             <!-- Mobile App Development Service -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <div class="service-card-modern h-100">
                     <div class="service-icon-wrapper">
                         <i class="fas fa-mobile-alt"></i>
@@ -100,7 +100,7 @@
             </div>
 
             <!-- Software Development Service -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <div class="service-card-modern h-100">
                     <div class="service-icon-wrapper">
                         <i class="fas fa-cogs"></i>
@@ -127,7 +127,7 @@
             </div>
 
             <!-- SEO Services -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <div class="service-card-modern h-100">
                     <div class="service-icon-wrapper">
                         <i class="fas fa-search"></i>
@@ -146,6 +146,60 @@
                     </ul>
                     <div class="service-footer-modern">
                         <a href="{{ route('services.seo') }}" class="service-link-modern">
+                            <span>Learn More</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Digital Marketing Services -->
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card-modern h-100">
+                    <div class="service-icon-wrapper">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <h3 class="service-title">Digital Marketing</h3>
+                    <p class="service-description">
+                        Drive growth, increase brand visibility, and generate qualified leads with comprehensive digital marketing 
+                        strategies. SEO, PPC, content marketing, email marketing, and analytics.
+                    </p>
+                    <ul class="service-features-list">
+                        <li><i class="fas fa-check-circle"></i> SEO & Search Marketing</li>
+                        <li><i class="fas fa-check-circle"></i> PPC Advertising Campaigns</li>
+                        <li><i class="fas fa-check-circle"></i> Content Marketing Strategy</li>
+                        <li><i class="fas fa-check-circle"></i> Email Marketing Automation</li>
+                        <li><i class="fas fa-check-circle"></i> Analytics & Performance Tracking</li>
+                    </ul>
+                    <div class="service-footer-modern">
+                        <a href="{{ route('services.digital-marketing') }}" class="service-link-modern">
+                            <span>Learn More</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media Marketing Services -->
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card-modern h-100">
+                    <div class="service-icon-wrapper">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <h3 class="service-title">Social Media Marketing</h3>
+                    <p class="service-description">
+                        Build your brand, engage your audience, and drive sales with strategic social media marketing. 
+                        Facebook, Instagram, LinkedIn, Twitter management, content creation, and paid advertising.
+                    </p>
+                    <ul class="service-features-list">
+                        <li><i class="fas fa-check-circle"></i> Multi-Platform Management</li>
+                        <li><i class="fas fa-check-circle"></i> Content Creation & Design</li>
+                        <li><i class="fas fa-check-circle"></i> Community Management</li>
+                        <li><i class="fas fa-check-circle"></i> Social Media Advertising</li>
+                        <li><i class="fas fa-check-circle"></i> Performance Analytics</li>
+                    </ul>
+                    <div class="service-footer-modern">
+                        <a href="{{ route('services.social-media-marketing') }}" class="service-link-modern">
                             <span>Learn More</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
