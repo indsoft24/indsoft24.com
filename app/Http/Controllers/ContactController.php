@@ -78,10 +78,12 @@ class ContactController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/',
             'email' => 'required|email|max:255',
+            'phone' => 'nullable|string|max:20|regex:/^[0-9\+\-\s\(\)]+$/',
             'subject' => 'required|string|max:255|regex:/^[a-zA-Z0-9\s\-\.\,\!\?]+$/',
             'message' => 'required|string|min:10|max:1000',
         ], [
             'name.regex' => 'Name can only contain letters and spaces.',
+            'phone.regex' => 'Phone number contains invalid characters.',
             'subject.regex' => 'Subject contains invalid characters.',
             'message.min' => 'Message must be at least 10 characters long.',
         ]);
@@ -109,6 +111,7 @@ class ContactController extends Controller
         $contactMessage = ContactMessage::create([
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
             'subject' => $request->subject,
             'message' => $request->message,
             'ip_address' => $request->ip(),
@@ -119,10 +122,11 @@ class ContactController extends Controller
 
         // Send email notification
         try {
+            $phoneInfo = $request->phone ? "Phone: {$request->phone}\n" : "";
             Mail::raw("
 Name: {$request->name}
 Email: {$request->email}
-Subject: {$request->subject}
+{$phoneInfo}Subject: {$request->subject}
 
 Message:
 {$request->message}

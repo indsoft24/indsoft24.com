@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Lead;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class LeadController extends Controller
 {
@@ -12,7 +14,7 @@ class LeadController extends Controller
     {
         // Rate limiting check
         $key = 'lead_form_' . $request->ip();
-        $attempts = \Cache::get($key, 0);
+        $attempts = Cache::get($key, 0);
         
         if ($attempts >= 5) {
             if ($request->ajax()) {
@@ -26,7 +28,7 @@ class LeadController extends Controller
 
         // Honeypot check
         if (!empty($request->website)) {
-            \Log::warning('Bot detected from IP: ' . $request->ip() . ' - Honeypot triggered');
+            Log::warning('Bot detected from IP: ' . $request->ip() . ' - Honeypot triggered');
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
@@ -40,15 +42,25 @@ class LeadController extends Controller
         $spamScore = $this->calculateSpamScore($request);
         $isSpam = $spamScore > 3;
 
+        // Determine if this is a homepage submission
+        $isHomepage = ($request->source === 'homepage');
+        
+        // Set default service for homepage submissions if not provided
+        if ($isHomepage && empty($request->service)) {
+            $request->merge(['service' => 'web development']);
+        }
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/',
-            'email' => 'nullable|email|max:255',
-            'phone' => 'required|string|max:20|regex:/^[0-9\+\-\s\(\)]+$/',
-            'service' => 'required|string|in:web development,app development,custom software,digital marketing,digital stores',
+            'email' => $isHomepage ? 'required|email|max:255' : 'nullable|email|max:255',
+            'phone' => $isHomepage ? 'nullable|string|max:20|regex:/^[0-9\+\-\s\(\)]+$/' : 'required|string|max:20|regex:/^[0-9\+\-\s\(\)]+$/',
+            'service' => $isHomepage ? 'nullable|string|in:web development,app development,custom software,digital marketing,digital stores' : 'required|string|in:web development,app development,custom software,digital marketing,digital stores',
             'company' => 'nullable|string|max:255',
             'message' => 'nullable|string|max:500',
         ], [
             'name.regex' => 'Name can only contain letters and spaces.',
+            'email.required' => 'Email address is required.',
+            'email.email' => 'Please enter a valid email address.',
             'phone.regex' => 'Please enter a valid phone number.',
             'phone.required' => 'Phone number is required.',
             'service.required' => 'Please select a service.',
@@ -73,7 +85,7 @@ class LeadController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'service' => $request->service,
+            'service' => $request->service ?? ($isHomepage ? 'web development' : null),
             'company' => $request->company,
             'message' => $request->message,
             'source' => $request->source ?? 'cms',
@@ -84,7 +96,7 @@ class LeadController extends Controller
         ]);
 
         // Increment rate limiting counter
-        \Cache::put($key, $attempts + 1, 300); // 5 minutes
+        Cache::put($key, $attempts + 1, 300); // 5 minutes
 
         if ($request->ajax()) {
             return response()->json([
