@@ -84,9 +84,9 @@
                             </div>
                             
                             <div class="form-group">
-                                <label for="lead_phone"><i class="fas fa-phone"></i> Phone Number</label>
+                                <label for="lead_phone"><i class="fas fa-phone"></i> Phone Number <span class="text-danger">*</span></label>
                                 <input type="tel" id="lead_phone" name="phone" class="form-control" 
-                                       placeholder="Enter your phone (optional)">
+                                       placeholder="Enter your phone number" required pattern="[0-9\+\-\s\(\)]+">
                             </div>
                             
                             <div class="form-group">
@@ -739,9 +739,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="phone">Phone Number <i class="fas fa-phone"></i></label>
-                                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number (optional)"
-                                    value="{{ old('phone') }}" pattern="[0-9\+\-\s\(\)]+">
+                                <label for="phone">Phone Number <i class="fas fa-phone"></i> <span class="text-danger">*</span></label>
+                                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number"
+                                    value="{{ old('phone') }}" required pattern="[0-9\+\-\s\(\)]+">
                             </div>
                             <div class="form-group">
                                 <label for="subject">Subject <i class="fas fa-tag"></i></label>

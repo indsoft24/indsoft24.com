@@ -65,18 +65,6 @@ production-setup.bat
 
 The contact form sends emails to `indsoft24@gmail.com` using Gmail SMTP.
 
-**Production `.env` settings:**
-```env
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=indsoft24@gmail.com
-MAIL_PASSWORD=yntunjkrqepcqgsf
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=indsoft24@gmail.com
-MAIL_FROM_NAME="Indsoft24.com"
-```
-
 ## 📁 Project Structure
 
 ```

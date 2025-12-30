@@ -78,11 +78,12 @@ class ContactController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/',
             'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:20|regex:/^[0-9\+\-\s\(\)]+$/',
+            'phone' => 'required|string|max:20|regex:/^[0-9\+\-\s\(\)]+$/',
             'subject' => 'required|string|max:255|regex:/^[a-zA-Z0-9\s\-\.\,\!\?]+$/',
             'message' => 'required|string|min:10|max:1000',
         ], [
             'name.regex' => 'Name can only contain letters and spaces.',
+            'phone.required' => 'Phone number is required.',
             'phone.regex' => 'Phone number contains invalid characters.',
             'subject.regex' => 'Subject contains invalid characters.',
             'message.min' => 'Message must be at least 10 characters long.',

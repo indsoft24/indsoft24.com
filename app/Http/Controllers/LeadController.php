@@ -53,7 +53,7 @@ class LeadController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/',
             'email' => $isHomepage ? 'required|email|max:255' : 'nullable|email|max:255',
-            'phone' => $isHomepage ? 'nullable|string|max:20|regex:/^[0-9\+\-\s\(\)]+$/' : 'required|string|max:20|regex:/^[0-9\+\-\s\(\)]+$/',
+            'phone' => 'required|string|max:20|regex:/^[0-9\+\-\s\(\)]+$/',
             'service' => $isHomepage ? 'nullable|string|in:web development,app development,custom software,digital marketing,digital stores' : 'required|string|in:web development,app development,custom software,digital marketing,digital stores',
             'company' => 'nullable|string|max:255',
             'message' => 'nullable|string|max:500',
@@ -61,8 +61,8 @@ class LeadController extends Controller
             'name.regex' => 'Name can only contain letters and spaces.',
             'email.required' => 'Email address is required.',
             'email.email' => 'Please enter a valid email address.',
-            'phone.regex' => 'Please enter a valid phone number.',
             'phone.required' => 'Phone number is required.',
+            'phone.regex' => 'Please enter a valid phone number.',
             'service.required' => 'Please select a service.',
             'service.in' => 'Please select a valid service.',
         ]);
