@@ -538,7 +538,7 @@
                         Whether it's solving a challenge, creating a product, or sharing a story — Indsoft24 is here for you.
                     </p>
                     <div class="d-flex justify-content-center gap-3 flex-wrap">
-                        <a href="{{ route('contact.store') }}" class="btn btn-light btn-lg">
+                        <a href="{{ route('contact') }}" class="btn btn-light btn-lg">
                             <i class="fas fa-paper-plane me-2"></i>Get in Touch
                         </a>
                         @auth

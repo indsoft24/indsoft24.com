@@ -484,7 +484,7 @@
                             <p class="lead mb-4">
                                 📞 Get in touch with us today for a free consultation.
                             </p>
-                            <a href="{{ route('contact.store') }}" class="btn btn-light btn-lg px-5">
+                            <a href="{{ route('contact') }}" class="btn btn-light btn-lg px-5">
                                 <i class="fas fa-paper-plane me-2"></i>Get Free Consultation
                             </a>
                         </div>

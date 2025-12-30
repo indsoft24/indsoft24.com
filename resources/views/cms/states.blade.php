@@ -269,7 +269,7 @@
                                         <a href="{{ route('e-commerce') }}" class="btn btn-primary btn-lg w-100 mb-3">
                                             <i class="fas fa-rocket me-2"></i>Start Your Store
                                         </a>
-                                        <a href="{{ route('contact.store') }}" class="btn btn-outline-primary w-100">
+                                        <a href="{{ route('contact') }}" class="btn btn-outline-primary w-100">
                                             <i class="fas fa-phone me-2"></i>Contact Us
                                         </a>
                                     </div>
