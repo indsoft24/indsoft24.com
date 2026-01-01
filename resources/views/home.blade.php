@@ -138,7 +138,8 @@
         </div>
 
         <div class="services-grid">
-            <div class="service-card">
+            <!-- First Row -->
+            <div class="service-card compact">
                 <div class="service-card-inner">
                     <div class="service-icon">
                         <i class="fas fa-globe"></i>
@@ -150,12 +151,6 @@
                             Transform your online presence with modern, responsive websites and web
                             applications built using the latest technologies.
                         </p>
-                        <ul class="service-features">
-                            <li><i class="fas fa-check"></i> Responsive Design</li>
-                            <li><i class="fas fa-check"></i> E-commerce Solutions</li>
-                            <li><i class="fas fa-check"></i> CMS Development</li>
-                            <li><i class="fas fa-check"></i> API Integration</li>
-                        </ul>
                     </div>
                     <div class="service-footer">
                         <a href="{{ route('services.web') }}" 
@@ -168,7 +163,7 @@
                 </div>
             </div>
 
-            <div class="service-card">
+            <div class="service-card compact">
                 <div class="service-card-inner">
                     <div class="service-icon">
                         <i class="fas fa-mobile-alt"></i>
@@ -180,12 +175,6 @@
                             Reach your audience anywhere with native and cross-platform mobile apps
                             that deliver exceptional user experiences.
                         </p>
-                        <ul class="service-features">
-                            <li><i class="fas fa-check"></i> iOS Development</li>
-                            <li><i class="fas fa-check"></i> Android Development</li>
-                            <li><i class="fas fa-check"></i> Cross-platform Apps</li>
-                            <li><i class="fas fa-check"></i> App Store Optimization</li>
-                        </ul>
                     </div>
                     <div class="service-footer">
                         <a href="{{ route('services.app') }}" class="service-link" aria-label="Learn more about Mobile Applications">
@@ -196,7 +185,7 @@
                 </div>
             </div>
 
-            <div class="service-card">
+            <div class="service-card compact">
                 <div class="service-card-inner">
                     <div class="service-icon">
                         <i class="fas fa-cogs"></i>
@@ -208,15 +197,76 @@
                             Streamline your operations with tailored software solutions designed to
                             solve specific business challenges.
                         </p>
-                        <ul class="service-features">
-                            <li><i class="fas fa-check"></i> Business Automation</li>
-                            <li><i class="fas fa-check"></i> Data Management</li>
-                            <li><i class="fas fa-check"></i> Integration Solutions</li>
-                            <li><i class="fas fa-check"></i> Legacy System Updates</li>
-                        </ul>
                     </div>
                     <div class="service-footer">
                         <a href="{{ route('services.software') }}" class="service-link" aria-label="Learn more about Custom Software">
+                            <span>Learn More</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second Row -->
+            <div class="service-card compact">
+                <div class="service-card-inner">
+                    <div class="service-icon">
+                        <i class="fas fa-search"></i>
+                        <div class="icon-bg"></div>
+                    </div>
+                    <div class="service-content">
+                        <h3>SEO Optimization</h3>
+                        <p>
+                            Increase your organic traffic, improve Google rankings, and generate more leads with our
+                            data-driven SEO strategies.
+                        </p>
+                    </div>
+                    <div class="service-footer">
+                        <a href="{{ route('services.seo') }}" class="service-link" aria-label="Learn more about SEO Optimization">
+                            <span>Learn More</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-card compact">
+                <div class="service-card-inner">
+                    <div class="service-icon">
+                        <i class="fas fa-bullhorn"></i>
+                        <div class="icon-bg"></div>
+                    </div>
+                    <div class="service-content">
+                        <h3>Digital Marketing</h3>
+                        <p>
+                            Drive growth, increase brand visibility, and generate qualified leads with comprehensive
+                            digital marketing strategies.
+                        </p>
+                    </div>
+                    <div class="service-footer">
+                        <a href="{{ route('services.digital-marketing') }}" class="service-link" aria-label="Learn more about Digital Marketing">
+                            <span>Learn More</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-card compact">
+                <div class="service-card-inner">
+                    <div class="service-icon">
+                        <i class="fas fa-share-alt"></i>
+                        <div class="icon-bg"></div>
+                    </div>
+                    <div class="service-content">
+                        <h3>Social Media Marketing</h3>
+                        <p>
+                            Build your brand, engage your audience, and drive sales with strategic social media
+                            marketing across all major platforms.
+                        </p>
+                    </div>
+                    <div class="service-footer">
+                        <a href="{{ route('services.social-media-marketing') }}" class="service-link" aria-label="Learn more about Social Media Marketing">
                             <span>Learn More</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -279,7 +329,10 @@
                                     @if($project->featured_image)
                                         <img src="{{ asset($project->featured_image) }}" 
                                              alt="{{ $project->name }}" 
-                                             class="project-img">
+                                             class="project-img"
+                                             loading="lazy"
+                                             width="400"
+                                             height="300">
                                     @else
                                         <div class="project-image-placeholder">
                                             <i class="fas fa-image"></i>

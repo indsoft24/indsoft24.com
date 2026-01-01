@@ -45,7 +45,10 @@
                                     @if($project->featured_image)
                                         <img src="{{ asset($project->featured_image) }}" 
                                              alt="{{ $project->name }}" 
-                                             class="project-image">
+                                             class="project-image"
+                                             loading="lazy"
+                                             width="400"
+                                             height="300">
                                     @else
                                         <div class="project-image-placeholder">
                                             <i class="fas fa-image"></i>
