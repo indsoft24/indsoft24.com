@@ -116,10 +116,14 @@ class PdfLockController extends Controller
 
     /**
      * Check if FPDI is available
+     * Note: Currently disabled as FPDI requires FPDF or FPDI-TCPDF bridge
      */
     private function isFpdiAvailable()
     {
-        return class_exists('setasign\Fpdi\Fpdi');
+        // Disabled - FPDI requires FPDF or FPDI-TCPDF bridge
+        // Uncomment when proper dependencies are installed:
+        // return class_exists('setasign\Fpdi\Fpdi\Tcpdf\Fpdi') || class_exists('setasign\Fpdi\Fpdi');
+        return false;
     }
 
     /**
@@ -194,10 +198,10 @@ class PdfLockController extends Controller
             // Ghostscript PDF encryption with password protection
             // -sOwnerPassword: Owner password (for permissions)
             // -sUserPassword: User password (to open the file)
-            // -dEncryptionR: Encryption revision (4 = AES 128-bit)
+            // -dEncryptionR: Encryption revision (2 or 3 - Ghostscript 9.25 only supports 2 and 3)
             // -dPermissions: PDF permissions (-300 = no printing, no copying, no modifying)
             $command = sprintf(
-                '%s -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -sOwnerPassword=%s -sUserPassword=%s -dEncryptionR=4 -dPermissions=-300 -sOutputFile=%s %s 2>&1',
+                '%s -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -sOwnerPassword=%s -sUserPassword=%s -dEncryptionR=2 -dPermissions=-300 -sOutputFile=%s %s 2>&1',
                 escapeshellarg($gsPath),
                 escapeshellarg($password),
                 escapeshellarg($password),
@@ -230,43 +234,13 @@ class PdfLockController extends Controller
 
     /**
      * Lock PDF using FPDI (PHP library - no command-line tools needed)
+     * Note: FPDI requires FPDF, not TCPDF. This method is disabled until FPDF is installed.
      */
     private function lockWithFpdi($inputPath, $outputPath, $password)
     {
-        try {
-            // FPDI with TCPDF for password protection
-            if (! class_exists('setasign\Fpdi\Fpdi') || ! class_exists('TCPDF')) {
-                return null;
-            }
-
-            // Create FPDI instance
-            $pdf = new \setasign\Fpdi\Fpdi();
-            
-            // Set password protection
-            $pdf->SetProtection(['print', 'copy'], $password, $password);
-            
-            // Import pages from source PDF
-            $pageCount = $pdf->setSourceFile($inputPath);
-            
-            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-                $templateId = $pdf->importPage($pageNo);
-                $size = $pdf->getTemplateSize($templateId);
-                
-                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-                $pdf->useTemplate($templateId);
-            }
-            
-            // Save to output file
-            $pdf->Output('F', $outputPath);
-            
-            // Check if file was created and has content
-            if (file_exists($outputPath) && filesize($outputPath) > 0) {
-                return $outputPath;
-            }
-        } catch (\Exception $e) {
-            Log::error('FPDI lock error: '.$e->getMessage());
-        }
-
+        // FPDI base class requires FPDF, not TCPDF
+        // To use FPDI with TCPDF, we need setasign/fpdi-tcpdf package
+        // For now, this method is disabled as it requires additional dependencies
         return null;
     }
 }
