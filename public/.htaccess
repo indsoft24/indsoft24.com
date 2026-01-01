@@ -56,6 +56,12 @@
     AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>
 
+# Upload Size Limits
+php_value upload_max_filesize 100M
+php_value post_max_size 100M
+php_value max_execution_time 300
+php_value max_input_time 300
+
 # Browser Caching
 <IfModule mod_headers.c>
     # Cache static assets for 1 year
