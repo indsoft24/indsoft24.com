@@ -112,7 +112,15 @@ class PdfUnlockController extends Controller
 
             // Determine error message based on whether password was provided
             if (! empty($password)) {
-                $errorMessage = 'Unable to unlock password-protected PDF. Please ensure the password is correct. If the issue persists, the PDF may use encryption that requires qpdf to be installed on the server.';
+                // Check what tools are available
+                $hasQpdf = $this->isQpdfAvailable();
+                $hasImagick = extension_loaded('imagick');
+
+                if (! $hasQpdf && ! $hasImagick) {
+                    $errorMessage = 'Unable to unlock password-protected PDF. qpdf is required for password-protected PDFs but is not installed on the server. Please contact your hosting provider to install qpdf.';
+                } else {
+                    $errorMessage = 'Unable to unlock password-protected PDF. Please ensure the password is correct. If the issue persists, the PDF may use encryption that requires qpdf to be installed on the server.';
+                }
             } else {
                 $errorMessage = 'Unable to unlock PDF. The PDF may already be unlocked, or it may require a password. If the PDF is password-protected, please provide the password.';
             }
@@ -120,7 +128,7 @@ class PdfUnlockController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $errorMessage,
-            ], 500);
+            ], 422);
 
         } catch (\Exception $e) {
             Log::error('PDF Unlock Error: '.$e->getMessage());
@@ -227,10 +235,33 @@ class PdfUnlockController extends Controller
             }
 
             // Read PDF with password if needed
-            $imagick->readImage($inputPath);
+            // This may throw an exception if password is wrong or PDF is corrupted
+            try {
+                $imagick->readImage($inputPath);
+            } catch (\ImagickException $e) {
+                // If reading fails, it's likely a password issue or corrupted PDF
+                $imagick->clear();
+                $imagick->destroy();
+                Log::error('Imagick readImage failed', [
+                    'error' => $e->getMessage(),
+                    'has_password' => ! empty($password),
+                ]);
+
+                return null;
+            }
+
             $imagick->setImageFormat('pdf');
 
-            $imagick->writeImages($outputPath, true);
+            try {
+                $imagick->writeImages($outputPath, true);
+            } catch (\ImagickException $e) {
+                Log::error('Imagick writeImages failed', ['error' => $e->getMessage()]);
+                $imagick->clear();
+                $imagick->destroy();
+
+                return null;
+            }
+
             $imagick->clear();
             $imagick->destroy();
 
