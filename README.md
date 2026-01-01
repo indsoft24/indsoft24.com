@@ -183,3 +183,17 @@ This project is proprietary software developed for Indsoft24.com.
 **🚀 Ready for Production Deployment!**
 
 *Built with Laravel 10, optimized for performance and security.*
+# Process everything (states, cities, areas, and all nearby locations)
+php artisan cms:auto-update-pages
+
+# Process only nearby locations (schools, hospitals, metros, markets, localities)
+php artisan cms:auto-update-pages --only-nearby
+
+# Skip nearby locations (only process states, cities, areas)
+php artisan cms:auto-update-pages --skip-nearby
+
+# Process specific service only
+php artisan cms:auto-update-pages --service="web development"
+
+# Resume from last checkpoint
+php artisan cms:auto-update-pages --resume
