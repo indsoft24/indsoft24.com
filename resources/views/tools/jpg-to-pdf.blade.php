@@ -44,7 +44,7 @@
                                 @csrf
                                 <div class="mb-4">
                                     <label for="images" class="form-label fw-semibold">Select Images (JPG, JPEG, PNG)</label>
-                                    <input type="file" class="form-control" id="images" name="images[]" accept="image/jpeg,image/jpg,image/png" multiple required>
+                                    <input type="file" class="form-control" id="images" name="images[]" accept="image/jpeg,image/png" multiple required>
                                     <div class="form-text">You can upload up to 20 images at once. Maximum file size: 10MB per image.</div>
                                 </div>
 

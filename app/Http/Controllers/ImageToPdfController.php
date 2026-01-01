@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use TCPDF;
 
 class ImageToPdfController extends Controller
 {
@@ -34,7 +34,7 @@ class ImageToPdfController extends Controller
             'images.min' => 'Please upload at least one image.',
             'images.max' => 'You can upload maximum 20 images at once.',
             'images.*.image' => 'All files must be images.',
-            'images.*.mimes' => 'Only JPEG and PNG images are allowed.',
+            'images.*.mimes' => 'Only JPG, JPEG, and PNG images are allowed.',
             'images.*.max' => 'Each image must not exceed 10MB.',
         ]);
 
@@ -49,7 +49,7 @@ class ImageToPdfController extends Controller
             $images = $request->file('images');
             
             // Create new PDF document
-            $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+            $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
             
             // Remove default header/footer
             $pdf->setPrintHeader(false);
@@ -120,7 +120,7 @@ class ImageToPdfController extends Controller
             return response()->download($pdfPath, $filename)->deleteFileAfterSend(true);
             
         } catch (\Exception $e) {
-            \Log::error('PDF Conversion Error: ' . $e->getMessage());
+            Log::error('PDF Conversion Error: ' . $e->getMessage());
             
             return response()->json([
                 'success' => false,

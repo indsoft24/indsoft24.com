@@ -522,12 +522,25 @@
 <script src="{{ asset('js/script.js') }}" defer></script>
 
 <script>
-    toastr.options = {
-        "closeButton": true,
-        "progressBar": true,
-        "positionClass": "toast-top-right",
-        "timeOut": "5000"
-    };
+    // Wait for toastr to be loaded before configuring
+    (function configureToastr(retries) {
+        retries = retries || 0;
+        const maxRetries = 100; // Maximum 5 seconds (100 * 50ms)
+        
+        if (typeof toastr !== 'undefined') {
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+        } else if (retries < maxRetries) {
+            // If toastr is not loaded yet, wait a bit and try again
+            setTimeout(function() {
+                configureToastr(retries + 1);
+            }, 50);
+        }
+    })();
 </script>
 
     <!-- SweetAlert Flash Messages -->
