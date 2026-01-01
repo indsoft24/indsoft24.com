@@ -1,6 +1,6 @@
 # Server Installation Guide for PDF Tools
 
-This guide explains how to install qpdf and Ghostscript on your Linux production server.
+This guide explains how to install qpdf, Ghostscript, and LibreOffice on your Linux production server.
 
 ## Option 1: Install qpdf (Recommended for PDF Lock/Unlock)
 
@@ -81,6 +81,60 @@ gs --version
 ```
 
 Both commands should return version information without errors.
+
+## Option 3: Install LibreOffice (For DOC/DOCX to PDF Conversion)
+
+### For Ubuntu/Debian:
+```bash
+sudo apt-get update
+sudo apt-get install libreoffice
+```
+
+### For CentOS/RHEL/Fedora:
+```bash
+# CentOS/RHEL 7/8
+sudo yum install libreoffice
+
+# CentOS/RHEL 9 / Fedora
+sudo dnf install libreoffice
+```
+
+### For Amazon Linux:
+```bash
+sudo yum install libreoffice
+```
+
+### Verify Installation:
+```bash
+libreoffice --version
+```
+
+## Option 4: Install All Tools (Recommended)
+
+For best functionality, install all tools:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install qpdf ghostscript libreoffice
+
+# CentOS/RHEL/Fedora
+sudo yum install qpdf ghostscript libreoffice
+# OR
+sudo dnf install qpdf ghostscript libreoffice
+```
+
+## Verify All Tools Are Working
+
+After installation, verify all tools are accessible:
+
+```bash
+qpdf --version
+gs --version
+libreoffice --version
+```
+
+All commands should return version information without errors.
 
 ## For cPanel/Shared Hosting (Jailshell Environment)
 

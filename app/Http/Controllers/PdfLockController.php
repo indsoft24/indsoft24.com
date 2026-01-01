@@ -16,12 +16,12 @@ class PdfLockController extends Controller
         $metaDescription = 'Lock PDF files online for free. Add password protection to PDF documents instantly. Fast, secure, and easy-to-use PDF lock tool by Indsoft24. No registration required.';
         $canonicalUrl = route('tools.pdf-lock');
         
-        // Check if qpdf or Ghostscript is available
-        $isQpdfAvailable = $this->isQpdfAvailable();
+        // Check if Ghostscript is available (primary method, qpdf is optional)
         $isGhostscriptAvailable = $this->isGhostscriptAvailable();
-        $isAvailable = $isQpdfAvailable || $isGhostscriptAvailable;
+        $isQpdfAvailable = $this->isQpdfAvailable();
+        $isAvailable = $isGhostscriptAvailable || $isQpdfAvailable;
 
-        return view('tools.pdf-lock', compact('metaDescription', 'canonicalUrl', 'isAvailable', 'isQpdfAvailable', 'isGhostscriptAvailable'));
+        return view('tools.pdf-lock', compact('metaDescription', 'canonicalUrl', 'isAvailable', 'isGhostscriptAvailable', 'isQpdfAvailable'));
     }
 
     /**
@@ -77,21 +77,26 @@ class PdfLockController extends Controller
 
             $lockedPath = null;
 
-            // Try qpdf first (best for password protection)
-            if ($this->isQpdfAvailable()) {
-                $lockedPath = $this->lockWithQpdf($originalPath, $outputPath, $password);
-            }
-
-            // Fallback to Ghostscript if qpdf is not available
-            if (! $lockedPath && $this->isGhostscriptAvailable()) {
+            // Try Ghostscript first (already available on server)
+            if ($this->isGhostscriptAvailable()) {
                 $lockedPath = $this->lockWithGhostscript($originalPath, $outputPath, $password);
             }
 
-            // If both methods failed, return error
+            // Fallback to FPDI (PHP library) if Ghostscript failed
+            if (! $lockedPath && $this->isFpdiAvailable()) {
+                $lockedPath = $this->lockWithFpdi($originalPath, $outputPath, $password);
+            }
+
+            // Fallback to qpdf if both above failed (optional)
+            if (! $lockedPath && $this->isQpdfAvailable()) {
+                $lockedPath = $this->lockWithQpdf($originalPath, $outputPath, $password);
+            }
+
+            // If all methods failed, return error
             if (! $lockedPath || ! file_exists($lockedPath)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'PDF locking requires qpdf or Ghostscript to be installed. Please install qpdf from https://qpdf.sourceforge.io/ or Ghostscript from https://www.ghostscript.com/download/gsdnld.html and ensure it is available in your system PATH.',
+                    'message' => 'PDF locking requires Ghostscript to be installed. Ghostscript is already installed on your server, but there may be an issue with the conversion. Please try again or contact support.',
                 ], 500);
             }
 
@@ -107,6 +112,14 @@ class PdfLockController extends Controller
                 'message' => 'An error occurred while locking the PDF. Please ensure the PDF is not corrupted and try again.',
             ], 500);
         }
+    }
+
+    /**
+     * Check if FPDI is available
+     */
+    private function isFpdiAvailable()
+    {
+        return class_exists('setasign\Fpdi\Fpdi');
     }
 
     /**
@@ -176,12 +189,13 @@ class PdfLockController extends Controller
     private function lockWithGhostscript($inputPath, $outputPath, $password)
     {
         try {
-            // Ghostscript doesn't directly support password protection
-            // We'll use a workaround with PDF encryption
             $gsPath = $this->getGhostscriptPath();
 
-            // Note: Ghostscript has limited PDF encryption support
-            // This is a basic implementation
+            // Ghostscript PDF encryption with password protection
+            // -sOwnerPassword: Owner password (for permissions)
+            // -sUserPassword: User password (to open the file)
+            // -dEncryptionR: Encryption revision (4 = AES 128-bit)
+            // -dPermissions: PDF permissions (-300 = no printing, no copying, no modifying)
             $command = sprintf(
                 '%s -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -sOwnerPassword=%s -sUserPassword=%s -dEncryptionR=4 -dPermissions=-300 -sOutputFile=%s %s 2>&1',
                 escapeshellarg($gsPath),
@@ -195,11 +209,62 @@ class PdfLockController extends Controller
             $returnVar = 0;
             @exec($command, $output, $returnVar);
 
+            // Check if file was created and has content
             if ($returnVar === 0 && file_exists($outputPath) && filesize($outputPath) > 0) {
                 return $outputPath;
             }
+
+            // If Ghostscript failed, log the output for debugging
+            if ($returnVar !== 0 && ! empty($output)) {
+                Log::error('Ghostscript lock failed', [
+                    'return_code' => $returnVar,
+                    'output' => implode("\n", $output),
+                ]);
+            }
         } catch (\Exception $e) {
             Log::error('Ghostscript lock error: '.$e->getMessage());
+        }
+
+        return null;
+    }
+
+    /**
+     * Lock PDF using FPDI (PHP library - no command-line tools needed)
+     */
+    private function lockWithFpdi($inputPath, $outputPath, $password)
+    {
+        try {
+            // FPDI with TCPDF for password protection
+            if (! class_exists('setasign\Fpdi\Fpdi') || ! class_exists('TCPDF')) {
+                return null;
+            }
+
+            // Create FPDI instance
+            $pdf = new \setasign\Fpdi\Fpdi();
+            
+            // Set password protection
+            $pdf->SetProtection(['print', 'copy'], $password, $password);
+            
+            // Import pages from source PDF
+            $pageCount = $pdf->setSourceFile($inputPath);
+            
+            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                $templateId = $pdf->importPage($pageNo);
+                $size = $pdf->getTemplateSize($templateId);
+                
+                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                $pdf->useTemplate($templateId);
+            }
+            
+            // Save to output file
+            $pdf->Output('F', $outputPath);
+            
+            // Check if file was created and has content
+            if (file_exists($outputPath) && filesize($outputPath) > 0) {
+                return $outputPath;
+            }
+        } catch (\Exception $e) {
+            Log::error('FPDI lock error: '.$e->getMessage());
         }
 
         return null;

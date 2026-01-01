@@ -55,71 +55,77 @@ class PdfUnlockController extends Controller
             $originalPath = $pdf->getRealPath();
             $originalName = pathinfo($pdf->getClientOriginalName(), PATHINFO_FILENAME);
 
-            // Try qpdf first if password is provided (best for password-protected PDFs)
-            if (! empty($password) && $this->isQpdfAvailable()) {
-                $unlockedPath = $this->unlockWithQpdf($originalPath, $password);
+            // For password-protected PDFs: Try Imagick first (if available), then qpdf (optional)
+            if (! empty($password)) {
+                // Try Imagick first (works with password-protected PDFs)
+                if (extension_loaded('imagick')) {
+                    $unlockedPath = $this->unlockWithImagick($originalPath, $password);
 
-                if ($unlockedPath && file_exists($unlockedPath)) {
-                    $filename = $originalName.'_unlocked_'.time().'.pdf';
+                    if ($unlockedPath && file_exists($unlockedPath)) {
+                        $filename = $originalName.'_unlocked_'.time().'.pdf';
 
-                    return response()->download($unlockedPath, $filename)->deleteFileAfterSend(true);
+                        return response()->download($unlockedPath, $filename)->deleteFileAfterSend(true);
+                    }
+                }
+
+                // Fallback to qpdf if Imagick failed (optional, not required)
+                if ($this->isQpdfAvailable()) {
+                    $unlockedPath = $this->unlockWithQpdf($originalPath, $password);
+
+                    if ($unlockedPath && file_exists($unlockedPath)) {
+                        $filename = $originalName.'_unlocked_'.time().'.pdf';
+
+                        return response()->download($unlockedPath, $filename)->deleteFileAfterSend(true);
+                    }
                 }
             }
 
-            // Try Imagick if password is provided
-            if (! empty($password) && extension_loaded('imagick')) {
-                $unlockedPath = $this->unlockWithImagick($originalPath, $password);
+            // For non-password-protected PDFs: Try Ghostscript first (already available), then others
+            if (empty($password)) {
+                // Try Ghostscript first (already available on server)
+                if ($this->isGhostscriptAvailable()) {
+                    $unlockedPath = $this->unlockWithGhostscript($originalPath, '');
 
-                if ($unlockedPath && file_exists($unlockedPath)) {
-                    $filename = $originalName.'_unlocked_'.time().'.pdf';
+                    if ($unlockedPath && file_exists($unlockedPath)) {
+                        $filename = $originalName.'_unlocked_'.time().'.pdf';
 
-                    return response()->download($unlockedPath, $filename)->deleteFileAfterSend(true);
+                        return response()->download($unlockedPath, $filename)->deleteFileAfterSend(true);
+                    }
                 }
-            }
 
-            // Try qpdf without password (for non-password-protected PDFs)
-            if (empty($password) && $this->isQpdfAvailable()) {
-                $unlockedPath = $this->unlockWithQpdf($originalPath, '');
+                // Try Imagick without password
+                if (extension_loaded('imagick')) {
+                    $unlockedPath = $this->unlockWithImagick($originalPath, '');
 
-                if ($unlockedPath && file_exists($unlockedPath)) {
-                    $filename = $originalName.'_unlocked_'.time().'.pdf';
+                    if ($unlockedPath && file_exists($unlockedPath)) {
+                        $filename = $originalName.'_unlocked_'.time().'.pdf';
 
-                    return response()->download($unlockedPath, $filename)->deleteFileAfterSend(true);
+                        return response()->download($unlockedPath, $filename)->deleteFileAfterSend(true);
+                    }
                 }
-            }
 
-            // Try Ghostscript (only works for non-password-protected PDFs)
-            if (empty($password) && $this->isGhostscriptAvailable()) {
-                $unlockedPath = $this->unlockWithGhostscript($originalPath, '');
+                // Fallback to qpdf if others failed (optional, not required)
+                if ($this->isQpdfAvailable()) {
+                    $unlockedPath = $this->unlockWithQpdf($originalPath, '');
 
-                if ($unlockedPath && file_exists($unlockedPath)) {
-                    $filename = $originalName.'_unlocked_'.time().'.pdf';
+                    if ($unlockedPath && file_exists($unlockedPath)) {
+                        $filename = $originalName.'_unlocked_'.time().'.pdf';
 
-                    return response()->download($unlockedPath, $filename)->deleteFileAfterSend(true);
-                }
-            }
-
-            // Try Imagick without password
-            if (empty($password) && extension_loaded('imagick')) {
-                $unlockedPath = $this->unlockWithImagick($originalPath, '');
-
-                if ($unlockedPath && file_exists($unlockedPath)) {
-                    $filename = $originalName.'_unlocked_'.time().'.pdf';
-
-                    return response()->download($unlockedPath, $filename)->deleteFileAfterSend(true);
+                        return response()->download($unlockedPath, $filename)->deleteFileAfterSend(true);
+                    }
                 }
             }
 
             // Determine error message based on whether password was provided
             if (! empty($password)) {
                 // Check what tools are available
-                $hasQpdf = $this->isQpdfAvailable();
                 $hasImagick = extension_loaded('imagick');
+                $hasQpdf = $this->isQpdfAvailable();
 
-                if (! $hasQpdf && ! $hasImagick) {
-                    $errorMessage = 'Unable to unlock password-protected PDF. qpdf is required for password-protected PDFs but is not installed on the server. Please contact your hosting provider to install qpdf.';
+                if (! $hasImagick && ! $hasQpdf) {
+                    $errorMessage = 'Unable to unlock password-protected PDF. The ImageMagick PHP extension is recommended for password-protected PDFs. Please contact your hosting provider to install the ImageMagick PHP extension, or ensure the password is correct.';
                 } else {
-                    $errorMessage = 'Unable to unlock password-protected PDF. Please ensure the password is correct. If the issue persists, the PDF may use encryption that requires qpdf to be installed on the server.';
+                    $errorMessage = 'Unable to unlock password-protected PDF. Please ensure the password is correct. If the issue persists, the PDF may use encryption that is not supported.';
                 }
             } else {
                 $errorMessage = 'Unable to unlock PDF. The PDF may already be unlocked, or it may require a password. If the PDF is password-protected, please provide the password.';

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DocToPdfController;
 use App\Http\Controllers\ImageConverterController;
 use App\Http\Controllers\ImageToPdfController;
 use App\Http\Controllers\PdfCompressController;
@@ -22,4 +23,6 @@ Route::prefix('tools')->name('tools.')->group(function () {
     Route::post('/pdf-unlock/unlock', [PdfUnlockController::class, 'unlock'])->name('pdf-unlock.unlock');
     Route::get('/pdf-lock', [PdfLockController::class, 'index'])->name('pdf-lock');
     Route::post('/pdf-lock/lock', [PdfLockController::class, 'lock'])->name('pdf-lock.lock');
+    Route::get('/doc-to-pdf', [DocToPdfController::class, 'index'])->name('doc-to-pdf');
+    Route::post('/doc-to-pdf/convert', [DocToPdfController::class, 'convert'])->name('doc-to-pdf.convert');
 });

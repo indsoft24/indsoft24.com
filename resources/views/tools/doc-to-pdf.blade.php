@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Free PDF Lock Tool Online - Add Password Protection to PDF | Indsoft24')
+@section('title', 'Free DOC to PDF Converter Online - Convert Word to PDF | Indsoft24')
 
 @section('content')
     <!-- Hero Section -->
@@ -19,14 +19,14 @@
             <div class="animated-grid"></div>
         </div>
         <div class="container text-center" style="position: relative; z-index: 3;">
-            <h1 class="display-4 fw-bold mb-3">Free PDF Lock Tool</h1>
+            <h1 class="display-4 fw-bold mb-3">Free DOC to PDF Converter</h1>
             <p class="lead mb-4">
-                Add password protection to PDF files. Secure your PDF documents instantly. Fast, secure, and completely free - no registration required.
+                Convert Word documents (DOC, DOCX) to PDF online. Fast, secure, and easy-to-use document converter. Completely free - no registration required.
             </p>
         </div>
     </section>
 
-    <!-- Lock Tool Section -->
+    <!-- Converter Tool Section -->
     <section class="py-5">
         <div class="container">
             <div class="row justify-content-center">
@@ -34,9 +34,9 @@
                     <div class="card shadow-lg border-0">
                         <div class="card-body p-4">
                             <div class="text-center mb-4">
-                                <i class="bi bi-lock display-4 text-primary mb-3"></i>
-                                <h2 class="fw-bold">Lock PDF Files</h2>
-                                <p class="text-muted">Upload your PDF file and add password protection to secure it</p>
+                                <i class="bi bi-file-earmark-word display-4 text-primary mb-3"></i>
+                                <h2 class="fw-bold">Convert DOC/DOCX to PDF</h2>
+                                <p class="text-muted">Upload your Word document and convert it to PDF format</p>
                             </div>
 
                             @if(!$isAvailable)
@@ -44,40 +44,30 @@
                             <div class="alert alert-warning text-center" role="alert">
                                 <i class="bi bi-clock-history display-6 mb-3 d-block"></i>
                                 <h4 class="alert-heading">Coming Soon!</h4>
-                                <p class="mb-2">PDF Lock feature is currently being set up on the server.</p>
+                                <p class="mb-2">DOC to PDF conversion feature is currently being set up on the server.</p>
                                 <p class="mb-0">
                                     <strong>Status:</strong> 
-                                    @if(!$isGhostscriptAvailable)
-                                        Ghostscript is not installed. Please contact your hosting provider to install Ghostscript for PDF password protection.
+                                    @if(!$isLibreOfficeAvailable && !$isPandocAvailable)
+                                        LibreOffice and Pandoc are not installed. Please contact your hosting provider to install LibreOffice (recommended) for document conversion.
+                                    @elseif(!$isLibreOfficeAvailable)
+                                        LibreOffice is not installed. Pandoc is available but may have limitations. Please contact your hosting provider to install LibreOffice for best results.
                                     @endif
                                 </p>
                                 <hr>
                                 <p class="mb-0 small">
-                                    <strong>Installation Required:</strong> The server needs Ghostscript installed to enable PDF password protection. 
+                                    <strong>Installation Required:</strong> The server needs LibreOffice installed to enable DOC/DOCX to PDF conversion. 
                                     Contact your hosting provider with the installation guide in <code>SERVER_INSTALLATION.md</code>
                                 </p>
                             </div>
                             @endif
 
                             <!-- Upload Form -->
-                            <form id="lockForm" enctype="multipart/form-data" @if(!$isAvailable) style="opacity: 0.5; pointer-events: none;" @endif>
+                            <form id="convertForm" enctype="multipart/form-data" @if(!$isAvailable) style="opacity: 0.5; pointer-events: none;" @endif>
                                 @csrf
                                 <div class="mb-4">
-                                    <label for="pdf" class="form-label fw-semibold">Select PDF File</label>
-                                    <input type="file" class="form-control" id="pdf" name="pdf" accept="application/pdf" required>
-                                    <div class="form-text">Maximum file size: 100MB</div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="password" class="form-label fw-semibold">Set Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password to protect PDF" required minlength="1" maxlength="255">
-                                    <div class="form-text">Enter a strong password to protect your PDF file.</div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="confirm_password" class="form-label fw-semibold">Confirm Password</label>
-                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm password" required minlength="1" maxlength="255">
-                                    <div class="form-text">Re-enter the password to confirm.</div>
+                                    <label for="doc" class="form-label fw-semibold">Select Word Document</label>
+                                    <input type="file" class="form-control" id="doc" name="doc" accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
+                                    <div class="form-text">Supported formats: DOC, DOCX. Maximum file size: 100MB</div>
                                 </div>
 
                                 <!-- File Info -->
@@ -93,16 +83,16 @@
                                     <div class="progress" style="height: 25px;">
                                         <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%">0%</div>
                                     </div>
-                                    <p class="text-center mt-2 mb-0" id="progressText">Preparing lock process...</p>
+                                    <p class="text-center mt-2 mb-0" id="progressText">Preparing conversion...</p>
                                 </div>
 
                                 <!-- Error/Success Messages -->
                                 <div id="messageContainer" class="mb-4"></div>
 
-                                <!-- Lock Button -->
+                                <!-- Convert Button -->
                                 <div class="text-center">
-                                    <button type="submit" class="btn btn-primary btn-lg px-5" id="lockBtn" @if(!$isAvailable) disabled @endif>
-                                        <i class="bi bi-lock me-2"></i>Lock PDF
+                                    <button type="submit" class="btn btn-primary btn-lg px-5" id="convertBtn" @if(!$isAvailable) disabled @endif>
+                                        <i class="bi bi-file-earmark-pdf me-2"></i>Convert to PDF
                                     </button>
                                 </div>
                             </form>
@@ -118,101 +108,67 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <h2 class="fw-bold mb-4">About Indsoft24 - Your Trusted Technology Partner</h2>
-                    <p class="lead text-muted mb-4">
-                        Indsoft24 is a leading software development company based in Noida, India, specializing in innovative digital solutions that transform businesses.
-                    </p>
-                    <p class="mb-4">
-                        With over <strong>5+ years of experience</strong> and <strong>100+ successful projects</strong>, we have established ourselves as a trusted partner for businesses seeking cutting-edge technology solutions.
-                    </p>
-                    <a href="{{ route('home') }}" class="btn btn-primary">Learn More About Us</a>
+                    <h2 class="fw-bold mb-4">Why Use Our DOC to PDF Converter?</h2>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>100% Free:</strong> Convert unlimited documents without any cost
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Secure:</strong> All files are processed securely and deleted after conversion
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Fast:</strong> Quick conversion process with high-quality output
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>No Registration:</strong> Start converting immediately without creating an account
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Privacy:</strong> Your documents are never stored or shared
+                        </li>
+                    </ul>
                 </div>
                 <div class="col-lg-6">
-                    <div class="p-4">
-                        <h4 class="fw-bold mb-3">Our Core Services</h4>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="p-3 bg-white rounded shadow-sm h-100">
-                                    <i class="bi bi-window-stack display-6 text-primary mb-2"></i>
-                                    <h6 class="fw-semibold">Web Development</h6>
-                                    <p class="small text-muted mb-0">Custom websites and web applications built with modern technologies.</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="p-3 bg-white rounded shadow-sm h-100">
-                                    <i class="bi bi-phone display-6 text-success mb-2"></i>
-                                    <h6 class="fw-semibold">App Development</h6>
-                                    <p class="small text-muted mb-0">Native and cross-platform mobile applications for iOS and Android.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <h3 class="fw-bold mb-4">How to Convert DOC to PDF</h3>
+                    <ol>
+                        <li class="mb-2">Click "Select Word Document" and choose your DOC or DOCX file</li>
+                        <li class="mb-2">Wait for the file to upload (up to 100MB)</li>
+                        <li class="mb-2">Click "Convert to PDF" button</li>
+                        <li class="mb-2">Wait for the conversion process to complete</li>
+                        <li class="mb-2">Download your converted PDF file</li>
+                    </ol>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Why Use Our Lock Tool Section -->
+    <!-- Features Section -->
     <section class="py-5">
         <div class="container">
-            <h2 class="text-center fw-bold mb-5">Why Use Our PDF Lock Tool?</h2>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="text-center p-4 border rounded shadow-sm h-100">
-                        <i class="bi bi-shield-check display-4 text-success mb-3"></i>
-                        <h5 class="fw-bold">100% Secure</h5>
-                        <p class="text-muted">All lock operations are processed securely. Your PDFs are never stored on our servers and are deleted immediately after processing.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="text-center p-4 border rounded shadow-sm h-100">
-                        <i class="bi bi-lightning-charge display-4 text-warning mb-3"></i>
-                        <h5 class="fw-bold">Fast & Efficient</h5>
-                        <p class="text-muted">Lock PDF files in seconds. Our optimized process ensures quick results without compromising file integrity.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="text-center p-4 border rounded shadow-sm h-100">
-                        <i class="bi bi-gift display-4 text-primary mb-3"></i>
-                        <h5 class="fw-bold">Completely Free</h5>
-                        <p class="text-muted">No hidden charges, no registration required. Use our lock tool as many times as you need, absolutely free.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center fw-bold mb-5">How to Lock PDF Files</h2>
-            <div class="row g-4">
-                <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-4 mb-4">
                     <div class="text-center">
-                        <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold;">1</div>
-                        <h5 class="fw-semibold">Upload PDF</h5>
-                        <p class="text-muted small">Click the upload button and select your PDF file. Maximum file size: 100MB.</p>
+                        <i class="bi bi-shield-check display-4 text-primary mb-3"></i>
+                        <h4 class="fw-bold">Secure Conversion</h4>
+                        <p class="text-muted">Your documents are processed securely and automatically deleted after conversion.</p>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4 mb-4">
                     <div class="text-center">
-                        <div class="step-number bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold;">2</div>
-                        <h5 class="fw-semibold">Set Password</h5>
-                        <p class="text-muted small">Enter a strong password to protect your PDF. Make sure to remember this password.</p>
+                        <i class="bi bi-lightning-charge display-4 text-primary mb-3"></i>
+                        <h4 class="fw-bold">Fast Processing</h4>
+                        <p class="text-muted">Quick conversion with high-quality PDF output preserving your document formatting.</p>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4 mb-4">
                     <div class="text-center">
-                        <div class="step-number bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold;">3</div>
-                        <h5 class="fw-semibold">Lock PDF</h5>
-                        <p class="text-muted small">Click the "Lock PDF" button. Our system will process your file and add password protection.</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="text-center">
-                        <div class="step-number bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold;">4</div>
-                        <h5 class="fw-semibold">Download</h5>
-                        <p class="text-muted small">Your locked PDF will be ready in seconds. Simply download it to your device.</p>
+                        <i class="bi bi-infinity display-4 text-primary mb-3"></i>
+                        <h4 class="fw-bold">Unlimited Conversions</h4>
+                        <p class="text-muted">Convert as many documents as you need without any limits or restrictions.</p>
                     </div>
                 </div>
             </div>
@@ -334,10 +290,8 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('lockForm');
-            const fileInput = document.getElementById('pdf');
-            const passwordInput = document.getElementById('password');
-            const confirmPasswordInput = document.getElementById('confirm_password');
+            const form = document.getElementById('convertForm');
+            const fileInput = document.getElementById('doc');
             const fileInfo = document.getElementById('fileInfo');
             const fileName = document.getElementById('fileName');
             const fileSize = document.getElementById('fileSize');
@@ -345,7 +299,7 @@
             const progressBar = document.getElementById('progressBar');
             const progressText = document.getElementById('progressText');
             const messageContainer = document.getElementById('messageContainer');
-            const lockBtn = document.getElementById('lockBtn');
+            const convertBtn = document.getElementById('convertBtn');
             
             // Handle file selection
             fileInput.addEventListener('change', function(e) {
@@ -356,23 +310,6 @@
                     fileInfo.style.display = 'block';
                 } else {
                     fileInfo.style.display = 'none';
-                }
-            });
-            
-            // Validate password match
-            confirmPasswordInput.addEventListener('input', function() {
-                if (passwordInput.value !== confirmPasswordInput.value) {
-                    confirmPasswordInput.setCustomValidity('Passwords do not match');
-                } else {
-                    confirmPasswordInput.setCustomValidity('');
-                }
-            });
-            
-            passwordInput.addEventListener('input', function() {
-                if (passwordInput.value !== confirmPasswordInput.value && confirmPasswordInput.value) {
-                    confirmPasswordInput.setCustomValidity('Passwords do not match');
-                } else {
-                    confirmPasswordInput.setCustomValidity('');
                 }
             });
             
@@ -391,18 +328,17 @@
                 
                 const file = fileInput.files[0];
                 if (!file) {
-                    showMessage('Please select a PDF file.', 'danger');
+                    showMessage('Please select a Word document.', 'danger');
                     return;
                 }
                 
-                // Validate passwords match
-                if (passwordInput.value !== confirmPasswordInput.value) {
-                    showMessage('Passwords do not match. Please enter the same password in both fields.', 'danger');
-                    return;
-                }
+                // Validate file type
+                const allowedTypes = ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                const allowedExtensions = ['.doc', '.docx'];
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
                 
-                if (!passwordInput.value || passwordInput.value.length < 1) {
-                    showMessage('Please enter a password.', 'danger');
+                if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+                    showMessage('Please select a valid DOC or DOCX file.', 'danger');
                     return;
                 }
                 
@@ -416,22 +352,20 @@
                 // Show progress
                 progressContainer.style.display = 'block';
                 progressBar.style.width = '30%';
-                progressText.textContent = 'Uploading PDF...';
-                lockBtn.disabled = true;
+                progressText.textContent = 'Uploading document...';
+                convertBtn.disabled = true;
                 messageContainer.innerHTML = '';
                 
                 // Create FormData
                 const formData = new FormData();
-                formData.append('pdf', file);
-                formData.append('password', passwordInput.value);
-                formData.append('confirm_password', confirmPasswordInput.value);
+                formData.append('doc', file);
                 
                 try {
                     // Simulate progress
                     progressBar.style.width = '60%';
-                    progressText.textContent = 'Locking PDF...';
+                    progressText.textContent = 'Converting to PDF...';
                     
-                    const response = await fetch('{{ route("tools.pdf-lock.lock") }}', {
+                    const response = await fetch('{{ route("tools.doc-to-pdf.convert") }}', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -441,13 +375,13 @@
                     
                     if (response.ok) {
                         progressBar.style.width = '100%';
-                        progressText.textContent = 'Downloading locked PDF...';
+                        progressText.textContent = 'Downloading PDF...';
                         
                         // Get filename from response
                         const contentDisposition = response.headers.get('Content-Disposition');
                         const filename = contentDisposition 
                             ? contentDisposition.split('filename=')[1].replace(/"/g, '')
-                            : 'locked.pdf';
+                            : 'converted.pdf';
                         
                         // Download the PDF
                         const blob = await response.blob();
@@ -460,7 +394,7 @@
                         window.URL.revokeObjectURL(url);
                         document.body.removeChild(a);
                         
-                        showMessage('PDF locked and downloaded successfully! Remember to save your password securely.', 'success');
+                        showMessage('Document converted and downloaded successfully!', 'success');
                         
                         // Reset form
                         setTimeout(() => {
@@ -470,7 +404,7 @@
                         }, 2000);
                     } else {
                         const errorData = await response.json();
-                        let errorMessage = errorData.message || 'An error occurred during lock. Please ensure the password is correct if the PDF is protected.';
+                        let errorMessage = errorData.message || 'An error occurred during conversion. Please try again.';
                         
                         // Show detailed validation errors if available
                         if (errorData.errors && typeof errorData.errors === 'object') {
@@ -490,7 +424,7 @@
                 } catch (error) {
                     showMessage('An error occurred. Please try again.', 'danger');
                 } finally {
-                    lockBtn.disabled = false;
+                    convertBtn.disabled = false;
                     progressContainer.style.display = 'none';
                     progressBar.style.width = '0%';
                 }
