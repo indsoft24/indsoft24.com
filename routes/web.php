@@ -1,37 +1,17 @@
 <?php
 
-use App\Http\Controllers\Admin\AreaController;
-use App\Http\Controllers\Admin\AuthController;
-// --- Controllers ---
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\CityController;
-use App\Http\Controllers\Admin\CommentController as AdminCommentController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\LeadController as AdminLeadController;
-use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PostController;
-use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
-use App\Http\Controllers\Admin\SitemapController as AdminSitemapController;
-use App\Http\Controllers\Admin\StateController;
-use App\Http\Controllers\Admin\SubscriberController;
-use App\Http\Controllers\Admin\TagController;
-// --- Admin Controllers ---
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CareerController;
-use App\Http\Controllers\CmsController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ImageConverterController;
-use App\Http\Controllers\ImageToPdfController;
 use App\Http\Controllers\LeadController;
-use App\Http\Controllers\PdfToImageController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SitemapController;
-// --- CMS Controllers ---
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -96,15 +76,7 @@ Route::view('/social-media-marketing', 'services.social-media-marketing')->name(
 // E-commerce Page
 Route::view('/e-commerce', 'e-commerce.index')->name('e-commerce');
 
-// Tools Pages
-Route::prefix('tools')->name('tools.')->group(function () {
-    Route::get('/jpg-to-pdf', [ImageToPdfController::class, 'index'])->name('jpg-to-pdf');
-    Route::post('/jpg-to-pdf/convert', [ImageToPdfController::class, 'convert'])->name('jpg-to-pdf.convert');
-    Route::get('/pdf-to-image', [PdfToImageController::class, 'index'])->name('pdf-to-image');
-    Route::post('/pdf-to-image/convert', [PdfToImageController::class, 'convert'])->name('pdf-to-image.convert');
-    Route::get('/image-converter', [ImageConverterController::class, 'index'])->name('image-converter');
-    Route::post('/image-converter/convert', [ImageConverterController::class, 'convert'])->name('image-converter.convert');
-});
+// Tools routes are in routes/tools.php
 
 // --- Sitemap Routes ---
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
@@ -118,17 +90,7 @@ Route::get('/sitemap-states.xml', [SitemapController::class, 'states'])->name('s
 Route::get('/sitemap-cities-{page}.xml', [SitemapController::class, 'cities'])->where('page', '[0-9]+')->name('sitemap.cities');
 Route::get('/sitemap-areas-{page}.xml', [SitemapController::class, 'areas'])->where('page', '[0-9]+')->name('sitemap.areas');
 
-// --- CMS Public Routes ---
-Route::prefix('cms')->name('cms.')->group(function () {
-    Route::get('/states', [CmsController::class, 'states'])->name('states');
-    Route::get('/state/{state}', [CmsController::class, 'statePages'])->name('state.pages');
-    Route::get('/state/{state}/cities', [CmsController::class, 'stateCities'])->name('state.cities');
-    Route::get('/city/{city}', [CmsController::class, 'cityPages'])->name('city.pages');
-    Route::get('/city/{city}/areas', [CmsController::class, 'cityAreas'])->name('city.areas');
-    Route::get('/area/{area}', [CmsController::class, 'areaPages'])->name('area.pages');
-    Route::get('/page/{page}', [CmsController::class, 'showPage'])->name('page');
-    Route::get('/search', [CmsController::class, 'search'])->name('search');
-});
+// CMS routes are in routes/cms.php
 
 // --- User-Specific Routes ---
 Route::middleware('auth')->prefix('my-blog')->name('user.blog.')->group(function () {
@@ -141,65 +103,4 @@ Route::middleware('auth')->prefix('my-blog')->name('user.blog.')->group(function
     Route::delete('/{post}', [PostController::class, 'destroy'])->name('destroy');
 });
 
-// --- Admin Routes ---
-Route::prefix('admin')->name('admin.')->group(function () {
-    // Guest routes for login/register
-    Route::middleware('guest')->group(function () {
-        Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-        Route::post('/login', [AuthController::class, 'login']);
-        Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-        Route::post('/register', [AuthController::class, 'register']);
-    });
-
-    // Auth routes for admin panel
-    Route::middleware('auth')->group(function () {
-        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-        // Management Sections
-        Route::resource('posts', PostController::class);
-        Route::resource('categories', CategoryController::class);
-        Route::resource('tags', TagController::class);
-        Route::resource('comments', AdminCommentController::class)->only(['index', 'edit', 'update', 'destroy']);
-
-        // CMS Management
-        Route::resource('states', StateController::class);
-        Route::resource('cities', CityController::class);
-        Route::resource('areas', AreaController::class);
-        Route::resource('pages', PageController::class);
-        Route::post('pages/bulk-action', [PageController::class, 'bulkAction'])->name('pages.bulkAction');
-        Route::get('pages/export', [PageController::class, 'export'])->name('pages.export');
-        Route::post('pages/{page}/duplicate', [PageController::class, 'duplicate'])->name('pages.duplicate');
-        Route::post('pages/{page}/quick-status', [PageController::class, 'quickUpdateStatus'])->name('pages.quickStatus');
-        Route::post('pages/{page}/toggle-featured', [PageController::class, 'quickToggleFeatured'])->name('pages.toggleFeatured');
-
-        // AJAX routes for CMS
-        Route::get('cities/by-state', [CityController::class, 'getByState'])->name('cities.byState');
-        Route::get('areas/by-city', [AreaController::class, 'getByCity'])->name('areas.byCity');
-        Route::resource('projects', AdminProjectController::class);
-
-        // Subscriber Management
-        Route::get('subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');
-        Route::delete('subscribers/{subscriber}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
-        Route::get('subscribers/export', [SubscriberController::class, 'export'])->name('subscribers.export');
-
-        // Lead Management
-        Route::get('leads', [AdminLeadController::class, 'index'])->name('leads.index');
-        Route::get('leads/{lead}', [AdminLeadController::class, 'show'])->name('leads.show');
-        Route::put('leads/{lead}/status', [AdminLeadController::class, 'updateStatus'])->name('leads.updateStatus');
-        Route::put('leads/{lead}/notes', [AdminLeadController::class, 'updateNotes'])->name('leads.updateNotes');
-        Route::post('leads/{lead}/toggle-read', [AdminLeadController::class, 'toggleRead'])->name('leads.toggleRead');
-        Route::delete('leads/{lead}', [AdminLeadController::class, 'destroy'])->name('leads.destroy');
-
-        // Utilities
-        Route::post('posts/upload-image', [PostController::class, 'uploadImage'])->name('posts.uploadImage');
-        Route::post('pages/upload-image', [PageController::class, 'uploadImage'])->name('pages.uploadImage');
-
-        // Sitemap Management
-        Route::prefix('sitemap')->name('sitemap.')->group(function () {
-            Route::get('/', [AdminSitemapController::class, 'index'])->name('index');
-            Route::post('/clear-cache', [AdminSitemapController::class, 'clearCache'])->name('clearCache');
-            Route::get('/preview', [AdminSitemapController::class, 'preview'])->name('preview');
-        });
-    });
-});
+// Admin routes are in routes/admin.php
