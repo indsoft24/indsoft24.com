@@ -49,27 +49,13 @@ class PdfCompressController extends Controller
             $postMaxSize = ini_get('post_max_size');
             $uploadMaxSize = ini_get('upload_max_filesize');
             
-            Log::error('File upload rejected by PHP', [
-                'content_length' => $request->server('CONTENT_LENGTH'),
-                'post_max_size' => $postMaxSize,
-                'upload_max_filesize' => $uploadMaxSize,
-                'php_upload_errors' => $_FILES ?? 'no $_FILES',
-            ]);
-            
             return response()->json([
                 'success' => false,
-                'message' => 'File upload was rejected. PHP post_max_size is set to ' . $postMaxSize . ' and upload_max_filesize is ' . $uploadMaxSize . '. Please increase these values in php.ini and restart your web server.',
+                'message' => 'File upload was rejected. PHP post_max_size is set to ' . $postMaxSize . ' and upload_max_filesize is ' . $uploadMaxSize . '. Please contact the administrator.',
             ], 422);
         }
 
         if ($validator->fails()) {
-            Log::error('PDF Compression Validation Failed', [
-                'errors' => $validator->errors()->all(),
-                'request_data' => $request->except(['pdf']), // Don't log file content
-                'file_size' => $request->hasFile('pdf') ? $request->file('pdf')->getSize() : 'no file',
-                'file_mime' => $request->hasFile('pdf') ? $request->file('pdf')->getMimeType() : 'no file',
-            ]);
-            
             return response()->json([
                 'success' => false,
                 'message' => $validator->errors()->first(),
@@ -121,14 +107,9 @@ class PdfCompressController extends Controller
 
             // If all methods failed, return error with helpful message
             if (! $compressedPath || ! file_exists($compressedPath)) {
-                $errorMessage = 'PDF compression requires Ghostscript or ImageMagick to be installed. ';
-                $errorMessage .= 'Please install Ghostscript from https://www.ghostscript.com/download/gsdnld.html ';
-                $errorMessage .= 'For Windows: Download and install Ghostscript, then restart your server. ';
-                $errorMessage .= 'The tool will automatically detect Ghostscript if installed in standard locations.';
-
                 return response()->json([
                     'success' => false,
-                    'message' => $errorMessage,
+                    'message' => 'PDF compression requires Ghostscript or ImageMagick to be installed. Please install Ghostscript from https://www.ghostscript.com/download/gsdnld.html and ensure it is available in your system PATH.',
                 ], 500);
             }
 
@@ -151,35 +132,10 @@ class PdfCompressController extends Controller
      */
     private function isGhostscriptAvailable()
     {
-        // Try standard 'gs' command
         $output = [];
         $returnVar = 0;
         @exec('gs --version 2>&1', $output, $returnVar);
-        if ($returnVar === 0) {
-            return true;
-        }
-
-        // Try common Windows paths
-        $windowsPaths = [
-            'C:\\Program Files\\gs\\gs*\\bin\\gswin64c.exe',
-            'C:\\Program Files (x86)\\gs\\gs*\\bin\\gswin32c.exe',
-            'C:\\Program Files\\Ghostscript\\bin\\gswin64c.exe',
-            'C:\\Program Files (x86)\\Ghostscript\\bin\\gswin32c.exe',
-        ];
-
-        foreach ($windowsPaths as $pathPattern) {
-            $matches = glob($pathPattern);
-            if (! empty($matches)) {
-                // Test if the executable works
-                $testCommand = escapeshellarg($matches[0]).' --version 2>&1';
-                @exec($testCommand, $testOutput, $testReturn);
-                if ($testReturn === 0) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return $returnVar === 0;
     }
 
     /**
@@ -187,35 +143,7 @@ class PdfCompressController extends Controller
      */
     private function getGhostscriptPath()
     {
-        // Try standard 'gs' command first
-        $output = [];
-        $returnVar = 0;
-        @exec('gs --version 2>&1', $output, $returnVar);
-        if ($returnVar === 0) {
-            return 'gs';
-        }
-
-        // Try common Windows paths
-        $windowsPaths = [
-            'C:\\Program Files\\gs\\gs*\\bin\\gswin64c.exe',
-            'C:\\Program Files (x86)\\gs\\gs*\\bin\\gswin32c.exe',
-            'C:\\Program Files\\Ghostscript\\bin\\gswin64c.exe',
-            'C:\\Program Files (x86)\\Ghostscript\\bin\\gswin32c.exe',
-        ];
-
-        foreach ($windowsPaths as $pathPattern) {
-            $matches = glob($pathPattern);
-            if (! empty($matches)) {
-                // Test if the executable works
-                $testCommand = escapeshellarg($matches[0]).' --version 2>&1';
-                @exec($testCommand, $testOutput, $testReturn);
-                if ($testReturn === 0) {
-                    return $matches[0];
-                }
-            }
-        }
-
-        return 'gs'; // Fallback to 'gs' command
+        return 'gs';
     }
 
     /**
@@ -250,8 +178,6 @@ class PdfCompressController extends Controller
 
             if ($returnVar === 0 && file_exists($outputPath) && filesize($outputPath) > 0) {
                 return $outputPath;
-            } else {
-                Log::error('Ghostscript compression failed. Return code: '.$returnVar.', Output: '.implode("\n", $output));
             }
         } catch (\Exception $e) {
             Log::error('Ghostscript compression error: '.$e->getMessage());

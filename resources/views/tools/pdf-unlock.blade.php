@@ -45,7 +45,7 @@
                                 <div class="mb-4">
                                     <label for="pdf" class="form-label fw-semibold">Select PDF File</label>
                                     <input type="file" class="form-control" id="pdf" name="pdf" accept="application/pdf" required>
-                                    <div class="form-text">Maximum file size: 50MB</div>
+                                    <div class="form-text">Maximum file size: 100MB</div>
                                 </div>
 
                                 <div class="mb-4">
@@ -350,10 +350,10 @@
                     return;
                 }
                 
-                // Validate file size (50MB)
-                const maxSize = 50 * 1024 * 1024;
+                // Validate file size (100MB)
+                const maxSize = 100 * 1024 * 1024;
                 if (file.size > maxSize) {
-                    showMessage('File size exceeds 50MB limit.', 'danger');
+                    showMessage('File size exceeds 100MB limit.', 'danger');
                     return;
                 }
                 

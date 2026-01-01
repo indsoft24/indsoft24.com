@@ -15,7 +15,7 @@ class PdfLockController extends Controller
     {
         $metaDescription = 'Lock PDF files online for free. Add password protection to PDF documents instantly. Fast, secure, and easy-to-use PDF lock tool by Indsoft24. No registration required.';
         $canonicalUrl = route('tools.pdf-lock');
-        
+
         return view('tools.pdf-lock', compact('metaDescription', 'canonicalUrl'));
     }
 
@@ -56,47 +56,47 @@ class PdfLockController extends Controller
         try {
             $pdf = $request->file('pdf');
             $password = $request->input('password');
-            
+
             // Get original file info
             $originalPath = $pdf->getRealPath();
             $originalName = pathinfo($pdf->getClientOriginalName(), PATHINFO_FILENAME);
-            
+
             // Generate locked PDF filename
-            $filename = $originalName . '_locked_' . time() . '.pdf';
-            $outputPath = storage_path('app/temp/' . $filename);
-            
+            $filename = $originalName.'_locked_'.time().'.pdf';
+            $outputPath = storage_path('app/temp/'.$filename);
+
             // Ensure temp directory exists
-            if (!file_exists(storage_path('app/temp'))) {
+            if (! file_exists(storage_path('app/temp'))) {
                 mkdir(storage_path('app/temp'), 0755, true);
             }
-            
+
             $lockedPath = null;
-            
+
             // Try qpdf first (best for password protection)
             if ($this->isQpdfAvailable()) {
                 $lockedPath = $this->lockWithQpdf($originalPath, $outputPath, $password);
             }
-            
+
             // Fallback to Ghostscript if qpdf is not available
-            if (!$lockedPath && $this->isGhostscriptAvailable()) {
+            if (! $lockedPath && $this->isGhostscriptAvailable()) {
                 $lockedPath = $this->lockWithGhostscript($originalPath, $outputPath, $password);
             }
-            
+
             // If both methods failed, return error
-            if (!$lockedPath || !file_exists($lockedPath)) {
+            if (! $lockedPath || ! file_exists($lockedPath)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'PDF locking is not available on this server. Please ensure qpdf or Ghostscript is installed. For Windows, download qpdf from https://qpdf.sourceforge.io/',
+                    'message' => 'PDF locking requires qpdf or Ghostscript to be installed. Please install qpdf from https://qpdf.sourceforge.io/ or Ghostscript from https://www.ghostscript.com/download/gsdnld.html and ensure it is available in your system PATH.',
                 ], 500);
             }
-            
+
             // Return locked PDF
             return response()->download($lockedPath, $filename)->deleteFileAfterSend(true);
-            
+
         } catch (\Exception $e) {
-            Log::error('PDF Lock Error: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
-            
+            Log::error('PDF Lock Error: '.$e->getMessage());
+            Log::error('Stack trace: '.$e->getTraceAsString());
+
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while locking the PDF. Please ensure the PDF is not corrupted and try again.',
@@ -112,6 +112,7 @@ class PdfLockController extends Controller
         $output = [];
         $returnVar = 0;
         @exec('qpdf --version 2>&1', $output, $returnVar);
+
         return $returnVar === 0;
     }
 
@@ -120,34 +121,11 @@ class PdfLockController extends Controller
      */
     private function isGhostscriptAvailable()
     {
-        // Try standard 'gs' command
         $output = [];
         $returnVar = 0;
         @exec('gs --version 2>&1', $output, $returnVar);
-        if ($returnVar === 0) {
-            return true;
-        }
 
-        // Try common Windows paths
-        $windowsPaths = [
-            'C:\\Program Files\\gs\\gs*\\bin\\gswin64c.exe',
-            'C:\\Program Files (x86)\\gs\\gs*\\bin\\gswin32c.exe',
-            'C:\\Program Files\\Ghostscript\\bin\\gswin64c.exe',
-            'C:\\Program Files (x86)\\Ghostscript\\bin\\gswin32c.exe',
-        ];
-
-        foreach ($windowsPaths as $pathPattern) {
-            $matches = glob($pathPattern);
-            if (!empty($matches)) {
-                $testCommand = escapeshellarg($matches[0]) . ' --version 2>&1';
-                @exec($testCommand, $testOutput, $testReturn);
-                if ($testReturn === 0) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return $returnVar === 0;
     }
 
     /**
@@ -155,33 +133,6 @@ class PdfLockController extends Controller
      */
     private function getGhostscriptPath()
     {
-        // Try standard 'gs' command first
-        $output = [];
-        $returnVar = 0;
-        @exec('gs --version 2>&1', $output, $returnVar);
-        if ($returnVar === 0) {
-            return 'gs';
-        }
-
-        // Try common Windows paths
-        $windowsPaths = [
-            'C:\\Program Files\\gs\\gs*\\bin\\gswin64c.exe',
-            'C:\\Program Files (x86)\\gs\\gs*\\bin\\gswin32c.exe',
-            'C:\\Program Files\\Ghostscript\\bin\\gswin64c.exe',
-            'C:\\Program Files (x86)\\Ghostscript\\bin\\gswin32c.exe',
-        ];
-
-        foreach ($windowsPaths as $pathPattern) {
-            $matches = glob($pathPattern);
-            if (!empty($matches)) {
-                $testCommand = escapeshellarg($matches[0]) . ' --version 2>&1';
-                @exec($testCommand, $testOutput, $testReturn);
-                if ($testReturn === 0) {
-                    return $matches[0];
-                }
-            }
-        }
-
         return 'gs';
     }
 
@@ -199,20 +150,18 @@ class PdfLockController extends Controller
                 escapeshellarg($inputPath),
                 escapeshellarg($outputPath)
             );
-            
+
             $output = [];
             $returnVar = 0;
             @exec($command, $output, $returnVar);
-            
+
             if ($returnVar === 0 && file_exists($outputPath) && filesize($outputPath) > 0) {
                 return $outputPath;
-            } else {
-                Log::error('qpdf lock failed. Return code: ' . $returnVar . ', Output: ' . implode("\n", $output));
             }
         } catch (\Exception $e) {
-            Log::error('qpdf lock error: ' . $e->getMessage());
+            Log::error('qpdf lock error: '.$e->getMessage());
         }
-        
+
         return null;
     }
 
@@ -225,7 +174,7 @@ class PdfLockController extends Controller
             // Ghostscript doesn't directly support password protection
             // We'll use a workaround with PDF encryption
             $gsPath = $this->getGhostscriptPath();
-            
+
             // Note: Ghostscript has limited PDF encryption support
             // This is a basic implementation
             $command = sprintf(
@@ -236,21 +185,18 @@ class PdfLockController extends Controller
                 escapeshellarg($outputPath),
                 escapeshellarg($inputPath)
             );
-            
+
             $output = [];
             $returnVar = 0;
             @exec($command, $output, $returnVar);
-            
+
             if ($returnVar === 0 && file_exists($outputPath) && filesize($outputPath) > 0) {
                 return $outputPath;
-            } else {
-                Log::error('Ghostscript lock failed. Return code: ' . $returnVar . ', Output: ' . implode("\n", $output));
             }
         } catch (\Exception $e) {
-            Log::error('Ghostscript lock error: ' . $e->getMessage());
+            Log::error('Ghostscript lock error: '.$e->getMessage());
         }
-        
+
         return null;
     }
 }
-

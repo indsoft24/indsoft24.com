@@ -18,8 +18,8 @@ class CustomValidatePostSize
         // Get the maximum post size from PHP configuration
         $maxSize = $this->getPostMaxSize();
         
-        // For PDF compression routes, allow up to 100MB
-        if ($request->is('tools/pdf-compress/*') || $request->is('tools/pdf-unlock/*')) {
+        // For PDF tool routes, allow up to 100MB
+        if ($request->is('tools/pdf-compress/*') || $request->is('tools/pdf-unlock/*') || $request->is('tools/pdf-lock/*')) {
             $maxSize = 100 * 1024 * 1024; // 100MB in bytes
         }
 
@@ -27,15 +27,9 @@ class CustomValidatePostSize
         
         // Check if content length exceeds limit
         if ($contentLength && (int)$contentLength > $maxSize) {
-            \Log::error('Post size exceeded', [
-                'content_length' => $contentLength,
-                'max_size' => $maxSize,
-                'post_max_size_ini' => ini_get('post_max_size'),
-            ]);
-            
             return response()->json([
                 'success' => false,
-                'message' => 'The uploaded file exceeds the maximum allowed size of ' . $this->formatBytes($maxSize) . '. Current PHP post_max_size: ' . ini_get('post_max_size'),
+                'message' => 'The uploaded file exceeds the maximum allowed size of ' . $this->formatBytes($maxSize) . '.',
             ], 413);
         }
 

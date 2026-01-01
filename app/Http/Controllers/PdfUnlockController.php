@@ -25,12 +25,18 @@ class PdfUnlockController extends Controller
     public function unlock(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'pdf' => 'required|mimes:pdf|max:51200', // 50MB max
+            'pdf' => [
+                'required',
+                'file',
+                'mimes:pdf,application/pdf',
+                'max:102400', // 100MB max
+            ],
             'password' => 'nullable|string|max:255', // Optional password if PDF is password-protected
         ], [
             'pdf.required' => 'Please upload a PDF file.',
-            'pdf.mimes' => 'Only PDF files are allowed.',
-            'pdf.max' => 'PDF file must not exceed 50MB.',
+            'pdf.file' => 'The uploaded file is not valid.',
+            'pdf.mimes' => 'Only PDF files are allowed. The file must have a .pdf extension.',
+            'pdf.max' => 'PDF file must not exceed 100MB.',
             'password.max' => 'Password must not exceed 255 characters.',
         ]);
 
