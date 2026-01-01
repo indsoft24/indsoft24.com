@@ -41,7 +41,7 @@ class CmsController extends Controller
         $majorCities = $cities->take(10);
         $majorCitiesList = $majorCities->pluck('city_name')->toArray();
         $majorCitiesString = $majorCities->take(5)->pluck('city_name')->implode(', ');
-        
+
         // Get capital city (first city or most popular)
         $capitalCity = $majorCities->first() ? $majorCities->first()->city_name : $state->name;
 
@@ -57,10 +57,10 @@ class CmsController extends Controller
             ->get();
 
         return view('cms.state-pages', compact(
-            'state', 
-            'pages', 
-            'metaTitle', 
-            'metaDescription', 
+            'state',
+            'pages',
+            'metaTitle',
+            'metaDescription',
             'blogPosts',
             'cities',
             'majorCities',
@@ -104,10 +104,10 @@ class CmsController extends Controller
         $topAreas = $areas->take(5);
         $topAreasList = $topAreas->pluck('name')->toArray();
         $topAreasString = $topAreas->take(3)->pluck('name')->implode(', ');
-        
+
         // Get a primary area (first area)
         $primaryArea = $topAreas->first() ? $topAreas->first()->name : $city->city_name;
-        
+
         // Get nearby areas (if available in city model)
         $nearbyArea = $topAreas->skip(1)->first() ? $topAreas->skip(1)->first()->name : $primaryArea;
 
@@ -123,10 +123,10 @@ class CmsController extends Controller
             ->get();
 
         return view('cms.city-pages', compact(
-            'city', 
-            'pages', 
-            'metaTitle', 
-            'metaDescription', 
+            'city',
+            'pages',
+            'metaTitle',
+            'metaDescription',
             'blogPosts',
             'areas',
             'topAreas',
@@ -181,7 +181,7 @@ class CmsController extends Controller
                 ->take(5)
                 ->get();
         }
-        
+
         $nearbyAreaName = $nearbyAreas->first() ? $nearbyAreas->first()->name : $area->name;
 
         // Enhanced SEO meta tags
@@ -196,12 +196,12 @@ class CmsController extends Controller
             ->get();
 
         return view('cms.area-pages', compact(
-            'area', 
-            'pages', 
-            'metaTitle', 
-            'metaDescription', 
-            'cityName', 
-            'stateName', 
+            'area',
+            'pages',
+            'metaTitle',
+            'metaDescription',
+            'cityName',
+            'stateName',
             'blogPosts',
             'nearbyAreas',
             'nearbyAreaName'

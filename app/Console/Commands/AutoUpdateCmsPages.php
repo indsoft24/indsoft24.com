@@ -23,14 +23,16 @@ class AutoUpdateCmsPages extends Command
                             {--chunk-size=50 : Number of records to process in each batch}
                             {--resume : Resume from last checkpoint}
                             {--reset : Reset and start from beginning}
-                            {--service= : Process only specific service}';
+                            {--service= : Process only specific service}
+                            {--skip-nearby : Skip processing nearby locations (schools, hospitals, metros, markets, localities)}
+                            {--only-nearby : Process only nearby locations}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Automatically create SEO-friendly CMS pages for services (State -> City -> Area) - One service at a time';
+    protected $description = 'Automatically create SEO-friendly CMS pages for services (State -> City -> Area) and nearby locations (schools, hospitals, metros, markets, localities)';
 
     /**
      * Resume checkpoint file path
@@ -42,15 +44,55 @@ class AutoUpdateCmsPages extends Command
      */
     private $services = [
         'web development',
+        'website development',
         'app development',
+        'mobile app development',
         'ios development',
-        'ecommerce platform',
         'software development',
         'digital marketing',
-        'mobile app development',
-        'website development',
+        'software marketing',
+        'ecommerce platform',
         'ecommerce development',
         'web design',
+        'CRM development',
+        'social media marketing',
+        'meta ads',
+        'google ads',
+        'seo',
+        'seo services',
+        'seo agency',
+        'seo company',
+        'seo services agency',
+        'seo services company',
+        'lead generation',
+        'lead generation services',
+        'lead generation agency',
+        'lead generation company',
+        'lead generation services company',
+        'lead generation services agency',
+        'img to pdf conversion',
+        'pdf to img conversion',
+        'pdf to doc conversion',
+        'doc to pdf conversion',
+        'doc to img conversion',
+        'doc to docx conversion',
+        'docx to pdf conversion',
+        'docx to img conversion',
+        'docx to doc conversion',
+    ];
+
+    /**
+     * List of nearby location types to process
+     * This creates pages for EVERY location in these tables with EVERY service
+     * Example: If you have 50 schools and 10 services, it creates 500 pages (50 x 10)
+     * Format: "Web Development near [School Name]" for each school and each service
+     */
+    private $nearbyLocationTypes = [
+        'schools' => ['table' => 'schools', 'name_field' => 'name', 'label' => 'School'],
+        'hospitals' => ['table' => 'hospitals', 'name_field' => 'name', 'label' => 'Hospital'],
+        'metros' => ['table' => 'metros', 'name_field' => 'name', 'label' => 'Metro Station'],
+        'markets' => ['table' => 'markets', 'name_field' => 'name', 'label' => 'Market'],
+        'localities' => ['table' => 'sy_localities', 'name_field' => 'name', 'label' => 'Locality'],
     ];
 
     /**
@@ -90,6 +132,11 @@ class AutoUpdateCmsPages extends Command
                 $this->info('   Last Area ID: '.($checkpoint['last_area_id'] ?? 'N/A'));
                 $this->newLine();
             }
+        }
+
+        // Check if only nearby locations should be processed
+        if ($this->option('only-nearby')) {
+            return $this->processNearbyLocationsOnly($user);
         }
 
         // Get services to process
@@ -166,6 +213,16 @@ class AutoUpdateCmsPages extends Command
                 [$created, $skipped] = $this->processAreas($user, $service, $checkpoint);
                 $totalCreated += $created;
                 $totalSkipped += $skipped;
+                $this->newLine();
+            }
+
+            // Step 4: Process Nearby Locations for this service (if not skipped)
+            if (! $this->option('skip-nearby')) {
+                $this->info('📍 Step 4: Processing Nearby Locations for '.ucfirst($service).'...');
+                $this->newLine();
+                [$createdNearby, $skippedNearby] = $this->processNearbyLocations($user, $service);
+                $totalCreated += $createdNearby;
+                $totalSkipped += $skippedNearby;
                 $this->newLine();
             }
 
@@ -270,10 +327,12 @@ class AutoUpdateCmsPages extends Command
                 // Generate SEO-friendly slug: "web-development-in-delhi"
                 $slug = $this->generateSlug($service, $state->name, null, null);
 
-                // Check if page already exists - IMPROVED: Check by slug AND service pattern
+                // Check if page already exists - Check by slug, state_id, and service in title
                 $pageExists = Page::where('slug', $slug)
-                    ->where('page_type', 'state')
                     ->where('state_id', $state->id)
+                    ->whereNull('city_id')
+                    ->whereNull('area_id')
+                    ->where('title', 'like', '%'.ucfirst($service).'%')
                     ->exists();
 
                 if ($pageExists) {
@@ -406,10 +465,11 @@ class AutoUpdateCmsPages extends Command
                 // Generate SEO-friendly slug: "web-development-in-mumbai"
                 $slug = $this->generateSlug($service, $state->name, $city->city_name, null);
 
-                // Check if page already exists - IMPROVED: Check by slug AND service pattern
+                // Check if page already exists - Check by slug, city_id, and service in title
                 $pageExists = Page::where('slug', $slug)
-                    ->where('page_type', 'city')
                     ->where('city_id', $city->id)
+                    ->whereNull('area_id')
+                    ->where('title', 'like', '%'.ucfirst($service).'%')
                     ->exists();
 
                 if ($pageExists) {
@@ -544,10 +604,10 @@ class AutoUpdateCmsPages extends Command
                 // Generate SEO-friendly slug: "web-development-in-connaught-place"
                 $slug = $this->generateSlug($service, $state->name, $city ? $city->city_name : null, $area->name);
 
-                // Check if page already exists - IMPROVED: Check by slug AND service pattern
+                // Check if page already exists - Check by slug, area_id, and service in title
                 $pageExists = Page::where('slug', $slug)
-                    ->where('page_type', 'area')
                     ->where('area_id', $area->id)
+                    ->where('title', 'like', '%'.ucfirst($service).'%')
                     ->exists();
 
                 if ($pageExists) {
@@ -849,5 +909,319 @@ class AutoUpdateCmsPages extends Command
         $location .= ", {$state->name}";
 
         return "Professional {$service} services in {$location}, India. Expert solutions for businesses in {$area->name}. Get started today!";
+    }
+
+    /**
+     * Process nearby locations only (when --only-nearby flag is used)
+     */
+    private function processNearbyLocationsOnly($user): int
+    {
+        $this->info('🚀 Processing Nearby Locations Only...');
+        $this->newLine();
+
+        $totalCreated = 0;
+        $totalSkipped = 0;
+
+        foreach ($this->services as $service) {
+            $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            $this->info('🔧 Processing Service: '.ucfirst($service));
+            $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            $this->newLine();
+
+            [$created, $skipped] = $this->processNearbyLocations($user, $service);
+            $totalCreated += $created;
+            $totalSkipped += $skipped;
+            $this->newLine();
+        }
+
+        $this->info('✅ Nearby Locations Processing Completed!');
+        $this->table(
+            ['Action', 'Count'],
+            [
+                ['Created', $totalCreated],
+                ['Skipped', $totalSkipped],
+                ['Total Processed', $totalCreated + $totalSkipped],
+            ]
+        );
+
+        return 0;
+    }
+
+    /**
+     * Process nearby locations for a service
+     */
+    private function processNearbyLocations($user, $service): array
+    {
+        $totalCreated = 0;
+        $totalSkipped = 0;
+
+        foreach ($this->nearbyLocationTypes as $locationType => $config) {
+            try {
+                $this->info("  📍 Processing {$config['label']}s for ".ucfirst($service).'...');
+                [$created, $skipped] = $this->processNearbyLocationType($user, $service, $locationType, $config);
+                $totalCreated += $created;
+                $totalSkipped += $skipped;
+
+                if ($created > 0 || $skipped > 0) {
+                    $this->info("    ✅ {$config['label']}s: {$created} created, {$skipped} skipped");
+                }
+            } catch (\Exception $e) {
+                $this->warn("    ⚠️  Error processing {$config['label']}s: ".$e->getMessage());
+            }
+        }
+
+        return [$totalCreated, $totalSkipped];
+    }
+
+    /**
+     * Process a specific nearby location type (schools, hospitals, metros, markets, localities)
+     */
+    private function processNearbyLocationType($user, $service, $locationType, $config): array
+    {
+        $created = 0;
+        $skipped = 0;
+
+        try {
+            // Check if table exists
+            if (! DB::getSchemaBuilder()->hasTable($config['table'])) {
+                $this->warn("    ⚠️  Table '{$config['table']}' does not exist. Skipping...");
+
+                return [0, 0];
+            }
+
+            // Get all records from the table
+            $query = DB::table($config['table']);
+
+            // Try to filter by status if column exists
+            if (DB::getSchemaBuilder()->hasColumn($config['table'], 'status')) {
+                $query->where('status', 1);
+            }
+
+            // Get records with location info (state_id, city_id, area_id if available)
+            $records = $query->get();
+            $totalRecords = $records->count();
+
+            if ($totalRecords == 0) {
+                return [0, 0];
+            }
+
+            $bar = $this->output->createProgressBar($totalRecords);
+            $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%%');
+            $bar->start();
+
+            foreach ($records as $record) {
+                try {
+                    DB::beginTransaction();
+
+                    // Get location information
+                    $stateId = $record->state_id ?? null;
+                    $cityId = $record->city_id ?? null;
+                    $areaId = $record->area_id ?? null;
+                    $name = $record->{$config['name_field']} ?? $record->name ?? null;
+
+                    if (! $name) {
+                        $skipped++;
+                        $bar->advance();
+                        DB::rollBack();
+
+                        continue;
+                    }
+
+                    // Get state, city, area objects for location string
+                    $state = $stateId ? State::find($stateId) : null;
+                    $city = $cityId ? City::find($cityId) : null;
+                    $area = $areaId ? Area::find($areaId) : null;
+
+                    if (! $state) {
+                        $skipped++;
+                        $bar->advance();
+                        DB::rollBack();
+
+                        continue;
+                    }
+
+                    // Generate slug
+                    $locationName = $name;
+                    $slug = $this->generateNearbyLocationSlug($service, $locationType, $locationName, $state, $city, $area);
+
+                    // Check if page already exists for this service and location
+                    // Check by slug first (fastest), then by title pattern as fallback
+                    $pageExists = Page::where('slug', $slug)->exists();
+
+                    // If slug doesn't exist, check by service + location pattern + location IDs
+                    if (! $pageExists) {
+                        $query = Page::where('title', 'like', '%'.ucfirst($service).'%')
+                            ->where('title', 'like', '%'.$locationName.'%')
+                            ->where('state_id', $stateId);
+
+                        if ($cityId) {
+                            $query->where('city_id', $cityId);
+                        } else {
+                            $query->whereNull('city_id');
+                        }
+
+                        if ($areaId) {
+                            $query->where('area_id', $areaId);
+                        } else {
+                            $query->whereNull('area_id');
+                        }
+
+                        $pageExists = $query->exists();
+                    }
+
+                    if ($pageExists) {
+                        $skipped++;
+                        $bar->advance();
+                        DB::rollBack();
+
+                        continue;
+                    }
+
+                    // Ensure unique slug
+                    $slug = $this->ensureUniqueSlug($slug);
+
+                    // Generate content
+                    $locationString = $this->buildLocationString($locationName, $area, $city, $state);
+                    $title = ucfirst($service).' near '.$locationString.' | Professional Services';
+                    $content = $this->generateNearbyLocationContent($service, $locationType, $config['label'], $locationName, $area, $city, $state, $record);
+                    $excerpt = $this->generateNearbyLocationExcerpt($service, $config['label'], $locationName, $area, $city, $state);
+
+                    // Create page
+                    $page = new Page([
+                        'title' => $title,
+                        'slug' => $slug,
+                        'content' => $content,
+                        'excerpt' => $excerpt,
+                        'status' => 'published',
+                        'is_featured' => false,
+                        'state_id' => $stateId,
+                        'city_id' => $cityId,
+                        'area_id' => $areaId,
+                        'user_id' => $user->id,
+                        'page_type' => 'nearby_location',
+                        'template' => 'nearby_location',
+                        'meta_title' => $title.' | Indsoft24',
+                        'meta_description' => $excerpt,
+                        'published_at' => now(),
+                    ]);
+
+                    $page->save();
+                    $created++;
+                    $bar->advance();
+
+                    DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    $skipped++;
+                    $bar->advance();
+
+                    if ($skipped <= 5) {
+                        $this->newLine();
+                        $this->error("    ❌ Error processing record {$record->id}: ".$e->getMessage());
+                    }
+                }
+            }
+
+            $bar->finish();
+            $this->newLine();
+        } catch (\Exception $e) {
+            $this->error("    ❌ Error accessing table '{$config['table']}': ".$e->getMessage());
+        }
+
+        return [$created, $skipped];
+    }
+
+    /**
+     * Generate slug for nearby location page
+     * Format: service-near-locationname-city-state
+     * Example: web-development-near-dps-school-delhi-delhi
+     */
+    private function generateNearbyLocationSlug($service, $locationType, $locationName, $state, $city = null, $area = null): string
+    {
+        $parts = [Str::slug($service), 'near', Str::slug($locationName)];
+
+        // Add location hierarchy for uniqueness
+        if ($city && $city->city_name) {
+            $parts[] = Str::slug($city->city_name);
+        }
+        if ($state && $state->name) {
+            $parts[] = Str::slug($state->name);
+        }
+
+        // Add location type prefix if needed for uniqueness (optional, can be removed if causes issues)
+        // $parts[] = $locationType;
+
+        return implode('-', $parts);
+    }
+
+    /**
+     * Build location string for display
+     */
+    private function buildLocationString($locationName, $area = null, $city = null, $state = null): string
+    {
+        $parts = [$locationName];
+
+        if ($area && $area->name) {
+            $parts[] = $area->name;
+        }
+        if ($city && $city->city_name) {
+            $parts[] = $city->city_name;
+        }
+        if ($state && $state->name) {
+            $parts[] = $state->name;
+        }
+
+        return implode(', ', $parts);
+    }
+
+    /**
+     * Generate content for nearby location page
+     */
+    private function generateNearbyLocationContent($service, $locationType, $locationLabel, $locationName, $area, $city, $state, $record): string
+    {
+        $serviceTitle = ucfirst($service);
+        $locationString = $this->buildLocationString($locationName, $area, $city, $state);
+        $address = isset($record->address) && $record->address ? "Located at {$record->address}" : '';
+
+        $content = "<h1>{$serviceTitle} near {$locationName} - Professional Services</h1>
+        
+        <p>Looking for professional <strong>{$service}</strong> services near <strong>{$locationName}</strong> {$locationLabel} in {$locationString}? You've come to the right place! {$address}. We offer comprehensive <strong>{$service}</strong> solutions for businesses and individuals near {$locationName}.</p>
+        
+        <h2>Why Choose Our {$serviceTitle} Services near {$locationName}?</h2>
+        <p>Our expert team provides top-quality <strong>{$service}</strong> services in the {$locationName} area. Whether you're a local business or an individual looking for professional {$service} solutions, we deliver customized services that meet your specific needs.</p>
+        
+        <h3>Convenient Location</h3>
+        <p>Located near {$locationName} {$locationLabel}, we provide easy access to <strong>{$service}</strong> services for residents and businesses in {$locationString}. Our proximity to {$locationName} ensures quick service delivery and convenient consultations.</p>
+        
+        <h3>Local Expertise</h3>
+        <p>Our experienced professionals understand the unique needs of the {$locationName} area and provide tailored <strong>{$service}</strong> solutions that work best for local businesses and residents.</p>
+        
+        <h2>Comprehensive {$serviceTitle} Solutions</h2>
+        <p>We specialize in providing professional <strong>{$service}</strong> services near {$locationName}, {$locationString}. Our services are designed to help businesses grow and succeed while serving the local community effectively.</p>
+        
+        <h3>Services We Offer</h3>
+        <ul>
+            <li>Professional {$serviceTitle} consultations</li>
+            <li>Customized solutions for local businesses</li>
+            <li>Quick response times for urgent requirements</li>
+            <li>Ongoing support and maintenance</li>
+        </ul>
+        
+        <h2>Get Started Today</h2>
+        <p>Ready to take advantage of our <strong>{$service}</strong> services near {$locationName}? Contact us today to discuss your requirements and get a customized solution that fits your needs.</p>
+        
+        <p>We serve clients near {$locationName} and throughout {$locationString}, providing professional <strong>{$service}</strong> services that help businesses and individuals succeed.</p>";
+
+        return $content;
+    }
+
+    /**
+     * Generate excerpt for nearby location page
+     */
+    private function generateNearbyLocationExcerpt($service, $locationLabel, $locationName, $area, $city, $state): string
+    {
+        $locationString = $this->buildLocationString($locationName, $area, $city, $state);
+
+        return "Professional {$service} services near {$locationName} {$locationLabel} in {$locationString}, India. Expert solutions for businesses and individuals. Get started today!";
     }
 }

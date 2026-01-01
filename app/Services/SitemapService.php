@@ -157,6 +157,12 @@ class SitemapService
                     'priority' => '0.8',
                 ],
                 [
+                    'loc' => $this->getBaseUrl().'/contact-us',
+                    'lastmod' => now()->toAtomString(),
+                    'changefreq' => 'monthly',
+                    'priority' => '0.8',
+                ],
+                [
                     'loc' => $this->getBaseUrl().'/blog',
                     'lastmod' => now()->toAtomString(),
                     'changefreq' => 'daily',
@@ -173,6 +179,12 @@ class SitemapService
                     'lastmod' => now()->toAtomString(),
                     'changefreq' => 'weekly',
                     'priority' => '0.7',
+                ],
+                [
+                    'loc' => $this->getBaseUrl().'/services',
+                    'lastmod' => now()->toAtomString(),
+                    'changefreq' => 'monthly',
+                    'priority' => '0.8',
                 ],
                 [
                     'loc' => $this->getBaseUrl().'/web-development',
@@ -227,12 +239,6 @@ class SitemapService
                     'lastmod' => now()->toAtomString(),
                     'changefreq' => 'weekly',
                     'priority' => '0.7',
-                ],
-                [
-                    'loc' => $this->getBaseUrl().'/cms/search',
-                    'lastmod' => now()->toAtomString(),
-                    'changefreq' => 'daily',
-                    'priority' => '0.6',
                 ],
             ];
 
@@ -389,7 +395,7 @@ class SitemapService
 
         return Cache::remember($cacheKey, self::CACHE_DURATION, function () {
             $states = State::active()
-                ->select('name', 'updated_at')
+                ->select('id', 'name', 'slug', 'updated_at')
                 ->get();
 
             $urls = [];
@@ -429,7 +435,7 @@ class SitemapService
             $offset = ($page - 1) * self::MAX_URLS_PER_SITEMAP;
 
             $cities = City::active()
-                ->select('id', 'city_name', 'state_id', 'updated_at')
+                ->select('id', 'city_name', 'slug', 'state_id', 'updated_at')
                 ->with('state:id,name')
                 ->orderBy('id', 'asc')
                 ->offset($offset)
@@ -473,7 +479,7 @@ class SitemapService
             $offset = ($page - 1) * self::MAX_URLS_PER_SITEMAP;
 
             $areas = Area::active()
-                ->select('id', 'name', 'city_id', 'updated_at')
+                ->select('id', 'name', 'slug', 'city_id', 'updated_at')
                 ->orderBy('id', 'asc')
                 ->offset($offset)
                 ->limit(self::MAX_URLS_PER_SITEMAP)
@@ -481,7 +487,8 @@ class SitemapService
 
             $urls = [];
             foreach ($areas as $area) {
-                $slug = \Illuminate\Support\Str::slug($area->name);
+                // Use the actual slug from database, fallback to generated slug if missing
+                $slug = $area->slug ?? \Illuminate\Support\Str::slug($area->name);
                 $urls[] = [
                     'loc' => $this->getBaseUrl().'/cms/area/'.$slug,
                     'lastmod' => $area->updated_at->toAtomString(),
