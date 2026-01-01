@@ -46,6 +46,14 @@ class ImageToPdfController extends Controller
         }
 
         try {
+            // Check if GD library is available
+            if (!extension_loaded('gd')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'GD library is not available on this server. Please contact the administrator.',
+                ], 500);
+            }
+
             $images = $request->file('images');
             
             // Create new PDF document
@@ -77,9 +85,20 @@ class ImageToPdfController extends Controller
                     continue;
                 }
                 
-                // Get image dimensions
-                $imageWidth = $imageInfo[0];
-                $imageHeight = $imageInfo[1];
+                // Compress/resize image before adding to PDF
+                $compressedImagePath = $this->compressImage($imagePath, $imageInfo);
+                if ($compressedImagePath === false) {
+                    // If compression fails, use original image
+                    $compressedImagePath = $imagePath;
+                } else {
+                    // Track compressed files for cleanup
+                    $tempFiles[] = $compressedImagePath;
+                }
+                
+                // Get compressed image dimensions
+                $compressedInfo = getimagesize($compressedImagePath);
+                $imageWidth = $compressedInfo[0];
+                $imageHeight = $compressedInfo[1];
                 
                 // Calculate PDF page size to fit image (maintain aspect ratio)
                 $pageWidth = $pdf->getPageWidth();
@@ -101,7 +120,14 @@ class ImageToPdfController extends Controller
                 $y = ($pageHeight - $pdfHeight) / 2;
                 
                 // Add image to PDF
-                $pdf->Image($imagePath, $x, $y, $pdfWidth, $pdfHeight, '', '', '', false, 300, '', false, false, 0);
+                $pdf->Image($compressedImagePath, $x, $y, $pdfWidth, $pdfHeight, '', '', '', false, 300, '', false, false, 0);
+            }
+            
+            // Clean up compressed temporary files
+            foreach ($tempFiles as $tempFile) {
+                if (file_exists($tempFile)) {
+                    @unlink($tempFile);
+                }
             }
             
             // Generate PDF filename
@@ -126,6 +152,98 @@ class ImageToPdfController extends Controller
                 'success' => false,
                 'message' => 'An error occurred while converting images to PDF. Please try again.',
             ], 500);
+        }
+    }
+
+    /**
+     * Compress and resize image to reduce file size
+     * 
+     * @param string $imagePath Original image path
+     * @param array $imageInfo Image information from getimagesize()
+     * @return string|false Path to compressed image or false on failure
+     */
+    private function compressImage($imagePath, $imageInfo)
+    {
+        try {
+            $maxWidth = 2000;  // Maximum width in pixels
+            $maxHeight = 2000; // Maximum height in pixels
+            $jpegQuality = 85; // JPEG quality (0-100)
+            $pngQuality = 9;   // PNG compression level (0-9, 9 = maximum compression)
+            
+            $originalWidth = $imageInfo[0];
+            $originalHeight = $imageInfo[1];
+            $mimeType = $imageInfo['mime'];
+            
+            // Calculate new dimensions maintaining aspect ratio
+            $ratio = min($maxWidth / $originalWidth, $maxHeight / $originalHeight);
+            $newWidth = (int)($originalWidth * $ratio);
+            $newHeight = (int)($originalHeight * $ratio);
+            
+            // If image is already smaller than max dimensions, still compress for file size reduction
+            if ($ratio >= 1) {
+                $newWidth = $originalWidth;
+                $newHeight = $originalHeight;
+            }
+            
+            // Create image resource based on MIME type
+            $sourceImage = null;
+            switch ($mimeType) {
+                case 'image/jpeg':
+                    $sourceImage = @imagecreatefromjpeg($imagePath);
+                    break;
+                case 'image/png':
+                    $sourceImage = @imagecreatefrompng($imagePath);
+                    break;
+                default:
+                    return false;
+            }
+            
+            if (!$sourceImage) {
+                return false;
+            }
+            
+            // Create new image with new dimensions
+            $compressedImage = imagecreatetruecolor($newWidth, $newHeight);
+            
+            // Preserve transparency for PNG
+            if ($mimeType === 'image/png') {
+                imagealphablending($compressedImage, false);
+                imagesavealpha($compressedImage, true);
+                $transparent = imagecolorallocatealpha($compressedImage, 255, 255, 255, 127);
+                imagefilledrectangle($compressedImage, 0, 0, $newWidth, $newHeight, $transparent);
+            }
+            
+            // Resize image
+            imagecopyresampled(
+                $compressedImage,
+                $sourceImage,
+                0, 0, 0, 0,
+                $newWidth,
+                $newHeight,
+                $originalWidth,
+                $originalHeight
+            );
+            
+            // Create temporary file for compressed image
+            $tempDir = storage_path('app/temp');
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+            
+            $compressedPath = $tempDir . '/compressed_' . uniqid() . '_' . time() . '.jpg';
+            
+            // Save compressed image as JPEG (smaller file size)
+            imagejpeg($compressedImage, $compressedPath, $jpegQuality);
+            
+            // Clean up
+            imagedestroy($sourceImage);
+            imagedestroy($compressedImage);
+            
+            return $compressedPath;
+            
+        } catch (\Exception $e) {
+            Log::error('Image compression error: ' . $e->getMessage());
+            return false;
         }
     }
 }

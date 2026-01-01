@@ -65,10 +65,13 @@
                                 <!-- Error/Success Messages -->
                                 <div id="messageContainer" class="mb-4"></div>
 
-                                <!-- Convert Button -->
+                                <!-- Convert/Download Button -->
                                 <div class="text-center">
                                     <button type="submit" class="btn btn-primary btn-lg px-5" id="convertBtn">
                                         <i class="bi bi-file-earmark-pdf me-2"></i>Convert to PDF
+                                    </button>
+                                    <button type="button" class="btn btn-success btn-lg px-5" id="downloadBtn" style="display: none;">
+                                        <i class="bi bi-download me-2"></i>Download PDF
                                     </button>
                                 </div>
                             </form>
@@ -482,18 +485,46 @@
             const progressText = document.getElementById('progressText');
             const messageContainer = document.getElementById('messageContainer');
             const convertBtn = document.getElementById('convertBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
             
             let selectedFiles = [];
+            let pdfBlob = null;
+            let pdfFilename = 'converted.pdf';
             
             // Handle file selection
             fileInput.addEventListener('change', function(e) {
                 const files = Array.from(e.target.files);
                 selectedFiles = files;
                 
+                // Reset to convert button when new files are selected
+                resetToConvertMode();
+                
                 if (files.length > 0) {
                     displayPreview(files);
                 } else {
                     imagePreview.style.display = 'none';
+                }
+            });
+            
+            // Function to switch to convert mode
+            function resetToConvertMode() {
+                convertBtn.style.display = 'inline-block';
+                downloadBtn.style.display = 'none';
+                pdfBlob = null;
+                pdfFilename = 'converted.pdf';
+            }
+            
+            // Handle download button click
+            downloadBtn.addEventListener('click', function() {
+                if (pdfBlob) {
+                    const url = window.URL.createObjectURL(pdfBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = pdfFilename;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
                 }
             });
             
@@ -544,11 +575,59 @@
                 
                 selectedFiles = Array.from(fileInput.files);
                 
+                // Reset to convert mode when files are removed
+                resetToConvertMode();
+                
                 if (selectedFiles.length > 0) {
                     displayPreview(selectedFiles);
                 } else {
                     imagePreview.style.display = 'none';
                 }
+            }
+            
+            // Compress image using Canvas API
+            function compressImage(file, maxWidth = 2000, maxHeight = 2000, quality = 0.85) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = new Image();
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            
+                            // Calculate new dimensions
+                            if (width > maxWidth || height > maxHeight) {
+                                const ratio = Math.min(maxWidth / width, maxHeight / height);
+                                width = width * ratio;
+                                height = height * ratio;
+                            }
+                            
+                            canvas.width = width;
+                            canvas.height = height;
+                            
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            canvas.toBlob(function(blob) {
+                                if (!blob) {
+                                    reject(new Error('Compression failed'));
+                                    return;
+                                }
+                                // Create a new File object with the compressed blob
+                                const compressedFile = new File([blob], file.name, {
+                                    type: 'image/jpeg',
+                                    lastModified: Date.now()
+                                });
+                                resolve(compressedFile);
+                            }, 'image/jpeg', quality);
+                        };
+                        img.onerror = reject;
+                        img.src = e.target.result;
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
             }
             
             // Handle form submission
@@ -560,32 +639,53 @@
                     return;
                 }
                 
-                // Validate file sizes
-                const maxSize = 10 * 1024 * 1024; // 10MB
-                for (let file of selectedFiles) {
-                    if (file.size > maxSize) {
-                        showMessage(`File "${file.name}" exceeds 10MB limit.`, 'danger');
-                        return;
-                    }
-                }
-                
                 // Show progress
                 progressContainer.style.display = 'block';
-                progressBar.style.width = '30%';
-                progressText.textContent = 'Uploading images...';
+                progressBar.style.width = '10%';
+                progressText.textContent = 'Compressing images...';
                 convertBtn.disabled = true;
                 messageContainer.innerHTML = '';
                 
-                // Create FormData
-                const formData = new FormData();
-                selectedFiles.forEach(file => {
-                    formData.append('images[]', file);
-                });
-                
                 try {
-                    // Simulate progress
+                    // Compress all images first
+                    progressBar.style.width = '30%';
+                    progressText.textContent = 'Compressing images (1/' + selectedFiles.length + ')...';
+                    
+                    const compressedFiles = [];
+                    for (let i = 0; i < selectedFiles.length; i++) {
+                        const file = selectedFiles[i];
+                        progressText.textContent = `Compressing images (${i + 1}/${selectedFiles.length})...`;
+                        progressBar.style.width = (30 + (i / selectedFiles.length) * 20) + '%';
+                        
+                        try {
+                            const compressedFile = await compressImage(file);
+                            compressedFiles.push(compressedFile);
+                        } catch (error) {
+                            console.error('Compression error for file:', file.name, error);
+                            // If compression fails, use original file
+                            compressedFiles.push(file);
+                        }
+                    }
+                    
+                    // Validate total size (max 50MB for all files combined)
+                    const maxTotalSize = 50 * 1024 * 1024; // 50MB
+                    const totalSize = compressedFiles.reduce((sum, file) => sum + file.size, 0);
+                    if (totalSize > maxTotalSize) {
+                        showMessage('Total file size exceeds 50MB limit. Please reduce the number of images or their sizes.', 'danger');
+                        progressContainer.style.display = 'none';
+                        convertBtn.disabled = false;
+                        return;
+                    }
+                    
+                    // Create FormData with compressed files
+                    const formData = new FormData();
+                    compressedFiles.forEach(file => {
+                        formData.append('images[]', file);
+                    });
+                    
+                    // Upload and convert
                     progressBar.style.width = '60%';
-                    progressText.textContent = 'Converting to PDF...';
+                    progressText.textContent = 'Uploading images...';
                     
                     const response = await fetch('{{ route("tools.jpg-to-pdf.convert") }}', {
                         method: 'POST',
@@ -597,44 +697,50 @@
                     
                     if (response.ok) {
                         progressBar.style.width = '100%';
-                        progressText.textContent = 'Downloading PDF...';
+                        progressText.textContent = 'Conversion complete!';
                         
                         // Get filename from response
                         const contentDisposition = response.headers.get('Content-Disposition');
-                        const filename = contentDisposition 
+                        pdfFilename = contentDisposition 
                             ? contentDisposition.split('filename=')[1].replace(/"/g, '')
                             : 'converted.pdf';
                         
-                        // Download the PDF
-                        const blob = await response.blob();
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        window.URL.revokeObjectURL(url);
-                        document.body.removeChild(a);
+                        // Store PDF blob for download
+                        pdfBlob = await response.blob();
                         
-                        showMessage('PDF converted and downloaded successfully!', 'success');
+                        // Hide convert button and show download button
+                        convertBtn.style.display = 'none';
+                        downloadBtn.style.display = 'inline-block';
                         
-                        // Reset form
+                        showMessage('PDF converted successfully! Click the download button to save it.', 'success');
+                        
+                        // Hide progress after a short delay
                         setTimeout(() => {
-                            form.reset();
-                            imagePreview.style.display = 'none';
                             progressContainer.style.display = 'none';
-                            selectedFiles = [];
-                        }, 2000);
+                            progressBar.style.width = '0%';
+                        }, 1500);
                     } else {
-                        const error = await response.json();
-                        showMessage(error.message || 'An error occurred during conversion.', 'danger');
+                        if (response.status === 413) {
+                            showMessage('File size is too large. Images are being compressed, but the total size is still too large. Please try with fewer or smaller images.', 'danger');
+                        } else {
+                            try {
+                                const error = await response.json();
+                                showMessage(error.message || 'An error occurred during conversion.', 'danger');
+                            } catch (parseError) {
+                                showMessage('An error occurred during conversion. Please try again.', 'danger');
+                            }
+                        }
                     }
                 } catch (error) {
+                    console.error('Upload error:', error);
                     showMessage('An error occurred. Please try again.', 'danger');
+                    resetToConvertMode();
                 } finally {
                     convertBtn.disabled = false;
-                    progressContainer.style.display = 'none';
-                    progressBar.style.width = '0%';
+                    if (!pdfBlob) {
+                        progressContainer.style.display = 'none';
+                        progressBar.style.width = '0%';
+                    }
                 }
             });
             
