@@ -15,8 +15,13 @@ class PdfLockController extends Controller
     {
         $metaDescription = 'Lock PDF files online for free. Add password protection to PDF documents instantly. Fast, secure, and easy-to-use PDF lock tool by Indsoft24. No registration required.';
         $canonicalUrl = route('tools.pdf-lock');
+        
+        // Check if qpdf or Ghostscript is available
+        $isQpdfAvailable = $this->isQpdfAvailable();
+        $isGhostscriptAvailable = $this->isGhostscriptAvailable();
+        $isAvailable = $isQpdfAvailable || $isGhostscriptAvailable;
 
-        return view('tools.pdf-lock', compact('metaDescription', 'canonicalUrl'));
+        return view('tools.pdf-lock', compact('metaDescription', 'canonicalUrl', 'isAvailable', 'isQpdfAvailable', 'isGhostscriptAvailable'));
     }
 
     /**

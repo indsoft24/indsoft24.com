@@ -39,8 +39,30 @@
                                 <p class="text-muted">Upload your PDF file and add password protection to secure it</p>
                             </div>
 
+                            @if(!$isAvailable)
+                            <!-- Coming Soon Message -->
+                            <div class="alert alert-warning text-center" role="alert">
+                                <i class="bi bi-clock-history display-6 mb-3 d-block"></i>
+                                <h4 class="alert-heading">Coming Soon!</h4>
+                                <p class="mb-2">PDF Lock feature is currently being set up on the server.</p>
+                                <p class="mb-0">
+                                    <strong>Status:</strong> 
+                                    @if(!$isQpdfAvailable && !$isGhostscriptAvailable)
+                                        qpdf and Ghostscript are not installed. Please contact your hosting provider to install qpdf for PDF password protection.
+                                    @elseif(!$isQpdfAvailable)
+                                        qpdf is not installed. Ghostscript is available but cannot add password protection. Please contact your hosting provider to install qpdf.
+                                    @endif
+                                </p>
+                                <hr>
+                                <p class="mb-0 small">
+                                    <strong>Installation Required:</strong> The server needs qpdf installed to enable PDF password protection. 
+                                    Contact your hosting provider with the installation guide in <code>SERVER_INSTALLATION.md</code>
+                                </p>
+                            </div>
+                            @endif
+
                             <!-- Upload Form -->
-                            <form id="lockForm" enctype="multipart/form-data">
+                            <form id="lockForm" enctype="multipart/form-data" @if(!$isAvailable) style="opacity: 0.5; pointer-events: none;" @endif>
                                 @csrf
                                 <div class="mb-4">
                                     <label for="pdf" class="form-label fw-semibold">Select PDF File</label>
@@ -81,7 +103,7 @@
 
                                 <!-- Lock Button -->
                                 <div class="text-center">
-                                    <button type="submit" class="btn btn-primary btn-lg px-5" id="lockBtn">
+                                    <button type="submit" class="btn btn-primary btn-lg px-5" id="lockBtn" @if(!$isAvailable) disabled @endif>
                                         <i class="bi bi-lock me-2"></i>Lock PDF
                                     </button>
                                 </div>
