@@ -8,9 +8,23 @@ use App\Page;
 use App\Post;
 use App\State;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CmsController extends Controller
 {
+    /**
+     * Add cache prevention headers to response if user is authenticated
+     */
+    protected function addCacheHeaders($response)
+    {
+        if (Auth::check()) {
+            return $response->header('Cache-Control', 'no-cache, no-store, must-revalidate, private, max-age=0')
+                           ->header('Pragma', 'no-cache')
+                           ->header('Expires', '0')
+                           ->header('Vary', 'Cookie, Authorization');
+        }
+        return $response;
+    }
     /**
      * Display pages by state
      */
@@ -56,7 +70,7 @@ class CmsController extends Controller
             ->limit(6)
             ->get();
 
-        return view('cms.state-pages', compact(
+        $response = response()->view('cms.state-pages', compact(
             'state',
             'pages',
             'metaTitle',
@@ -68,6 +82,8 @@ class CmsController extends Controller
             'majorCitiesString',
             'capitalCity'
         ));
+        
+        return $this->addCacheHeaders($response);
     }
 
     /**
@@ -122,7 +138,7 @@ class CmsController extends Controller
             ->limit(6)
             ->get();
 
-        return view('cms.city-pages', compact(
+        $response = response()->view('cms.city-pages', compact(
             'city',
             'pages',
             'metaTitle',
@@ -135,6 +151,8 @@ class CmsController extends Controller
             'primaryArea',
             'nearbyArea'
         ));
+        
+        return $this->addCacheHeaders($response);
     }
 
     /**
@@ -195,7 +213,7 @@ class CmsController extends Controller
             ->limit(6)
             ->get();
 
-        return view('cms.area-pages', compact(
+        $response = response()->view('cms.area-pages', compact(
             'area',
             'pages',
             'metaTitle',
@@ -206,6 +224,8 @@ class CmsController extends Controller
             'nearbyAreas',
             'nearbyAreaName'
         ));
+        
+        return $this->addCacheHeaders($response);
     }
 
     /**
@@ -259,7 +279,9 @@ class CmsController extends Controller
             ->limit(6)
             ->get();
 
-        return view('cms.page', compact('page', 'relatedPages', 'metaTitle', 'metaDescription', 'blogPosts'));
+        $response = response()->view('cms.page', compact('page', 'relatedPages', 'metaTitle', 'metaDescription', 'blogPosts'));
+        
+        return $this->addCacheHeaders($response);
     }
 
     /**
@@ -284,7 +306,9 @@ class CmsController extends Controller
             ->limit(6)
             ->get();
 
-        return view('cms.states', compact('states', 'metaTitle', 'metaDescription', 'blogPosts'));
+        $response = response()->view('cms.states', compact('states', 'metaTitle', 'metaDescription', 'blogPosts'));
+        
+        return $this->addCacheHeaders($response);
     }
 
     /**
@@ -307,7 +331,9 @@ class CmsController extends Controller
             ->limit(6)
             ->get();
 
-        return view('cms.state-cities', compact('state', 'cities', 'metaTitle', 'metaDescription', 'blogPosts'));
+        $response = response()->view('cms.state-cities', compact('state', 'cities', 'metaTitle', 'metaDescription', 'blogPosts'));
+        
+        return $this->addCacheHeaders($response);
     }
 
     /**
@@ -334,7 +360,9 @@ class CmsController extends Controller
             ->limit(6)
             ->get();
 
-        return view('cms.city-areas', compact('city', 'areas', 'metaTitle', 'metaDescription', 'blogPosts'));
+        $response = response()->view('cms.city-areas', compact('city', 'areas', 'metaTitle', 'metaDescription', 'blogPosts'));
+        
+        return $this->addCacheHeaders($response);
     }
 
     /**
@@ -414,6 +442,8 @@ class CmsController extends Controller
             ->limit(6)
             ->get();
 
-        return view('cms.search', compact('pages', 'states', 'cities', 'areas', 'metaTitle', 'metaDescription', 'blogPosts'));
+        $response = response()->view('cms.search', compact('pages', 'states', 'cities', 'areas', 'metaTitle', 'metaDescription', 'blogPosts'));
+        
+        return $this->addCacheHeaders($response);
     }
 }

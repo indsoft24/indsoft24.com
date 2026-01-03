@@ -32,7 +32,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // --- Blog Management ---
-        Route::prefix('blog')->name('blog.')->group(function () {
+        Route::prefix('blog')->group(function () {
             Route::resource('posts', PostController::class);
             Route::resource('categories', CategoryController::class);
             Route::resource('tags', TagController::class);
@@ -41,7 +41,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
 
         // --- CMS Pages Management ---
-        Route::prefix('cms')->name('cms.')->group(function () {
+        Route::prefix('cms')->group(function () {
             // Location Management
             Route::resource('states', StateController::class);
             Route::resource('cities', CityController::class);
