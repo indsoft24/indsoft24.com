@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>भारत न्यूज़ - Latest Hindi News, Breaking News, ताज़ा समाचार</title>
+    <meta name="description"
+        content="भारत न्यूज़ - Hindi news website for latest news, breaking news in Hindi of India, World, Sports, Business, Politics, Entertainment, Technology and more.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-bar-content">
+                <div class="top-bar-left">
+                    <span class="date" id="currentDate"></span>
+                    <span class="separator">|</span>
+                    <a href="#" class="top-link">Weather</a>
+                    <a href="#" class="top-link">Epaper</a>
+                </div>
+                <div class="top-bar-right">
+                    <div class="language-selector">
+                        <select id="languageSelect">
+                            <option value="hi" selected>हिन्दी</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon" aria-label="Facebook"><svg width="20" height="20"
+                                viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                            </svg></a>
+                        <a href="#" class="social-icon" aria-label="Twitter"><svg width="20" height="20"
+                                viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                            </svg></a>
+                        <a href="#" class="social-icon" aria-label="YouTube"><svg width="20" height="20"
+                                viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                            </svg></a>
+                        <a href="#" class="social-icon" aria-label="Instagram"><svg width="20" height="20"
+                                viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                            </svg></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="index.html">भारत न्यूज़</a></h1>
+                    <p class="tagline">सत्य की आवाज़</p>
+                </div>
+                <div class="header-ad">
+                    <div class="ad-placeholder">Advertisement</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="active">होम</a></li>
+                <li class="dropdown">
+                    <a href="category.html">राज्य <span class="arrow">▼</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="category.html">उत्तर प्रदेश</a></li>
+                        <li><a href="category.html">दिल्ली</a></li>
+                        <li><a href="category.html">मध्य प्रदेश</a></li>
+                        <li><a href="category.html">राजस्थान</a></li>
+                        <li><a href="category.html">बिहार</a></li>
+                        <li><a href="category.html">झारखंड</a></li>
+                    </ul>
+                </li>
+                <li><a href="category.html">देश</a></li>
+                <li><a href="category.html">विदेश</a></li>
+                <li><a href="category.html">राजनीति</a></li>
+                <li><a href="sports.html">खेल</a></li>
+                <li><a href="entertainment.html">मनोरंजन</a></li>
+                <li><a href="technology.html">टेक्नोलॉजी</a></li>
+                <li><a href="category.html">बिजनेस</a></li>
+                <li><a href="category.html">हेल्थ</a></li>
+                <li class="nav-search">
+                    <button class="search-btn" id="searchBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                </li>
+            </ul>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Breaking News Ticker -->
+    <div class="breaking-news">
+        <div class="container">
+            <div class="breaking-news-content">
+                <span class="breaking-label">ब्रेकिंग न्यूज़</span>
+                <div class="news-ticker">
+                    <div class="ticker-content">
+                        <span class="ticker-item">भारत ने अंतरिक्ष में नया इतिहास रचा, सफलतापूर्वक लॉन्च किया
+                            उपग्रह</span>
+                        <span class="ticker-item">प्रधानमंत्री ने नई शिक्षा नीति पर दिया बड़ा बयान</span>
+                        <span class="ticker-item">क्रिकेट: भारत ने जीती रोमांचक मैच, विराट कोहली का शानदार शतक</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="content-grid">
+                <!-- Left Sidebar -->
+                <aside class="sidebar-left">
+                    <div class="widget trending-widget">
+                        <h3 class="widget-title">ट्रेंडिंग</h3>
+                        <div class="trending-list">
+                            <div class="trending-item">
+                                <span class="trending-number">1</span>
+                                <a href="article.html">भारत की अर्थव्यवस्था में तेजी, GDP में बड़ी वृद्धि</a>
+                            </div>
+                            <div class="trending-item">
+                                <span class="trending-number">2</span>
+                                <a href="article.html">नई तकनीक से बदलेगा शिक्षा का भविष्य</a>
+                            </div>
+                            <div class="trending-item">
+                                <span class="trending-number">3</span>
+                                <a href="article.html">बॉलीवुड स्टार की नई फिल्म का ट्रेलर रिलीज</a>
+                            </div>
+                            <div class="trending-item">
+                                <span class="trending-number">4</span>
+                                <a href="article.html">मौसम विभाग ने जारी किया अलर्ट</a>
+                            </div>
+                            <div class="trending-item">
+                                <span class="trending-number">5</span>
+                                <a href="article.html">टेक्नोलॉजी कंपनी ने लॉन्च किया नया स्मार्टफोन</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="widget ad-widget">
+                        <div class="ad-placeholder vertical">Advertisement</div>
+                    </div>
+                </aside>
+
+                <!-- Main Content Area -->
+                <section class="main-section">
+                    <!-- Featured News -->
+                    <div class="featured-section">
+                        <div class="featured-main">
+                            <article class="featured-article">
+                                <div class="featured-image">
+                                    <img src="assets/images/featured_1.jpg" alt="Featured News">
+                                    <span class="category-badge">देश</span>
+                                </div>
+                                <div class="featured-content">
+                                    <h2><a href="article.html">भारत ने अंतरिक्ष में रचा इतिहास: चंद्रयान-4 मिशन की
+                                            सफलता</a></h2>
+                                    <p class="excerpt">भारतीय अंतरिक्ष अनुसंधान संगठन (ISRO) ने एक और बड़ी उपलब्धि हासिल
+                                        की है। चंद्रयान-4 मिशन की सफलता के साथ भारत ने अंतरिक्ष विज्ञान में नया मुकाम
+                                        हासिल किया है...</p>
+                                    <div class="article-meta">
+                                        <span class="author">संवाददाता</span>
+                                        <span class="separator">•</span>
+                                        <span class="time">2 घंटे पहले</span>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="featured-side">
+                            <article class="side-article">
+                                <div class="side-image">
+                                    <img src="assets/images/news_2.jpg" alt="News">
+                                    <span class="category-badge small">राजनीति</span>
+                                </div>
+                                <h3><a href="article.html">संसद में पेश हुआ नया विधेयक, विपक्ष ने किया विरोध</a></h3>
+                                <span class="time">3 घंटे पहले</span>
+                            </article>
+                            <article class="side-article">
+                                <div class="side-image">
+                                    <img src="assets/images/news_3.jpg" alt="News">
+                                    <span class="category-badge small">खेल</span>
+                                </div>
+                                <h3><a href="article.html">भारतीय क्रिकेट टीम ने जीती सीरीज, कप्तान ने दी बधाई</a></h3>
+                                <span class="time">4 घंटे पहले</span>
+                            </article>
+                            <article class="side-article">
+                                <div class="side-image">
+                                    <img src="assets/images/news_4.jpg" alt="News">
+                                    <span class="category-badge small">टेक्नोलॉजी</span>
+                                </div>
+                                <h3><a href="article.html">AI की दुनिया में भारत का बड़ा कदम, नई पॉलिसी जारी</a></h3>
+                                <span class="time">5 घंटे पहले</span>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- Latest News Grid -->
+                    <div class="section-header">
+                        <h2 class="section-title">ताज़ा ख़बरें</h2>
+                        <a href="category.html" class="view-all">सभी देखें →</a>
+                    </div>
+
+                    <div class="news-grid">
+                        <article class="news-card">
+                            <div class="news-image">
+                                <img src="assets/images/news_5.jpg" alt="News">
+                                <span class="category-badge">मनोरंजन</span>
+                            </div>
+                            <div class="news-content">
+                                <h3><a href="article.html">बॉलीवुड की नई फिल्म ने तोड़े सारे रिकॉर्ड, पहले दिन की कमाई
+                                        50 करोड़</a></h3>
+                                <p class="excerpt">बॉक्स ऑफिस पर धमाल मचाने के लिए तैयार इस फिल्म ने रिलीज के पहले ही
+                                    दिन शानदार कमाई की है...</p>
+                                <div class="article-meta">
+                                    <span class="time">1 घंटा पहले</span>
+                                    <span class="separator">•</span>
+                                    <span class="views">12.5K views</span>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card">
+                            <div class="news-image">
+                                <img src="assets/images/news_6.jpg" alt="News">
+                                <span class="category-badge">बिजनेस</span>
+                            </div>
+                            <div class="news-content">
+                                <h3><a href="article.html">शेयर बाजार में तेजी, सेंसेक्स 500 अंक चढ़ा</a></h3>
+                                <p class="excerpt">आज शेयर बाजार में जबरदस्त तेजी देखने को मिली। निवेशकों को बड़ा फायदा
+                                    हुआ है...</p>
+                                <div class="article-meta">
+                                    <span class="time">2 घंटे पहले</span>
+                                    <span class="separator">•</span>
+                                    <span class="views">8.2K views</span>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card">
+                            <div class="news-image">
+                                <img src="assets/images/news_7.jpg" alt="News">
+                                <span class="category-badge">हेल्थ</span>
+                            </div>
+                            <div class="news-content">
+                                <h3><a href="article.html">नई वैक्सीन से मिलेगी बीमारी से राहत, वैज्ञानिकों ने किया
+                                        दावा</a></h3>
+                                <p class="excerpt">चिकित्सा विज्ञान में एक और बड़ी उपलब्धि, नई वैक्सीन से लाखों लोगों को
+                                    फायदा होगा...</p>
+                                <div class="article-meta">
+                                    <span class="time">3 घंटे पहले</span>
+                                    <span class="separator">•</span>
+                                    <span class="views">15.3K views</span>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card">
+                            <div class="news-image">
+                                <img src="assets/images/news_8.jpg" alt="News">
+                                <span class="category-badge">विदेश</span>
+                            </div>
+                            <div class="news-content">
+                                <h3><a href="article.html">अमेरिका में बड़ा राजनीतिक घटनाक्रम, राष्ट्रपति ने दिया
+                                        बयान</a></h3>
+                                <p class="excerpt">वैश्विक राजनीति में एक और महत्वपूर्ण घटना, जिसका असर पूरी दुनिया पर
+                                    पड़ सकता है...</p>
+                                <div class="article-meta">
+                                    <span class="time">4 घंटे पहले</span>
+                                    <span class="separator">•</span>
+                                    <span class="views">20.1K views</span>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card">
+                            <div class="news-image">
+                                <img src="assets/images/news_9.jpg" alt="News">
+                                <span class="category-badge">खेल</span>
+                            </div>
+                            <div class="news-content">
+                                <h3><a href="article.html">ओलंपिक में भारत का शानदार प्रदर्शन, 5 पदक जीते</a></h3>
+                                <p class="excerpt">खेल जगत में भारत ने एक और कीर्तिमान स्थापित किया है। युवा खिलाड़ियों
+                                    ने देश का नाम रोशन किया...</p>
+                                <div class="article-meta">
+                                    <span class="time">5 घंटे पहले</span>
+                                    <span class="separator">•</span>
+                                    <span class="views">25.7K views</span>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card">
+                            <div class="news-image">
+                                <img src="assets/images/news_10.jpg" alt="News">
+                                <span class="category-badge">टेक्नोलॉजी</span>
+                            </div>
+                            <div class="news-content">
+                                <h3><a href="article.html">भारतीय कंपनी ने लॉन्च किया 5G स्मार्टफोन, कीमत मात्र 15,000
+                                        रुपये</a></h3>
+                                <p class="excerpt">तकनीक की दुनिया में एक और बड़ी खबर, सस्ते दाम में मिलेगा शानदार
+                                    फीचर्स वाला फोन...</p>
+                                <div class="article-meta">
+                                    <span class="time">6 घंटे पहले</span>
+                                    <span class="separator">•</span>
+                                    <span class="views">18.9K views</span>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Video Section -->
+                    <div class="section-header">
+                        <h2 class="section-title">वीडियो</h2>
+                        <a href="#" class="view-all">सभी देखें →</a>
+                    </div>
+
+                    <div class="video-grid">
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <img src="assets/images/video_1.jpg" alt="Video">
+                                <div class="play-button">
+                                    <svg width="50" height="50" viewBox="0 0 50 50">
+                                        <circle cx="25" cy="25" r="25" fill="rgba(255,255,255,0.9)" />
+                                        <polygon points="20,15 35,25 20,35" fill="#c41e3a" />
+                                    </svg>
+                                </div>
+                                <span class="duration">5:32</span>
+                            </div>
+                            <h4><a href="article.html">प्रधानमंत्री का देश के नाम संदेश</a></h4>
+                            <span class="time">2 घंटे पहले</span>
+                        </div>
+
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <img src="assets/images/video_2.jpg" alt="Video">
+                                <div class="play-button">
+                                    <svg width="50" height="50" viewBox="0 0 50 50">
+                                        <circle cx="25" cy="25" r="25" fill="rgba(255,255,255,0.9)" />
+                                        <polygon points="20,15 35,25 20,35" fill="#c41e3a" />
+                                    </svg>
+                                </div>
+                                <span class="duration">8:15</span>
+                            </div>
+                            <h4><a href="article.html">क्रिकेट मैच के रोमांचक पल</a></h4>
+                            <span class="time">4 घंटे पहले</span>
+                        </div>
+
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <img src="assets/images/video_3.jpg" alt="Video">
+                                <div class="play-button">
+                                    <svg width="50" height="50" viewBox="0 0 50 50">
+                                        <circle cx="25" cy="25" r="25" fill="rgba(255,255,255,0.9)" />
+                                        <polygon points="20,15 35,25 20,35" fill="#c41e3a" />
+                                    </svg>
+                                </div>
+                                <span class="duration">3:45</span>
+                            </div>
+                            <h4><a href="article.html">बॉलीवुड सितारों का इंटरव्यू</a></h4>
+                            <span class="time">6 घंटे पहले</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Right Sidebar -->
+                <aside class="sidebar-right">
+                    <div class="widget popular-widget">
+                        <h3 class="widget-title">लोकप्रिय खबरें</h3>
+                        <div class="popular-list">
+                            <article class="popular-item">
+                                <div class="popular-image">
+                                    <img src="assets/images/popular_1.jpg" alt="Popular News">
+                                </div>
+                                <div class="popular-content">
+                                    <h4><a href="article.html">भारत की GDP में 7.5% की वृद्धि</a></h4>
+                                    <span class="time">1 घंटा पहले</span>
+                                </div>
+                            </article>
+                            <article class="popular-item">
+                                <div class="popular-image">
+                                    <img src="assets/images/popular_2.jpg" alt="Popular News">
+                                </div>
+                                <div class="popular-content">
+                                    <h4><a href="article.html">नई शिक्षा नीति से बदलेगी तस्वीर</a></h4>
+                                    <span class="time">2 घंटे पहले</span>
+                                </div>
+                            </article>
+                            <article class="popular-item">
+                                <div class="popular-image">
+                                    <img src="assets/images/popular_3.jpg" alt="Popular News">
+                                </div>
+                                <div class="popular-content">
+                                    <h4><a href="article.html">मौसम में बदलाव, बारिश की संभावना</a></h4>
+                                    <span class="time">3 घंटे पहले</span>
+                                </div>
+                            </article>
+                            <article class="popular-item">
+                                <div class="popular-image">
+                                    <img src="assets/images/popular_4.jpg" alt="Popular News">
+                                </div>
+                                <div class="popular-content">
+                                    <h4><a href="article.html">टेक्नोलॉजी सेक्टर में नई नौकरियां</a></h4>
+                                    <span class="time">4 घंटे पहले</span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <div class="widget ad-widget">
+                        <div class="ad-placeholder vertical">Advertisement</div>
+                    </div>
+
+                    <div class="widget social-widget">
+                        <h3 class="widget-title">हमसे जुड़ें</h3>
+                        <div class="social-follow">
+                            <a href="#" class="social-follow-btn facebook">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                                </svg>
+                                <span>Facebook</span>
+                                <strong>125K</strong>
+                            </a>
+                            <a href="#" class="social-follow-btn twitter">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                                </svg>
+                                <span>Twitter</span>
+                                <strong>89K</strong>
+                            </a>
+                            <a href="#" class="social-follow-btn youtube">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                                </svg>
+                                <span>YouTube</span>
+                                <strong>256K</strong>
+                            </a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>भारत न्यूज़</h3>
+                    <p>भारत का सबसे भरोसेमंद न्यूज़ पोर्टल। ताज़ा खबरें, ब्रेकिंग न्यूज़, और विश्लेषण।</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Facebook"><svg width="24" height="24" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path
+                                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                            </svg></a>
+                        <a href="#" aria-label="Twitter"><svg width="24" height="24" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path
+                                    d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                            </svg></a>
+                        <a href="#" aria-label="YouTube"><svg width="24" height="24" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path
+                                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                            </svg></a>
+                        <a href="#" aria-label="Instagram"><svg width="24" height="24" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                            </svg></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>श्रेणियाँ</h4>
+                    <ul>
+                        <li><a href="category.html">देश</a></li>
+                        <li><a href="category.html">विदेश</a></li>
+                        <li><a href="category.html">राजनीति</a></li>
+                        <li><a href="sports.html">खेल</a></li>
+                        <li><a href="entertainment.html">मनोरंजन</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>अन्य</h4>
+                    <ul>
+                        <li><a href="technology.html">टेक्नोलॉजी</a></li>
+                        <li><a href="category.html">बिजनेस</a></li>
+                        <li><a href="category.html">हेल्थ</a></li>
+                        <li><a href="category.html">शिक्षा</a></li>
+                        <li><a href="category.html">लाइफस्टाइल</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>जानकारी</h4>
+                    <ul>
+                        <li><a href="#">हमारे बारे में</a></li>
+                        <li><a href="#">संपर्क करें</a></li>
+                        <li><a href="#">विज्ञापन</a></li>
+                        <li><a href="#">गोपनीयता नीति</a></li>
+                        <li><a href="#">नियम और शर्तें</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 भारत न्यूज़. सर्वाधिकार सुरक्षित।</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>
