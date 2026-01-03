@@ -290,7 +290,7 @@
 
 <!-- Featured Projects Section -->
 @if($featuredProjects->count() > 0)
-<section id="projects" class="featured-projects py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+<section id="projects" class="featured-projects py-5">
     <div class="section-bg-animation projects-bg">
         <div class="projects-particles"></div>
         <div class="projects-waves">
