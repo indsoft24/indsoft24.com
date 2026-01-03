@@ -75,7 +75,7 @@
 }
 
 .btn {
-    padding: 12px 24px !important;
+    padding: 8px 24px !important;
     font-size: 0.9rem !important;
 }
 
@@ -247,7 +247,7 @@
 
 .service-card-flip.compact .service-card-front,
 .service-card-flip.compact .service-card-back {
-    padding: 45px 25px;
+    padding: 15px 25px;
     min-height: 320px;
 }
 
@@ -301,8 +301,8 @@
 /* Back Side Styles */
 .service-back-header {
     text-align: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -325,7 +325,7 @@
 .service-back-header h3 {
     font-size: 1.3rem !important;
     font-weight: 600;
-    color: white;
+    color: rgb(57, 246, 205);
     margin: 0;
 }
 
@@ -469,12 +469,12 @@
 
 /* About Section */
 .about {
-    padding: 50px 0 !important;
+    padding: 15px 0 !important;
 }
 
 .about-content {
     gap: 40px !important;
-    margin-top: 30px !important;
+    margin-top: 8px !important;
 }
 
 .about-description {
@@ -530,11 +530,11 @@
 
 /* Contact Section */
 .contact {
-    padding: 50px 0 !important;
+    padding: 5px 0 !important;
 }
 
 .contact-content {
-    margin-top: 30px !important;
+    margin-top: 8px !important;
     gap: 30px !important;
 }
 
@@ -614,7 +614,7 @@
 }
 
 .featured-projects-swiper {
-    padding: 15px 0 20px 0 !important;
+    padding: 5px 0 20px 0 !important;
 }
 
 .project-card-content {
@@ -1231,7 +1231,7 @@ section+section {
 }
 
 .featured-projects-swiper {
-    padding: 20px 0 60px 0;
+    padding: 5px 0 60px 0;
 }
 
 .project-swiper-card {
