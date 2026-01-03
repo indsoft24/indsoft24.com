@@ -25,9 +25,8 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/Indsoft24.png') }}">
     
-    <!-- Critical CSS - Inline for faster rendering -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></noscript>
+    <!-- Critical CSS - Bootstrap must load synchronously for navbar dropdown -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
@@ -62,6 +61,72 @@
             font-family: 'Inter';
             font-display: swap;
         }
+        
+        /* Critical CSS for Navbar Dropdown - Prevents FOUC */
+        .nav-item.dropdown {
+            position: relative;
+        }
+        .nav-item .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            display: none;
+            min-width: 200px;
+            padding: 0.5rem 0;
+            margin: 0.125rem 0 0;
+            font-size: 1rem;
+            color: #212529;
+            text-align: left;
+            list-style: none;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 0.375rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        .nav-item .dropdown-menu.show {
+            display: block;
+        }
+        .nav-item .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 1rem;
+            clear: both;
+            font-weight: 400;
+            color: #212529;
+            text-align: inherit;
+            text-decoration: none;
+            white-space: nowrap;
+            background-color: transparent;
+            border: 0;
+            transition: all 0.15s ease;
+        }
+        .nav-item .dropdown-item:hover,
+        .nav-item .dropdown-item:focus {
+            color: #1e2125;
+            background-color: #e9ecef;
+        }
+        .nav-item .dropdown-divider {
+            height: 0;
+            margin: 0.5rem 0;
+            overflow: hidden;
+            border-top: 1px solid rgba(0, 0, 0, 0.15);
+        }
+        .nav-link.dropdown-toggle::after {
+            display: inline-block;
+            margin-left: 0.255em;
+            vertical-align: 0.255em;
+            content: "";
+            border-top: 0.3em solid;
+            border-right: 0.3em solid transparent;
+            border-bottom: 0;
+            border-left: 0.3em solid transparent;
+            transition: transform 0.15s ease;
+        }
+        .nav-link.dropdown-toggle[aria-expanded="true"]::after {
+            transform: rotate(180deg);
+        }
     </style>
     @stack('styles')
     <style>
@@ -88,7 +153,7 @@
     
     <!-- Async CSS Loading Script -->
     <script>
-        // Handle async CSS loading
+        // Handle async CSS loading for non-critical stylesheets
         (function() {
             var links = document.querySelectorAll('link[media="print"][onload]');
             links.forEach(function(link) {
