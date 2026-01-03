@@ -17,7 +17,6 @@ class DocToPdfController extends Controller
         $canonicalUrl = route('tools.doc-to-pdf');
 
         // Check if conversion tools are available
-        // Note: qpdf and Ghostscript cannot convert DOC/DOCX - they only work with PDF files
         $isLibreOfficeAvailable = $this->isLibreOfficeAvailable();
         $isPandocAvailable = $this->isPandocAvailable();
         $isAvailable = $isLibreOfficeAvailable || $isPandocAvailable;
@@ -103,43 +102,14 @@ class DocToPdfController extends Controller
 
     /**
      * Check if LibreOffice is available
-     * Note: qpdf and Ghostscript cannot convert DOC/DOCX to PDF - they only work with PDF files
      */
     private function isLibreOfficeAvailable()
     {
-        // Try common paths for LibreOffice (similar to how PDF lock checks for tools)
-        $paths = [
-            '/usr/bin/libreoffice',
-            '/usr/local/bin/libreoffice',
-            '/usr/bin/soffice',
-            '/usr/local/bin/soffice',
-        ];
-        
-        // Try to find LibreOffice in /opt (common installation location)
-        $optPaths = glob('/opt/libreoffice*/program/soffice');
-        if ($optPaths) {
-            $paths = array_merge($paths, $optPaths);
-        }
-        
-        // Also try without path (in case it's in PATH)
-        $paths[] = 'libreoffice';
-        $paths[] = 'soffice';
-        
-        foreach ($paths as $path) {
-            // Try --version first (for libreoffice command)
-            $result = $this->runCommand($path . ' --version 2>&1');
-            if ($result['success']) {
-                return true;
-            }
-            
-            // Try --help as fallback (for soffice)
-            $result = $this->runCommand($path . ' --help 2>&1');
-            if ($result['success']) {
-                return true;
-            }
-        }
-        
-        return false;
+        $output = [];
+        $returnVar = 0;
+        @exec('libreoffice --version 2>&1', $output, $returnVar);
+
+        return $returnVar === 0;
     }
 
     /**
@@ -147,41 +117,11 @@ class DocToPdfController extends Controller
      */
     private function isPandocAvailable()
     {
-        // Try common paths for Pandoc
-        $paths = ['/usr/bin/pandoc', '/usr/local/bin/pandoc', 'pandoc'];
-        
-        foreach ($paths as $path) {
-            $result = $this->runCommand($path . ' --version');
-            if ($result['success']) {
-                return true;
-            }
-        }
-        
-        return false;
-    }
+        $output = [];
+        $returnVar = 0;
+        @exec('pandoc --version 2>&1', $output, $returnVar);
 
-    /**
-     * Run a shell command safely using proc_open()
-     */
-    private function runCommand($command)
-    {
-        $pipes = [];
-        $process = @proc_open($command, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
-
-        if (!is_resource($process)) {
-            return ['success' => false, 'output' => []];
-        }
-
-        $output = stream_get_contents($pipes[1]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-
-        $returnVar = proc_close($process);
-
-        return [
-            'success' => $returnVar === 0 && !empty(trim($output)),
-            'output' => explode("\n", trim($output))
-        ];
+        return $returnVar === 0;
     }
 
     /**
@@ -189,57 +129,7 @@ class DocToPdfController extends Controller
      */
     private function getLibreOfficePath()
     {
-        // Try common paths for LibreOffice (same as availability check)
-        $paths = [
-            '/usr/bin/libreoffice',
-            '/usr/local/bin/libreoffice',
-            '/usr/bin/soffice',
-            '/usr/local/bin/soffice',
-        ];
-        
-        // Try to find LibreOffice in /opt (common installation location)
-        $optPaths = glob('/opt/libreoffice*/program/soffice');
-        if ($optPaths) {
-            $paths = array_merge($paths, $optPaths);
-        }
-        
-        // Also try without path (in case it's in PATH)
-        $paths[] = 'libreoffice';
-        $paths[] = 'soffice';
-        
-        foreach ($paths as $path) {
-            // Try --version first (for libreoffice command)
-            $result = $this->runCommand($path . ' --version 2>&1');
-            if ($result['success']) {
-                return $path;
-            }
-            
-            // Try --help as fallback (for soffice)
-            $result = $this->runCommand($path . ' --help 2>&1');
-            if ($result['success']) {
-                return $path;
-            }
-        }
-        
-        return 'libreoffice'; // Fallback
-    }
-
-    /**
-     * Get Pandoc executable path
-     */
-    private function getPandocPath()
-    {
-        // Try common paths for Pandoc
-        $paths = ['/usr/bin/pandoc', '/usr/local/bin/pandoc', 'pandoc'];
-        
-        foreach ($paths as $path) {
-            $result = $this->runCommand($path . ' --version');
-            if ($result['success']) {
-                return $path;
-            }
-        }
-        
-        return 'pandoc'; // Fallback
+        return 'libreoffice';
     }
 
     /**
@@ -262,14 +152,16 @@ class DocToPdfController extends Controller
                 escapeshellarg($inputPath)
             );
 
-            $result = $this->runCommand($command);
+            $output = [];
+            $returnVar = 0;
+            @exec($command, $output, $returnVar);
 
             // LibreOffice creates output file with same name but .pdf extension
             $inputBasename = pathinfo($inputPath, PATHINFO_FILENAME);
             $expectedOutputPath = $outputDir.'/'.$inputBasename.'.pdf';
 
             // Check if file was created
-            if ($result['success'] && file_exists($expectedOutputPath) && filesize($expectedOutputPath) > 0) {
+            if ($returnVar === 0 && file_exists($expectedOutputPath) && filesize($expectedOutputPath) > 0) {
                 // Rename to desired output filename
                 if ($expectedOutputPath !== $outputPath) {
                     rename($expectedOutputPath, $outputPath);
@@ -279,9 +171,10 @@ class DocToPdfController extends Controller
             }
 
             // If LibreOffice failed, log the output for debugging
-            if (!$result['success'] && !empty($result['output'])) {
+            if ($returnVar !== 0 && ! empty($output)) {
                 Log::error('LibreOffice conversion failed', [
-                    'output' => implode("\n", $result['output']),
+                    'return_code' => $returnVar,
+                    'output' => implode("\n", $output),
                 ]);
             }
         } catch (\Exception $e) {
@@ -297,28 +190,28 @@ class DocToPdfController extends Controller
     private function convertWithPandoc($inputPath, $outputPath)
     {
         try {
-            $pandocPath = $this->getPandocPath();
-            
             // Pandoc command to convert to PDF
             // Requires LaTeX or wkhtmltopdf for PDF output
             $command = sprintf(
-                '%s -f docx -t pdf -o %s %s 2>&1',
-                escapeshellarg($pandocPath),
+                'pandoc -f docx -t pdf -o %s %s 2>&1',
                 escapeshellarg($outputPath),
                 escapeshellarg($inputPath)
             );
 
-            $result = $this->runCommand($command);
+            $output = [];
+            $returnVar = 0;
+            @exec($command, $output, $returnVar);
 
             // Check if file was created and has content
-            if ($result['success'] && file_exists($outputPath) && filesize($outputPath) > 0) {
+            if ($returnVar === 0 && file_exists($outputPath) && filesize($outputPath) > 0) {
                 return $outputPath;
             }
 
             // If Pandoc failed, log the output for debugging
-            if (!$result['success'] && !empty($result['output'])) {
+            if ($returnVar !== 0 && ! empty($output)) {
                 Log::error('Pandoc conversion failed', [
-                    'output' => implode("\n", $result['output']),
+                    'return_code' => $returnVar,
+                    'output' => implode("\n", $output),
                 ]);
             }
         } catch (\Exception $e) {
@@ -328,3 +221,4 @@ class DocToPdfController extends Controller
         return null;
     }
 }
+
