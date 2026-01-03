@@ -139,48 +139,22 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Smooth scrolling for navigation links
+// Smooth scrolling removed for performance - using instant scroll
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
             target.scrollIntoView({
-                behavior: 'smooth',
+                behavior: 'auto',
                 block: 'start'
             });
         }
     });
 });
 
-// Auto-hide/show navbar on scroll
-let lastScrollTop = 0;
-let ticking = false;
-
-function updateNavbar() {
-    const navbar = document.querySelector('.navbar');
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    
-    if (scrollTop > lastScrollTop && scrollTop > 100) {
-        // Scrolling down - hide navbar
-        navbar.classList.add('hidden');
-    } else {
-        // Scrolling up - show navbar
-        navbar.classList.remove('hidden');
-    }
-    
-    lastScrollTop = scrollTop;
-    ticking = false;
-}
-
-function requestTick() {
-    if (!ticking) {
-        requestAnimationFrame(updateNavbar);
-        ticking = true;
-    }
-}
-
-window.addEventListener('scroll', requestTick);
+// Navbar is now always sticky - auto-hide functionality disabled
+// Keeping navbar always visible for better user experience
 
 // Counter animation for stats
 function animateCounters() {

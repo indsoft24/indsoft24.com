@@ -108,12 +108,10 @@ body.blog-page .container {
 }
 
 .featured-post:hover {
-    transform: translateY(-8px);
     box-shadow: 0 12px 40px rgba(0,0,0,0.15);
 }
 
 .blog-post:hover, .related-post:hover {
-    transform: translateY(-5px);
     box-shadow: 0 10px 35px rgba(0,0,0,0.12);
 }
 
@@ -135,7 +133,6 @@ body.blog-page .card {
 }
 
 body.blog-page .card:hover {
-    transform: translateY(-3px);
     box-shadow: 0 8px 30px rgba(0,0,0,0.12);
 }
 
@@ -260,17 +257,13 @@ body.blog-page .card-title {
     transition: transform 0.2s ease;
 }
 
-.tag-cloud a:hover, .tag-list a:hover {
-    transform: scale(1.1);
-}
+/* Tag hover animation removed */
 
 .share-buttons .btn {
     transition: transform 0.2s ease;
 }
 
-.share-buttons .btn:hover {
-    transform: translateY(-2px);
-}
+/* Share button animation removed */
 
 /* ========================================
    UTILITY CLASSES

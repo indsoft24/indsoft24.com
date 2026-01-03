@@ -15,9 +15,9 @@ $(document).ready(function () {
     }
   });
 
-  // Auto-hide alerts after 5 seconds
+  // Auto-hide alerts after 5 seconds - no animation
   setTimeout(function () {
-    $(".alert").fadeOut("slow");
+    $(".alert").hide();
   }, 5000);
 
   // Confirm delete actions
@@ -212,17 +212,12 @@ $(document).ready(function () {
     });
   }
 
-  // Smooth scrolling for anchor links
+  // Instant scrolling for anchor links - no animation
   $('a[href^="#"]').on("click", function (e) {
     e.preventDefault();
     const target = $(this.getAttribute("href"));
     if (target.length) {
-      $("html, body").animate(
-        {
-          scrollTop: target.offset().top - 100,
-        },
-        500
-      );
+      $("html, body").scrollTop(target.offset().top - 100);
     }
   });
 
@@ -241,9 +236,7 @@ $(document).ready(function () {
     }, 5000);
   });
 
-  // Initialize animations
-  $(".fade-in").addClass("fade-in");
-  $(".slide-in").addClass("slide-in");
+  // Animations removed for performance
 
   // Admin panel JavaScript loaded successfully
 });
