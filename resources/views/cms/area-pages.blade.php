@@ -130,9 +130,9 @@
                         <li class="breadcrumb-item"><a href="{{ route('cms.state.pages', $area->state) }}" class="text-decoration-none">{{ $stateName }}</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('cms.state.cities', $area->state) }}" class="text-decoration-none">Cities</a></li>
                     @endif
-                    @if($area->city)
-                        <li class="breadcrumb-item"><a href="{{ route('cms.city.pages', $area->city) }}" class="text-decoration-none">{{ $cityName }}</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('cms.city.areas', $area->city) }}" class="text-decoration-none">Areas</a></li>
+                    @if($area->city_id && is_object($area->city) && $area->city->id)
+                        <li class="breadcrumb-item"><a href="{{ route('cms.city.pages', $area->city_id) }}" class="text-decoration-none">{{ $cityName }}</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('cms.city.areas', $area->city_id) }}" class="text-decoration-none">Areas</a></li>
                     @endif
                     <li class="breadcrumb-item active" aria-current="page">{{ $area->name }}</li>
                 </ol>
@@ -497,14 +497,14 @@
                 <div class="card-body p-4">
                     <h5 class="card-title mb-4 fw-bold"><i class="fas fa-sitemap me-2 text-primary"></i>Explore {{ $area->name }}</h5>
                     <div class="row g-3">
-                        @if($area->city)
+                        @if($area->city_id)
                             <div class="col-md-4">
-                                <a href="{{ route('cms.city.pages', $area->city) }}" class="btn btn-outline-primary w-100 py-3">
+                                <a href="{{ route('cms.city.pages', $area->city_id) }}" class="btn btn-outline-primary w-100 py-3">
                                     <i class="fas fa-city me-2"></i>City Businesses
                                 </a>
                             </div>
                             <div class="col-md-4">
-                                <a href="{{ route('cms.city.areas', $area->city) }}" class="btn btn-outline-secondary w-100 py-3">
+                                <a href="{{ route('cms.city.areas', $area->city_id) }}" class="btn btn-outline-secondary w-100 py-3">
                                     <i class="fas fa-map-pin me-2"></i>All Areas in {{ $cityName }}
                                 </a>
                             </div>
@@ -627,9 +627,11 @@
                         There are currently no businesses listed in {{ $area->name }}, {{ $cityName }}. 
                         Check back soon as we're constantly updating our directory with new listings.
                     </p>
-                    <a href="{{ route('cms.city.pages', $area->city) }}" class="btn btn-primary">
-                        <i class="fas fa-arrow-left me-2"></i>Browse City Businesses
-                    </a>
+                    @if($area->city_id)
+                        <a href="{{ route('cms.city.pages', $area->city_id) }}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Browse City Businesses
+                        </a>
+                    @endif
                 </div>
             @endif
         </div>
