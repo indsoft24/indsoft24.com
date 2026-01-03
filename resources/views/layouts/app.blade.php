@@ -25,9 +25,8 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/Indsoft24.png') }}">
     
-    <!-- Critical CSS - Inline for faster rendering -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></noscript>
+    <!-- Critical CSS - Bootstrap must load synchronously for navbar dropdown -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
@@ -62,6 +61,72 @@
             font-family: 'Inter';
             font-display: swap;
         }
+        
+        /* Critical CSS for Navbar Dropdown - Prevents FOUC */
+        .nav-item.dropdown {
+            position: relative;
+        }
+        .nav-item .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            display: none;
+            min-width: 200px;
+            padding: 0.5rem 0;
+            margin: 0.125rem 0 0;
+            font-size: 1rem;
+            color: #212529;
+            text-align: left;
+            list-style: none;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 0.375rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        .nav-item .dropdown-menu.show {
+            display: block;
+        }
+        .nav-item .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 1rem;
+            clear: both;
+            font-weight: 400;
+            color: #212529;
+            text-align: inherit;
+            text-decoration: none;
+            white-space: nowrap;
+            background-color: transparent;
+            border: 0;
+            transition: all 0.15s ease;
+        }
+        .nav-item .dropdown-item:hover,
+        .nav-item .dropdown-item:focus {
+            color: #1e2125;
+            background-color: #e9ecef;
+        }
+        .nav-item .dropdown-divider {
+            height: 0;
+            margin: 0.5rem 0;
+            overflow: hidden;
+            border-top: 1px solid rgba(0, 0, 0, 0.15);
+        }
+        .nav-link.dropdown-toggle::after {
+            display: inline-block;
+            margin-left: 0.255em;
+            vertical-align: 0.255em;
+            content: "";
+            border-top: 0.3em solid;
+            border-right: 0.3em solid transparent;
+            border-bottom: 0;
+            border-left: 0.3em solid transparent;
+            transition: transform 0.15s ease;
+        }
+        .nav-link.dropdown-toggle[aria-expanded="true"]::after {
+            transform: rotate(180deg);
+        }
     </style>
     @stack('styles')
     <style>
@@ -88,7 +153,7 @@
     
     <!-- Async CSS Loading Script -->
     <script>
-        // Handle async CSS loading
+        // Handle async CSS loading for non-critical stylesheets
         (function() {
             var links = document.querySelectorAll('link[media="print"][onload]');
             links.forEach(function(link) {
@@ -158,7 +223,7 @@
             <!-- Desktop Menu - Center -->
             <div class="nav-menu" id="nav-menu">
                 <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
-                
+
                 <!-- Services Dropdown -->
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle {{ request()->is('services*') ? 'active' : '' }}" 
@@ -179,6 +244,78 @@
                 
                 <a href="{{ route('about') }}" class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}">About</a>
                 <a href="{{ route('blog.index') }}" class="nav-link {{ request()->routeIs('blog*') ? 'active' : '' }}">Blog</a>
+
+                   <!-- Tools Mega Menu -->
+                <div class="nav-item dropdown mega-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle {{ request()->is('tools*') ? 'active' : '' }}" 
+                       id="toolsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Tools
+                    </a>
+                    <div class="dropdown-menu mega-menu p-4" aria-labelledby="toolsDropdown">
+                        <div class="container-fluid">
+                            <div class="row g-4">
+                                <div class="col-lg-4 col-md-4">
+                                    <div class="mega-menu-column">
+                                        <h6 class="mega-menu-title">
+                                            <i class="fas fa-image text-primary me-2"></i>Image Tools
+                                        </h6>
+                                        <ul class="list-unstyled mega-menu-list">
+                                            <li><a class="dropdown-item" href="{{ route('tools.image-converter') }}">
+                                                <i class="fas fa-exchange-alt me-2"></i>Jpg to Png
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{{ route('tools.image-converter') }}">
+                                                <i class="fas fa-exchange-alt me-2"></i>Jpg to Webp
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{{ route('tools.image-converter') }}">
+                                                <i class="fas fa-exchange-alt me-2"></i>Image Converter
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{{ route('tools.image-compress') }}">
+                                                <i class="fas fa-compress-arrows-alt me-2"></i>Image Compressor
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <div class="mega-menu-column">
+                                        <h6 class="mega-menu-title">
+                                            <i class="fas fa-file-pdf text-danger me-2"></i>PDF Tools
+                                        </h6>
+                                        <ul class="list-unstyled mega-menu-list">
+                                            <li><a class="dropdown-item" href="{{ route('tools.jpg-to-pdf') }}">
+                                                <i class="fas fa-file-image me-2"></i>JPG to PDF
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{{ route('tools.pdf-to-image') }}">
+                                                <i class="fas fa-file-pdf me-2"></i>PDF to Image
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{{ route('tools.pdf-compress') }}">
+                                                <i class="fas fa-file-contract me-2"></i>PDF Compress
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{{ route('tools.pdf-unlock') }}">
+                                                <i class="fas fa-unlock me-2"></i>PDF Unlock
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{{ route('tools.pdf-lock') }}">
+                                                <i class="fas fa-lock me-2"></i>PDF Lock
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <div class="mega-menu-column">
+                                        <h6 class="mega-menu-title">
+                                            <i class="fas fa-file-word text-primary me-2"></i>Doc Tools
+                                        </h6>
+                                        <ul class="list-unstyled mega-menu-list">
+                                            <li><a class="dropdown-item" href="{{ route('tools.doc-to-pdf') }}">
+                                                <i class="fas fa-file-word me-2"></i>Word to PDF
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <a href="{{ route('contact') }}" class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 <a href="{{ route('e-commerce') }}" class="nav-link {{ request()->routeIs('e-commerce') ? 'active' : '' }}">e commerce</a>
             </div>
@@ -201,12 +338,13 @@
                             <span>Logout</span>
                         </button>
                     </form>
-                @else
+                @endauth
+                @guest
                     <a href="{{ route('auth.google') }}" class="auth-link auth-login">
                         <i class="fab fa-google"></i>
                         <span>Login with Google</span>
                     </a>
-                @endauth
+                @endguest
             </div>
             
             <!-- Mobile Toggle - Right Side (Mobile/Tablet Only) -->
@@ -236,6 +374,57 @@
                     <i class="fas fa-home"></i>
                     <span>Home</span>
                 </a>
+
+                <!-- Tools Dropdown -->
+                <div class="sidebar-item sidebar-dropdown">
+                    <div class="sidebar-dropdown-toggle">
+                        <i class="fas fa-tools"></i>
+                        <span>Tools</span>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    </div>
+                    <div class="sidebar-dropdown-menu">
+                        <!-- Image Tools -->
+                        <div class="sidebar-group-label ms-3 mt-2 mb-1 text-muted small fw-bold">IMAGE TOOLS</div>
+                        <a href="{{ route('tools.image-converter') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span>Image Converter</span>
+                        </a>
+                        <a href="{{ route('tools.image-compress') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-compress-arrows-alt"></i>
+                            <span>Image Compressor</span>
+                        </a>
+
+                        <!-- PDF Tools -->
+                        <div class="sidebar-group-label ms-3 mt-2 mb-1 text-muted small fw-bold">PDF TOOLS</div>
+                        <a href="{{ route('tools.jpg-to-pdf') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-file-image"></i>
+                            <span>JPG to PDF</span>
+                        </a>
+                        <a href="{{ route('tools.pdf-to-image') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>PDF to Image</span>
+                        </a>
+                        <a href="{{ route('tools.pdf-compress') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-file-contract"></i>
+                            <span>PDF Compress</span>
+                        </a>
+                         <a href="{{ route('tools.pdf-unlock') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-unlock"></i>
+                            <span>PDF Unlock</span>
+                        </a>
+                        <a href="{{ route('tools.pdf-lock') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-lock"></i>
+                            <span>PDF Lock</span>
+                        </a>
+
+                        <!-- Doc Tools -->
+                        <div class="sidebar-group-label ms-3 mt-2 mb-1 text-muted small fw-bold">DOC TOOLS</div>
+                        <a href="{{ route('tools.doc-to-pdf') }}" class="sidebar-dropdown-item">
+                            <i class="fas fa-file-word"></i>
+                            <span>Word to PDF</span>
+                        </a>
+                    </div>
+                </div>
 
                 <!-- Services Dropdown -->
                 <div class="sidebar-item sidebar-dropdown">
@@ -305,7 +494,8 @@
                             <span>Logout</span>
                         </button>
                     </form>
-                @else
+                @endauth
+                @guest
                     <a href="{{ route('auth.google') }}" class="sidebar-btn sidebar-btn-login">
                         <i class="fab fa-google"></i>
                         <span>Login</span>
@@ -313,7 +503,7 @@
                     <a href="{{ route('auth.google') }}" class="sidebar-btn sidebar-btn-register">
                         <span>Register</span>
                     </a>
-                @endauth
+                @endguest
             </div>
         </div>
     </div>
@@ -337,12 +527,13 @@
                 <i class="fas fa-blog"></i>
                 <span>My Blog</span>
             </a>
-        @else
+        @endauth
+        @guest
             <a href="{{ route('projects.index') }}" class="bottom-nav-item {{ request()->routeIs('projects*') ? 'active' : '' }}">
                 <i class="fas fa-project-diagram"></i>
                 <span>Projects</span>
             </a>
-        @endauth
+        @endguest
         <a href="{{ route('blog.index') }}" class="bottom-nav-item {{ request()->routeIs('blog*') ? 'active' : '' }}">
             <i class="fas fa-newspaper"></i>
             <span>Blog</span>

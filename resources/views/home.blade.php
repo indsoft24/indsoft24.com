@@ -3,22 +3,8 @@
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <section id="home" class="hero">
-        <div class="hero-background">
-            <div class="hero-particles"></div>
-            <div class="hero-gradient-overlay"></div>
-            <!-- Floating geometric shapes -->
-            <div class="floating-shapes">
-                <div class="shape shape-1"></div>
-                <div class="shape shape-2"></div>
-                <div class="shape shape-3"></div>
-                <div class="shape shape-4"></div>
-                <div class="shape shape-5"></div>
-                <div class="shape shape-6"></div>
-            </div>
-            <!-- Animated grid pattern -->
-            <div class="animated-grid"></div>
-        </div>
-        <div class="hero-container" style="padding-top: 106px;">
+        <div class="hero-background-image"></div>
+        <div class="hero-container">
             <div class="hero-content">
                 <div class="hero-badge">
                     <i class="fas fa-star"></i>
@@ -97,7 +83,7 @@
                             
                             <div class="form-group">
                                 <label for="lead_message"><i class="fas fa-comment"></i> Message</label>
-                                <textarea id="lead_message" name="message" class="form-control" rows="2" 
+                                <textarea id="lead_message" name="message" class="form-control" rows="1" 
                                           placeholder="Tell us about your project (optional)"></textarea>
                             </div>
                             
@@ -115,162 +101,245 @@
     </section>
 
 <section id="services" class="services">
-    <div class="section-bg-animation services-bg">
-        <div class="services-particles"></div>
-        <div class="services-shapes">
-            <div class="service-shape shape-circle-1"></div>
-            <div class="service-shape shape-triangle-1"></div>
-            <div class="service-shape shape-square-1"></div>
-            <div class="service-shape shape-circle-2"></div>
-        </div>
-    </div>
     <div class="container">
         <div class="section-header">
             <div class="section-badge">
                 <i class="fas fa-rocket"></i>
-                <span>Our Services</span>
+                <span>Comprehensive Digital Solutions</span>
             </div>
-            <h2 class="section-title">Comprehensive Digital Solutions</h2>
             <p class="section-subtitle">
-                Empowering businesses with cutting-edge technology solutions that drive growth
-                and innovation in the digital landscape
+                Empowering businesses with cutting-edge technology solutions
             </p>
         </div>
 
         <div class="services-grid">
             <!-- First Row -->
-            <div class="service-card compact">
-                <div class="service-card-inner">
-                    <div class="service-icon">
-                        <i class="fas fa-globe"></i>
-                        <div class="icon-bg"></div>
+            <div class="service-card-flip compact">
+                <div class="service-card-inner-flip">
+                    <!-- Front Side -->
+                    <div class="service-card-front" style="background: url('{{ asset('images/cards/web-development.png') }}'); background-size: cover; background-position: center;">
+                        <div class="service-icon">
+                            <i class="fas fa-globe"></i>
+                            <div class="icon-bg"></div>
+                        </div>
+                        <div class="service-content">
+                            <h3>Web Development</h3>
+                            <p>
+                                Transform your online presence with modern, responsive websites and web
+                                applications built using the latest technologies.
+                            </p>
+                        </div>
+                        
                     </div>
-                    <div class="service-content">
-                        <h3>Web Development</h3>
-                        <p>
-                            Transform your online presence with modern, responsive websites and web
-                            applications built using the latest technologies.
-                        </p>
-                    </div>
-                    <div class="service-footer">
-                        <a href="{{ route('services.web') }}" 
-                           class="service-link" 
-                           aria-label="Learn more about Web Development">
-                            <span>Learn More</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
+                    <!-- Back Side -->
+                    <a href="{{ route('services.web') }}" class="service-card-back" style="text-decoration: none;">
+                        <div class="service-back-header">
+                            <div class="service-icon-small">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <h3>Web Development</h3>
+                        </div>
+                        <div class="service-back-content">
+                            <ul class="service-features-flip">
+                                <li><i class="fas fa-check-circle"></i> Custom Website Development</li>
+                                <li><i class="fas fa-check-circle"></i> Mobile Responsive Design</li>
+                                <li><i class="fas fa-check-circle"></i> E-commerce Solutions</li>
+                                <li><i class="fas fa-check-circle"></i> SEO & Performance Optimization</li>
+                                <li><i class="fas fa-check-circle"></i> CMS Development</li>
+                            </ul>
+                        </div>
+                    </a>
                 </div>
             </div>
 
-            <div class="service-card compact">
-                <div class="service-card-inner">
-                    <div class="service-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                        <div class="icon-bg"></div>
+            <div class="service-card-flip compact">
+                <div class="service-card-inner-flip">
+                    <!-- Front Side -->
+                    <div class="service-card-front" style="background:  url('{{ asset('images/cards/app-development.png') }}'); background-size: cover; background-position: center;">
+                        <div class="service-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                            <div class="icon-bg"></div>
+                        </div>
+                        <div class="service-content">
+                            <h3>Mobile Applications</h3>
+                            <p>
+                                Reach your audience anywhere with native and cross-platform mobile apps
+                                that deliver exceptional user experiences.
+                            </p>
+                        </div>
+                        
                     </div>
-                    <div class="service-content">
-                        <h3>Mobile Applications</h3>
-                        <p>
-                            Reach your audience anywhere with native and cross-platform mobile apps
-                            that deliver exceptional user experiences.
-                        </p>
-                    </div>
-                    <div class="service-footer">
-                        <a href="{{ route('services.app') }}" class="service-link" aria-label="Learn more about Mobile Applications">
-                            <span>Learn More</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
+                    <!-- Back Side -->
+                    <a href="{{ route('services.app') }}" class="service-card-back" style="text-decoration: none;">
+                        <div class="service-back-header">
+                            <div class="service-icon-small">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <h3>Mobile Applications</h3>
+                        </div>
+                        <div class="service-back-content">
+                            <ul class="service-features-flip">
+                                <li><i class="fas fa-check-circle"></i> Native iOS & Android Apps</li>
+                                <li><i class="fas fa-check-circle"></i> Cross-Platform Development</li>
+                                <li><i class="fas fa-check-circle"></i> App UI/UX Design</li>
+                                <li><i class="fas fa-check-circle"></i> App Store Optimization</li>
+                                <li><i class="fas fa-check-circle"></i> Backend Integration</li>
+                            </ul>
+                        </div>
+                    </a>
                 </div>
             </div>
 
-            <div class="service-card compact">
-                <div class="service-card-inner">
-                    <div class="service-icon">
-                        <i class="fas fa-cogs"></i>
-                        <div class="icon-bg"></div>
+            <div class="service-card-flip compact">
+                <div class="service-card-inner-flip">
+                    <!-- Front Side -->
+                    <div class="service-card-front" style="background:  url('{{ asset('images/cards/custom-software.png') }}'); background-size: cover; background-position: center;">
+                        <div class="service-icon">
+                            <i class="fas fa-cogs"></i>
+                            <div class="icon-bg"></div>
+                        </div>
+                        <div class="service-content">
+                            <h3>Custom Software</h3>
+                            <p>
+                                Streamline your operations with tailored software solutions designed to
+                                solve specific business challenges.
+                            </p>
+                        </div>
+                        
                     </div>
-                    <div class="service-content">
-                        <h3>Custom Software</h3>
-                        <p>
-                            Streamline your operations with tailored software solutions designed to
-                            solve specific business challenges.
-                        </p>
-                    </div>
-                    <div class="service-footer">
-                        <a href="{{ route('services.software') }}" class="service-link" aria-label="Learn more about Custom Software">
-                            <span>Learn More</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
+                    <!-- Back Side -->
+                    <a href="{{ route('services.software') }}" class="service-card-back" style="text-decoration: none;">
+                        <div class="service-back-header">
+                            <div class="service-icon-small">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <h3>Custom Software</h3>
+                        </div>
+                        <div class="service-back-content">
+                            <ul class="service-features-flip">
+                                <li><i class="fas fa-check-circle"></i> Enterprise Software Solutions</li>
+                                <li><i class="fas fa-check-circle"></i> SaaS Product Development</li>
+                                <li><i class="fas fa-check-circle"></i> API Development & Integration</li>
+                                <li><i class="fas fa-check-circle"></i> Business Automation</li>
+                                <li><i class="fas fa-check-circle"></i> Legacy System Updates</li>
+                            </ul>
+                        </div>
+                    </a>
                 </div>
             </div>
 
             <!-- Second Row -->
-            <div class="service-card compact">
-                <div class="service-card-inner">
-                    <div class="service-icon">
-                        <i class="fas fa-search"></i>
-                        <div class="icon-bg"></div>
+            <div class="service-card-flip compact">
+                <div class="service-card-inner-flip">
+                    <!-- Front Side -->
+                    <div class="service-card-front" style="background:  url('{{ asset('images/cards/seo.png') }}'); background-size: cover; background-position: center;">
+                        <div class="service-icon">
+                            <i class="fas fa-search"></i>
+                            <div class="icon-bg"></div>
+                        </div>
+                        <div class="service-content">
+                            <h3>SEO Optimization</h3>
+                            <p>
+                                Increase your organic traffic, improve Google rankings, and generate more leads with our
+                                data-driven SEO strategies.
+                            </p>
+                        </div>
+                        
                     </div>
-                    <div class="service-content">
-                        <h3>SEO Optimization</h3>
-                        <p>
-                            Increase your organic traffic, improve Google rankings, and generate more leads with our
-                            data-driven SEO strategies.
-                        </p>
-                    </div>
-                    <div class="service-footer">
-                        <a href="{{ route('services.seo') }}" class="service-link" aria-label="Learn more about SEO Optimization">
-                            <span>Learn More</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
+                    <!-- Back Side -->
+                    <a href="{{ route('services.seo') }}" class="service-card-back" style="text-decoration: none;">
+                        <div class="service-back-header">
+                            <div class="service-icon-small">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h3>SEO Optimization</h3>
+                        </div>
+                        <div class="service-back-content">
+                            <ul class="service-features-flip">
+                                <li><i class="fas fa-check-circle"></i> On-Page SEO Optimization</li>
+                                <li><i class="fas fa-check-circle"></i> Off-Page SEO & Link Building</li>
+                                <li><i class="fas fa-check-circle"></i> Technical SEO Audit</li>
+                                <li><i class="fas fa-check-circle"></i> Content Strategy & Optimization</li>
+                                <li><i class="fas fa-check-circle"></i> Monthly Performance Reporting</li>
+                            </ul>
+                        </div>
+                    </a>
                 </div>
             </div>
 
-            <div class="service-card compact">
-                <div class="service-card-inner">
-                    <div class="service-icon">
-                        <i class="fas fa-bullhorn"></i>
-                        <div class="icon-bg"></div>
+            <div class="service-card-flip compact">
+                <div class="service-card-inner-flip">
+                    <!-- Front Side -->
+                    <div class="service-card-front" style="background:  url('{{ asset('images/cards/digital-marketing.png') }}'); background-size: cover; background-position: center;">
+                        <div class="service-icon">
+                            <i class="fas fa-bullhorn"></i>
+                            <div class="icon-bg"></div>
+                        </div>
+                        <div class="service-content">
+                            <h3>Digital Marketing</h3>
+                            <p>
+                                Drive growth, increase brand visibility, and generate qualified leads with comprehensive
+                                digital marketing strategies.
+                            </p>
+                        </div>
+                        
                     </div>
-                    <div class="service-content">
-                        <h3>Digital Marketing</h3>
-                        <p>
-                            Drive growth, increase brand visibility, and generate qualified leads with comprehensive
-                            digital marketing strategies.
-                        </p>
-                    </div>
-                    <div class="service-footer">
-                        <a href="{{ route('services.digital-marketing') }}" class="service-link" aria-label="Learn more about Digital Marketing">
-                            <span>Learn More</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
+                    <!-- Back Side -->
+                    <a href="{{ route('services.digital-marketing') }}" class="service-card-back" style="text-decoration: none;">
+                        <div class="service-back-header">
+                            <div class="service-icon-small">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                            <h3>Digital Marketing</h3>
+                        </div>
+                        <div class="service-back-content">
+                            <ul class="service-features-flip">
+                                <li><i class="fas fa-check-circle"></i> PPC & Google Ads Management</li>
+                                <li><i class="fas fa-check-circle"></i> Social Media Advertising</li>
+                                <li><i class="fas fa-check-circle"></i> Email Marketing Campaigns</li>
+                                <li><i class="fas fa-check-circle"></i> Content Marketing Strategy</li>
+                                <li><i class="fas fa-check-circle"></i> Analytics & ROI Tracking</li>
+                            </ul>
+                        </div>
+                    </a>
                 </div>
             </div>
 
-            <div class="service-card compact">
-                <div class="service-card-inner">
-                    <div class="service-icon">
-                        <i class="fas fa-share-alt"></i>
-                        <div class="icon-bg"></div>
+            <div class="service-card-flip compact">
+                <div class="service-card-inner-flip">
+                    <!-- Front Side -->
+                    <div class="service-card-front" style="background:  url('{{ asset('images/cards/social-marketing.png') }}'); background-size: cover; background-position: center;">
+                        <div class="service-icon">
+                            <i class="fas fa-share-alt"></i>
+                            <div class="icon-bg"></div>
+                        </div>
+                        <div class="service-content">
+                            <h3>Social Media Marketing</h3>
+                            <p>
+                                Build your brand, engage your audience, and drive sales with strategic social media
+                                marketing across all major platforms.
+                            </p>
+                        </div>
+                        
                     </div>
-                    <div class="service-content">
-                        <h3>Social Media Marketing</h3>
-                        <p>
-                            Build your brand, engage your audience, and drive sales with strategic social media
-                            marketing across all major platforms.
-                        </p>
-                    </div>
-                    <div class="service-footer">
-                        <a href="{{ route('services.social-media-marketing') }}" class="service-link" aria-label="Learn more about Social Media Marketing">
-                            <span>Learn More</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
+                    <!-- Back Side -->
+                    <a href="{{ route('services.social-media-marketing') }}" class="service-card-back" style="text-decoration: none;">
+                        <div class="service-back-header">
+                            <div class="service-icon-small">
+                                <i class="fas fa-share-alt"></i>
+                            </div>
+                            <h3>Social Media Marketing</h3>
+                        </div>
+                        <div class="service-back-content">
+                            <ul class="service-features-flip">
+                                <li><i class="fas fa-check-circle"></i> Social Media Strategy & Planning</li>
+                                <li><i class="fas fa-check-circle"></i> Content Creation & Scheduling</li>
+                                <li><i class="fas fa-check-circle"></i> Community Management</li>
+                                <li><i class="fas fa-check-circle"></i> Influencer Partnerships</li>
+                                <li><i class="fas fa-check-circle"></i> Performance Analytics</li>
+                            </ul>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -290,36 +359,21 @@
 
 <!-- Featured Projects Section -->
 @if($featuredProjects->count() > 0)
-<section id="projects" class="featured-projects py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-    <div class="section-bg-animation projects-bg">
-        <div class="projects-particles"></div>
-        <div class="projects-waves">
-            <div class="wave wave-1"></div>
-            <div class="wave wave-2"></div>
-            <div class="wave wave-3"></div>
-        </div>
-        <div class="projects-stars">
-            <div class="star star-1"></div>
-            <div class="star star-2"></div>
-            <div class="star star-3"></div>
-            <div class="star star-4"></div>
-            <div class="star star-5"></div>
-        </div>
-    </div>
+<section id="projects" class="featured-projects">
     <div class="container">
-        <div class="section-header text-center text-white mb-5">
-            <div class="section-badge" style="background: rgba(255, 255, 255, 0.2); color: white;">
+        <div class="section-header text-center text-white">
+            <div class="section-badge">
                 <i class="fas fa-star"></i>
                 <span>Featured Projects</span>
             </div>
-            <h2 class="section-title text-white">Our <span class="text-warning">Portfolio</span></h2>
-            <p class="section-subtitle text-white-50">
+            {{-- <h2 class="section-title"><span class="text-warning">Our Portfolio</span></h2> --}}
+            <p class="section-subtitle text-dark-50">
                 Explore our showcase of innovative projects that demonstrate our expertise and creativity
             </p>
         </div>
 
         <!-- Swiper -->
-        <div class="swiper featured-projects-swiper mb-4">
+        <div class="swiper featured-projects-swiper">
             <div class="swiper-wrapper">
                 @foreach($featuredProjects as $project)
                     <div class="swiper-slide">
@@ -396,7 +450,7 @@
         </div>
 
         <!-- View All Projects Button -->
-        <div class="text-center mt-4">
+        <div class="text-center">
             <a href="{{ route('projects.index') }}" class="btn btn-light btn-lg">
                 <span>View All Projects</span>
                 <i class="fas fa-arrow-right ms-2"></i>
@@ -408,22 +462,6 @@
 
 
     <section id="about" class="about">
-        <div class="section-bg-animation about-bg">
-            <div class="about-grid-pattern"></div>
-            <div class="about-orbits">
-                <div class="orbit orbit-1"></div>
-                <div class="orbit orbit-2"></div>
-                <div class="orbit orbit-3"></div>
-            </div>
-            <div class="about-dots">
-                <div class="dot dot-1"></div>
-                <div class="dot dot-2"></div>
-                <div class="dot dot-3"></div>
-                <div class="dot dot-4"></div>
-                <div class="dot dot-5"></div>
-                <div class="dot dot-6"></div>
-            </div>
-        </div>
         <div class="container">
             <div class="about-content">
                 <div class="about-text">
@@ -672,10 +710,6 @@ document.addEventListener('DOMContentLoaded', function() {
         slidesPerView: 1,
         spaceBetween: 30,
         loop: true,
-        autoplay: {
-            delay: 5000,
-            disableOnInteraction: false,
-        },
         pagination: {
             el: '.swiper-pagination',
             clickable: true,
@@ -699,27 +733,26 @@ document.addEventListener('DOMContentLoaded', function() {
             },
         },
     });
+    
+    // Service card flip for touch devices
+    const serviceCards = document.querySelectorAll('.service-card-flip');
+    serviceCards.forEach(card => {
+        // Only add tap handler for touch devices
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            card.addEventListener('click', function(e) {
+                // Don't flip if clicking on a link
+                if (e.target.closest('a')) {
+                    return;
+                }
+                this.classList.toggle('flipped');
+            });
+        }
+    });
 });
 </script>
 @endpush
 
     <section id="contact" class="contact">
-        <div class="section-bg-animation contact-bg">
-            <div class="contact-gradient-mesh"></div>
-            <div class="contact-bubbles">
-                <div class="bubble bubble-1"></div>
-                <div class="bubble bubble-2"></div>
-                <div class="bubble bubble-3"></div>
-                <div class="bubble bubble-4"></div>
-                <div class="bubble bubble-5"></div>
-                <div class="bubble bubble-6"></div>
-            </div>
-            <div class="contact-lines">
-                <div class="line line-1"></div>
-                <div class="line line-2"></div>
-                <div class="line line-3"></div>
-            </div>
-        </div>
         <div class="container">
             <div class="section-header">
                 <div class="section-badge">
@@ -727,8 +760,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span>Contact Us</span>
                 </div>
                 <h2 class="section-title">Let's Build Something <span class="gradient-text">Amazing</span> Together</h2>
-                <p class="section-subtitle">Ready to transform your ideas into reality? Get in touch with our expert team
-                    and let's discuss your project</p>
             </div>
             <div class="contact-content">
                 <div class="contact-info">
