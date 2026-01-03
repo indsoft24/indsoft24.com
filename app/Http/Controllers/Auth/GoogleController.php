@@ -45,14 +45,6 @@ class GoogleController extends Controller
             $intendedUrl = url($intendedUrl);
         }
 
-        // Log for debugging (remove in production if needed)
-        Log::info('Google login redirect', [
-            'intended_url' => $intendedUrl,
-            'redirect_param' => $request->get('redirect'),
-            'referer' => $request->headers->get('referer'),
-            'current' => url()->current()
-        ]);
-
         // Save intended URL in session before redirecting to Google
         session(['url.intended' => $intendedUrl]);
         session()->save(); // Ensure session is saved
@@ -113,14 +105,6 @@ class GoogleController extends Controller
             if (!$intendedUrl) {
                 $intendedUrl = $request->cookie('intended_url');
             }
-            
-            // Log for debugging
-            Log::info('Google login callback', [
-                'intended_url_from_session' => session()->get('url.intended'),
-                'intended_url_from_cookie' => $request->cookie('intended_url'),
-                'final_intended_url' => $intendedUrl,
-                'session_id' => session()->getId()
-            ]);
             
             // Clean up intended URL from session and cookie
             session()->forget('url.intended');

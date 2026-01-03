@@ -920,9 +920,6 @@ document.addEventListener("DOMContentLoaded", function () {
             // Append current URL as redirect parameter
             const separator = this.href.includes('?') ? '&' : '?';
             this.href = this.href + separator + 'redirect=' + encodeURIComponent(currentUrl);
-            
-            // Log for debugging (remove in production)
-            console.log('Login redirect URL:', currentUrl);
         });
     });
     
