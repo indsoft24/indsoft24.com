@@ -24,7 +24,6 @@
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         padding: 60px 0;
-        margin-top: 70px;
         animation: fadeInUp 1s ease-out;
     }
     

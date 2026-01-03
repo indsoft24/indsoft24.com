@@ -75,7 +75,6 @@
         animation: gradientShift 10s ease infinite;
         color: white;
         padding: 80px 0;
-        margin-top: 70px;
         position: relative;
         overflow: hidden;
     }
