@@ -105,12 +105,10 @@
         <div class="section-header">
             <div class="section-badge">
                 <i class="fas fa-rocket"></i>
-                <span>Our Services</span>
+                <span>Comprehensive Digital Solutions</span>
             </div>
-            <h2 class="section-title">Comprehensive Digital Solutions</h2>
             <p class="section-subtitle">
-                Empowering businesses with cutting-edge technology solutions that drive growth
-                and innovation in the digital landscape
+                Empowering businesses with cutting-edge technology solutions
             </p>
         </div>
 
@@ -119,7 +117,7 @@
             <div class="service-card-flip compact">
                 <div class="service-card-inner-flip">
                     <!-- Front Side -->
-                    <div class="service-card-front">
+                    <div class="service-card-front" style="background: url('{{ asset('images/cards/web-development.png') }}'); background-size: cover; background-position: center;">
                         <div class="service-icon">
                             <i class="fas fa-globe"></i>
                             <div class="icon-bg"></div>
@@ -134,7 +132,7 @@
                         
                     </div>
                     <!-- Back Side -->
-                    <div class="service-card-back">
+                    <a href="{{ route('services.web') }}" class="service-card-back" style="text-decoration: none;">
                         <div class="service-back-header">
                             <div class="service-icon-small">
                                 <i class="fas fa-globe"></i>
@@ -150,20 +148,14 @@
                                 <li><i class="fas fa-check-circle"></i> CMS Development</li>
                             </ul>
                         </div>
-                        <div class="service-back-footer">
-                            <a href="{{ route('services.web') }}" class="service-link" aria-label="Learn more about Web Development">
-                                <span>Learn More</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
 
             <div class="service-card-flip compact">
                 <div class="service-card-inner-flip">
                     <!-- Front Side -->
-                    <div class="service-card-front">
+                    <div class="service-card-front" style="background:  url('{{ asset('images/cards/app-development.png') }}'); background-size: cover; background-position: center;">
                         <div class="service-icon">
                             <i class="fas fa-mobile-alt"></i>
                             <div class="icon-bg"></div>
@@ -178,7 +170,7 @@
                         
                     </div>
                     <!-- Back Side -->
-                    <div class="service-card-back">
+                    <a href="{{ route('services.app') }}" class="service-card-back" style="text-decoration: none;">
                         <div class="service-back-header">
                             <div class="service-icon-small">
                                 <i class="fas fa-mobile-alt"></i>
@@ -194,20 +186,14 @@
                                 <li><i class="fas fa-check-circle"></i> Backend Integration</li>
                             </ul>
                         </div>
-                        <div class="service-back-footer">
-                            <a href="{{ route('services.app') }}" class="service-link" aria-label="Learn more about Mobile Applications">
-                                <span>Learn More</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
 
             <div class="service-card-flip compact">
                 <div class="service-card-inner-flip">
                     <!-- Front Side -->
-                    <div class="service-card-front">
+                    <div class="service-card-front" style="background:  url('{{ asset('images/cards/custom-software.png') }}'); background-size: cover; background-position: center;">
                         <div class="service-icon">
                             <i class="fas fa-cogs"></i>
                             <div class="icon-bg"></div>
@@ -222,7 +208,7 @@
                         
                     </div>
                     <!-- Back Side -->
-                    <div class="service-card-back">
+                    <a href="{{ route('services.software') }}" class="service-card-back" style="text-decoration: none;">
                         <div class="service-back-header">
                             <div class="service-icon-small">
                                 <i class="fas fa-cogs"></i>
@@ -238,13 +224,7 @@
                                 <li><i class="fas fa-check-circle"></i> Legacy System Updates</li>
                             </ul>
                         </div>
-                        <div class="service-back-footer">
-                            <a href="{{ route('services.software') }}" class="service-link" aria-label="Learn more about Custom Software">
-                                <span>Learn More</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
 
@@ -252,7 +232,7 @@
             <div class="service-card-flip compact">
                 <div class="service-card-inner-flip">
                     <!-- Front Side -->
-                    <div class="service-card-front">
+                    <div class="service-card-front" style="background:  url('{{ asset('images/cards/seo.png') }}'); background-size: cover; background-position: center;">
                         <div class="service-icon">
                             <i class="fas fa-search"></i>
                             <div class="icon-bg"></div>
@@ -267,7 +247,7 @@
                         
                     </div>
                     <!-- Back Side -->
-                    <div class="service-card-back">
+                    <a href="{{ route('services.seo') }}" class="service-card-back" style="text-decoration: none;">
                         <div class="service-back-header">
                             <div class="service-icon-small">
                                 <i class="fas fa-search"></i>
@@ -283,20 +263,14 @@
                                 <li><i class="fas fa-check-circle"></i> Monthly Performance Reporting</li>
                             </ul>
                         </div>
-                        <div class="service-back-footer">
-                            <a href="{{ route('services.seo') }}" class="service-link" aria-label="Learn more about SEO Optimization">
-                                <span>Learn More</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
 
             <div class="service-card-flip compact">
                 <div class="service-card-inner-flip">
                     <!-- Front Side -->
-                    <div class="service-card-front">
+                    <div class="service-card-front" style="background:  url('{{ asset('images/cards/digital-marketing.png') }}'); background-size: cover; background-position: center;">
                         <div class="service-icon">
                             <i class="fas fa-bullhorn"></i>
                             <div class="icon-bg"></div>
@@ -311,7 +285,7 @@
                         
                     </div>
                     <!-- Back Side -->
-                    <div class="service-card-back">
+                    <a href="{{ route('services.digital-marketing') }}" class="service-card-back" style="text-decoration: none;">
                         <div class="service-back-header">
                             <div class="service-icon-small">
                                 <i class="fas fa-bullhorn"></i>
@@ -327,20 +301,14 @@
                                 <li><i class="fas fa-check-circle"></i> Analytics & ROI Tracking</li>
                             </ul>
                         </div>
-                        <div class="service-back-footer">
-                            <a href="{{ route('services.digital-marketing') }}" class="service-link" aria-label="Learn more about Digital Marketing">
-                                <span>Learn More</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
 
             <div class="service-card-flip compact">
                 <div class="service-card-inner-flip">
                     <!-- Front Side -->
-                    <div class="service-card-front">
+                    <div class="service-card-front" style="background:  url('{{ asset('images/cards/social-marketing.png') }}'); background-size: cover; background-position: center;">
                         <div class="service-icon">
                             <i class="fas fa-share-alt"></i>
                             <div class="icon-bg"></div>
@@ -355,7 +323,7 @@
                         
                     </div>
                     <!-- Back Side -->
-                    <div class="service-card-back">
+                    <a href="{{ route('services.social-media-marketing') }}" class="service-card-back" style="text-decoration: none;">
                         <div class="service-back-header">
                             <div class="service-icon-small">
                                 <i class="fas fa-share-alt"></i>
@@ -371,13 +339,7 @@
                                 <li><i class="fas fa-check-circle"></i> Performance Analytics</li>
                             </ul>
                         </div>
-                        <div class="service-back-footer">
-                            <a href="{{ route('services.social-media-marketing') }}" class="service-link" aria-label="Learn more about Social Media Marketing">
-                                <span>Learn More</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -399,7 +361,7 @@
 @if($featuredProjects->count() > 0)
 <section id="projects" class="featured-projects">
     <div class="container">
-        <div class="section-header text-center text-white mb-5">
+        <div class="section-header text-center text-white">
             <div class="section-badge" style="background: rgba(255, 255, 255, 0.2); color: rgb(10, 129, 109);">
                 <i class="fas fa-star"></i>
                 <span>Featured Projects</span>
@@ -411,7 +373,7 @@
         </div>
 
         <!-- Swiper -->
-        <div class="swiper featured-projects-swiper mb-4">
+        <div class="swiper featured-projects-swiper">
             <div class="swiper-wrapper">
                 @foreach($featuredProjects as $project)
                     <div class="swiper-slide">
@@ -488,7 +450,7 @@
         </div>
 
         <!-- View All Projects Button -->
-        <div class="text-center mt-4">
+        <div class="text-center">
             <a href="{{ route('projects.index') }}" class="btn btn-light btn-lg">
                 <span>View All Projects</span>
                 <i class="fas fa-arrow-right ms-2"></i>

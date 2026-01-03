@@ -411,19 +411,24 @@ body {
     width: 100%;
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(15px);
-    z-index: 1000;
-    transition: top 0.3s ease;
+    z-index: 99999;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
     border-top: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     height: 70px;
-    z-index: 99999;
     margin: 0;
     padding: 0
 }
 
 .navbar.top-zero {
-    top: 0 !important
+    top: 36px !important
+}
+
+/* Ensure navbar sticks correctly below top bar on mobile */
+@media (max-width: 768px) {
+    .navbar {
+        top: 32px;
+    }
 }
 
 .navbar.top-bar-visible {
@@ -439,14 +444,15 @@ body {
     justify-content: space-between;
     height: 70px;
     gap: 40px;
-    width: 100%
+    width: 100%;
 }
 
 .nav-logo {
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    margin-right: auto
+    margin-right: auto;
+    margin-top: 10px;
 }
 
 .logo-link {
@@ -649,6 +655,105 @@ body {
 
 .nav-link.active::after {
     width: 80%;
+}
+
+/* ========================================
+   MEGA MENU STYLES
+   ======================================== */
+.nav-item.mega-dropdown {
+    position: static !important;
+}
+
+.dropdown-menu.mega-menu {
+    width: 100%;
+    left: 0;
+    right: 0;
+    padding: 30px;
+    margin-top: 0;
+    border-radius: 0 0 15px 15px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    display: none;
+    /* Changed from block to none for hover effect logic */
+    animation: slideDown 0.3s ease forwards;
+}
+
+.nav-item.mega-dropdown:hover .dropdown-menu.mega-menu {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mega-menu-column {
+    padding: 0 15px;
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.mega-menu-column:last-child {
+    border-right: none;
+}
+
+.mega-menu-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+    display: flex;
+    align-items: center;
+}
+
+.mega-menu-list li {
+    margin-bottom: 8px;
+}
+
+.mega-menu-list .dropdown-item {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #555;
+    transition: all 0.2s ease;
+    display: flex !important;
+    align-items: center;
+}
+
+.mega-menu-list .dropdown-item:hover {
+    background-color: rgba(52, 152, 219, 0.08);
+    color: #3498db;
+    transform: translateX(5px);
+}
+
+.mega-menu-list .dropdown-item i {
+    width: 20px;
+    text-align: center;
+    color: #95a5a6;
+    transition: color 0.2s ease;
+}
+
+.mega-menu-list .dropdown-item:hover i {
+    color: #3498db;
+}
+
+/* Mobile Sidebar Group Labels */
+.sidebar-group-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    color: #95a5a6;
 }
 
 /* Mobile Toggle - Right Side */
