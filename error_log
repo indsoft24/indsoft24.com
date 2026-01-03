@@ -1,0 +1,7 @@
+[01-Jan-2026 12:12:01 UTC] PHP Fatal error:  Out of memory (allocated 19640320 bytes) (tried to allocate 32768 bytes) in phar:///opt/cpanel/composer/bin/composer/vendor/symfony/string/UnicodeString.php on line 237
+[01-Jan-2026 13:48:05 America/New_York] PHP Warning:  copy(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in Command line code on line 1
+[01-Jan-2026 13:48:05 America/New_York] PHP Warning:  copy(https://getcomposer.org/installer): Failed to open stream: no suitable wrapper could be found in Command line code on line 1
+[01-Jan-2026 13:48:40 America/New_York] PHP Warning:  copy(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in Command line code on line 1
+[01-Jan-2026 13:48:40 America/New_York] PHP Warning:  copy(https://getcomposer.org/installer): Failed to open stream: no suitable wrapper could be found in Command line code on line 1
+[01-Jan-2026 13:59:32 America/New_York] PHP Warning:  copy(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in Command line code on line 1
+[01-Jan-2026 13:59:32 America/New_York] PHP Warning:  copy(https://getcomposer.org/installer): Failed to open stream: no suitable wrapper could be found in Command line code on line 1
