@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-auth-state="{{ Auth::check() ? 'authenticated' : 'guest' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +7,13 @@
     <title>@yield('title', 'Indsoft24.com - Innovative Software Solutions')</title>
     <link rel="canonical" href="{{ $canonicalUrl ?? url()->current() }}" />
     <meta name="description" content="{{ Str::limit($metaDescription ?? 'Empowering businesses with cutting-edge technology and innovative software solutions. Discover insights on web development, mobile apps, and more.', 150, '') }}">
+    
+    @auth
+    <!-- Prevent caching for authenticated users -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    @endauth
     
     <!-- Resource Hints for Performance -->
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
@@ -224,7 +231,28 @@
             <div class="nav-menu" id="nav-menu">
                 <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
 
-                <!-- Tools Mega Menu -->
+                <!-- Services Dropdown -->
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle {{ request()->is('services*') ? 'active' : '' }}" 
+                       id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Services
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                        <li><a class="dropdown-item" href="{{ route('services.index') }}"><i class="fas fa-th me-2"></i>All Services</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ route('services.web') }}"><i class="fas fa-globe me-2"></i>Web Development</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.app') }}"><i class="fas fa-mobile-alt me-2"></i>App Development</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.software') }}"><i class="fas fa-cogs me-2"></i>Software Development</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.seo') }}"><i class="fas fa-search me-2"></i>SEO Optimization</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.digital-marketing') }}"><i class="fas fa-bullhorn me-2"></i>Digital Marketing</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.social-media-marketing') }}"><i class="fas fa-share-alt me-2"></i>Social Media Marketing</a></li>
+                    </ul>
+                </div>
+                
+                <a href="{{ route('about') }}" class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}">About</a>
+                <a href="{{ route('blog.index') }}" class="nav-link {{ request()->routeIs('blog*') ? 'active' : '' }}">Blog</a>
+
+                   <!-- Tools Mega Menu -->
                 <div class="nav-item dropdown mega-dropdown">
                     <a href="#" class="nav-link dropdown-toggle {{ request()->is('tools*') ? 'active' : '' }}" 
                        id="toolsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -239,6 +267,12 @@
                                             <i class="fas fa-image text-primary me-2"></i>Image Tools
                                         </h6>
                                         <ul class="list-unstyled mega-menu-list">
+                                            <li><a class="dropdown-item" href="{{ route('tools.image-converter') }}">
+                                                <i class="fas fa-exchange-alt me-2"></i>Jpg to Png
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{{ route('tools.image-converter') }}">
+                                                <i class="fas fa-exchange-alt me-2"></i>Jpg to Webp
+                                            </a></li>
                                             <li><a class="dropdown-item" href="{{ route('tools.image-converter') }}">
                                                 <i class="fas fa-exchange-alt me-2"></i>Image Converter
                                             </a></li>
@@ -289,26 +323,6 @@
                     </div>
                 </div>
                 
-                <!-- Services Dropdown -->
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle {{ request()->is('services*') ? 'active' : '' }}" 
-                       id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Services
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
-                        <li><a class="dropdown-item" href="{{ route('services.index') }}"><i class="fas fa-th me-2"></i>All Services</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{{ route('services.web') }}"><i class="fas fa-globe me-2"></i>Web Development</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.app') }}"><i class="fas fa-mobile-alt me-2"></i>App Development</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.software') }}"><i class="fas fa-cogs me-2"></i>Software Development</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.seo') }}"><i class="fas fa-search me-2"></i>SEO Optimization</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.digital-marketing') }}"><i class="fas fa-bullhorn me-2"></i>Digital Marketing</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.social-media-marketing') }}"><i class="fas fa-share-alt me-2"></i>Social Media Marketing</a></li>
-                    </ul>
-                </div>
-                
-                <a href="{{ route('about') }}" class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}">About</a>
-                <a href="{{ route('blog.index') }}" class="nav-link {{ request()->routeIs('blog*') ? 'active' : '' }}">Blog</a>
                 <a href="{{ route('contact') }}" class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 <a href="{{ route('e-commerce') }}" class="nav-link {{ request()->routeIs('e-commerce') ? 'active' : '' }}">e commerce</a>
             </div>
@@ -324,19 +338,20 @@
                         <i class="fas fa-user"></i>
                         <span>{{ Auth::user()->name }}</span>
                     </span>
-                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                    <form method="POST" action="{{ route('logout') }}" class="d-inline logout-form" data-current-url="{{ url()->current() }}">
                         @csrf
                         <button type="submit" class="auth-link auth-logout">
                             <i class="fas fa-sign-out-alt"></i>
                             <span>Logout</span>
                         </button>
                     </form>
-                @else
-                    <a href="{{ route('auth.google') }}" class="auth-link auth-login">
+                @endauth
+                @guest
+                    <a href="{{ route('auth.google') }}" class="auth-link auth-login" data-current-url="{{ url()->current() }}">
                         <i class="fab fa-google"></i>
                         <span>Login with Google</span>
                     </a>
-                @endauth
+                @endguest
             </div>
             
             <!-- Mobile Toggle - Right Side (Mobile/Tablet Only) -->
@@ -479,22 +494,23 @@
                             <span class="sidebar-user-email">{{ Auth::user()->email }}</span>
                         </div>
                     </div>
-                    <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-form">
+                    <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-form logout-form" data-current-url="{{ url()->current() }}">
                         @csrf
                         <button type="submit" class="sidebar-btn sidebar-btn-logout">
                             <i class="fas fa-sign-out-alt"></i>
                             <span>Logout</span>
                         </button>
                     </form>
-                @else
-                    <a href="{{ route('auth.google') }}" class="sidebar-btn sidebar-btn-login">
+                @endauth
+                @guest
+                    <a href="{{ route('auth.google') }}" class="sidebar-btn sidebar-btn-login" data-current-url="{{ url()->current() }}">
                         <i class="fab fa-google"></i>
                         <span>Login</span>
                     </a>
-                    <a href="{{ route('auth.google') }}" class="sidebar-btn sidebar-btn-register">
+                    <a href="{{ route('auth.google') }}" class="sidebar-btn sidebar-btn-register" data-current-url="{{ url()->current() }}">
                         <span>Register</span>
                     </a>
-                @endauth
+                @endguest
             </div>
         </div>
     </div>
@@ -518,12 +534,13 @@
                 <i class="fas fa-blog"></i>
                 <span>My Blog</span>
             </a>
-        @else
+        @endauth
+        @guest
             <a href="{{ route('projects.index') }}" class="bottom-nav-item {{ request()->routeIs('projects*') ? 'active' : '' }}">
                 <i class="fas fa-project-diagram"></i>
                 <span>Projects</span>
             </a>
-        @endauth
+        @endguest
         <a href="{{ route('blog.index') }}" class="bottom-nav-item {{ request()->routeIs('blog*') ? 'active' : '' }}">
             <i class="fas fa-newspaper"></i>
             <span>Blog</span>
@@ -724,53 +741,204 @@
     })();
 </script>
 
+    <!-- Early Cache Prevention Script - Runs immediately -->
+<script>
+    // Prevent browser from caching pages with authentication
+    // This runs before DOM is ready to catch early cache issues
+    (function preventAuthCache() {
+        @auth
+        // If user is authenticated, add timestamp to prevent cache
+        if (window.performance && window.performance.navigation) {
+            // If this is a back/forward navigation, force reload
+            if (window.performance.navigation.type === 2) {
+                window.location.reload(true);
+            }
+        }
+        @endauth
+        
+        // Store auth state in sessionStorage for verification
+        @auth
+        sessionStorage.setItem('server-auth-state', 'authenticated');
+        @endauth
+        @guest
+        sessionStorage.setItem('server-auth-state', 'guest');
+        @endguest
+    })();
+</script>
+
     <!-- SweetAlert Flash Messages -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Configure a reusable Toast
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',   // You can change to 'bottom-end' if you prefer
-            showConfirmButton: false,
-            timer: 4000,           // Auto close after 4 seconds
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
+    // Wait for SweetAlert2 to load before using it
+    (function initSweetAlert() {
+        function init() {
+            if (typeof Swal === 'undefined') {
+                setTimeout(init, 50);
+                return;
             }
-        });
 
-        @if(session('success'))
-            Toast.fire({
-                icon: 'success',
-                title: '{{ session('success') }}'
+            // Configure a reusable Toast
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
             });
-        @endif
 
-        @if(session('error'))
-            Toast.fire({
-                icon: 'error',
-                title: '{{ session('error') }}'
-            });
-        @endif
+            // Handle login success - show message and reload to update UI
+            @if(request()->has('logged_in'))
+                @if(session('success'))
+                    Toast.fire({
+                        icon: 'success',
+                        title: '{{ session('success') }}'
+                    });
+                @endif
+                
+                // Reload page after delay to ensure session cookie is set and UI updates
+                // Use a longer delay to ensure session is fully established
+                setTimeout(function() {
+                    try {
+                        const url = new URL(window.location);
+                        url.searchParams.delete('logged_in');
+                        // Force a hard reload to ensure fresh content and session
+                        window.location.href = url.toString();
+                    } catch (e) {
+                        // Fallback if URL parsing fails - hard reload
+                        window.location.reload(true);
+                    }
+                }, 1500);
+            @endif
+            
+            // Handle logout success - show message and reload to update UI
+            @if(session('success') && str_contains(session('success'), 'logged out'))
+                Toast.fire({
+                    icon: 'success',
+                    title: '{{ session('success') }}'
+                });
+                
+                // Reload page after delay to update UI
+                setTimeout(function() {
+                    window.location.reload(true);
+                }, 1500);
+            @endif
 
-        @if(session('warning'))
-            Toast.fire({
-                icon: 'warning',
-                title: '{{ session('warning') }}'
-            });
-        @endif
+            // Authentication state verification - runs on every page load
+            // This prevents cached pages from showing incorrect auth state
+            (function verifyAuthState() {
+                // Get server-side auth state from HTML data attribute
+                const htmlElement = document.documentElement;
+                const serverAuthState = htmlElement.getAttribute('data-auth-state');
+                
+                if (!serverAuthState) return; // Skip if attribute not found
+                
+                // Check what's actually displayed on the page
+                const isLoggedInDisplayed = document.querySelector('.auth-link.auth-logout, .sidebar-btn-logout, .sidebar-user-info') !== null;
+                const isLoggedOutDisplayed = document.querySelector('.auth-link.auth-login, .sidebar-btn-login') !== null;
+                
+                // Determine if there's a mismatch
+                const shouldBeLoggedIn = serverAuthState === 'authenticated';
+                const shouldBeLoggedOut = serverAuthState === 'guest';
+                
+                const stateMismatch = (shouldBeLoggedIn && isLoggedOutDisplayed) || (shouldBeLoggedOut && isLoggedInDisplayed);
+                
+                // If mismatch detected and not in the middle of a login/logout flow, force reload
+                if (stateMismatch && 
+                    !window.location.search.includes('logged_in') && 
+                    !window.location.search.includes('logout') &&
+                    !sessionStorage.getItem('auth-reload-skip')) {
+                    // Set flag to prevent infinite reload loop
+                    sessionStorage.setItem('auth-reload-skip', 'true');
+                    setTimeout(() => sessionStorage.removeItem('auth-reload-skip'), 2000);
+                    
+                    // Force a hard reload with cache bypass
+                    window.location.reload(true);
+                    return;
+                }
+            })();
+            
+            // Show other success messages
+            @if(session('success') && !request()->has('logged_in'))
+                Toast.fire({
+                    icon: 'success',
+                    title: '{{ session('success') }}'
+                });
+            @endif
 
-        @if(session('info'))
-            Toast.fire({
-                icon: 'info',
-                title: '{{ session('info') }}'
-            });
-        @endif
-    });
+            @if(session('error'))
+                Toast.fire({
+                    icon: 'error',
+                    title: '{{ session('error') }}'
+                });
+            @endif
+
+            @if(session('warning'))
+                Toast.fire({
+                    icon: 'warning',
+                    title: '{{ session('warning') }}'
+                });
+            @endif
+
+            @if(session('info'))
+                Toast.fire({
+                    icon: 'info',
+                    title: '{{ session('info') }}'
+                });
+            @endif
+        }
+
+        // Start initialization when DOM is ready or immediately if already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
 </script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+    // Capture current page URL for login redirects
+    const loginLinks = document.querySelectorAll('a[href*="auth/google"]');
+    loginLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            // Get current URL - prefer data attribute, fallback to window.location
+            let currentUrl = this.getAttribute('data-current-url');
+            
+            // If no data attribute or it's empty, use window.location
+            if (!currentUrl || currentUrl === '') {
+                currentUrl = window.location.href;
+            }
+            
+            // Ensure we have the full URL including query string and hash
+            if (!currentUrl.startsWith('http')) {
+                currentUrl = window.location.origin + currentUrl;
+            }
+            
+            // Append current URL as redirect parameter
+            const separator = this.href.includes('?') ? '&' : '?';
+            this.href = this.href + separator + 'redirect=' + encodeURIComponent(currentUrl);
+        });
+    });
+    
+    // Capture current page URL for logout redirects
+    const logoutForms = document.querySelectorAll('form.logout-form');
+    logoutForms.forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            const currentUrl = this.getAttribute('data-current-url') || window.location.href;
+            // Add hidden input with current URL for redirect
+            if (!this.querySelector('input[name="redirect"]')) {
+                const redirectInput = document.createElement('input');
+                redirectInput.type = 'hidden';
+                redirectInput.name = 'redirect';
+                redirectInput.value = currentUrl;
+                this.appendChild(redirectInput);
+            }
+        });
+    });
+
     // Only target the modal contact form, not the contact page form
     const modal = document.getElementById('getInTouchModal');
     if (modal) {

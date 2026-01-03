@@ -3,7 +3,7 @@
 @section('title', 'Our Projects - Portfolio')
 
 @section('content')
-<section class="projects-page py-5" style="margin-top: 70px;">
+<section class="projects-page">
     <div class="container">
         <div class="section-header text-center mb-5">
             <div class="section-badge">

@@ -20,11 +20,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::post('/contact-lead-store', [ContactController::class, 'store'])->name('contact.store');
 Route::post('/leads-store', [LeadController::class, 'store'])->name('leads.store');
 
-Route::post('/logout', function () {
-    Auth::logout();
-
-    return redirect()->route('home')->with('success', 'Successfully logged out!');
-})->name('logout');
+Route::post('/logout', [\App\Http\Controllers\Auth\LogoutController::class, 'logout'])->name('logout');
 
 // --- Newsletter Routes ---
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
