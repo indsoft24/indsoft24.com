@@ -3,7 +3,7 @@
 @section('title', $project->name . ' - Project Details')
 
 @section('content')
-<section class="project-detail-page py-5" style="margin-top: 70px;">
+<section class="project-detail-page">
     <div class="container">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">
