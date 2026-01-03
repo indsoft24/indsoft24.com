@@ -188,9 +188,20 @@
     background: transparent !important;
     border-radius: 20px;
     perspective: 1000px;
+    -webkit-perspective: 1000px;
     height: 100%;
     min-height: 320px;
     cursor: pointer;
+    position: relative;
+    transform: none !important;
+    -webkit-transform: none !important;
+}
+
+/* Prevent any translateY or other transforms on hover */
+.service-card-flip:hover {
+    transform: none !important;
+    -webkit-transform: none !important;
+    box-shadow: none !important;
 }
 
 /* Ensure flip cards work in grid */
@@ -206,11 +217,17 @@
     text-align: center;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transform: rotateY(0deg);
+    -webkit-transform: rotateY(0deg);
+    transform-origin: center center;
+    -webkit-transform-origin: center center;
 }
 
 .service-card-flip:hover .service-card-inner-flip,
 .service-card-flip:focus .service-card-inner-flip {
-    transform: rotateY(180deg);
+    transform: rotateY(180deg) !important;
+    -webkit-transform: rotateY(180deg) !important;
 }
 
 /* Touch device support - flip on tap */
@@ -223,6 +240,8 @@
 .service-card-front,
 .service-card-back {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
@@ -236,10 +255,42 @@
     justify-content: space-between;
     user-select: none;
     -webkit-user-select: none;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    margin: 0;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+/* Add overlay for background images on service-card-front */
+.service-card-front {
+    position: relative;
+}
+
+.service-card-front::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 100%);
+    z-index: 1;
+    border-radius: 20px;
+    pointer-events: none;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.service-card-front>* {
+    position: relative;
+    z-index: 2;
 }
 
 .service-card-back {
     transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
     background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
     color: white;
     padding: 25px 20px;
@@ -256,19 +307,60 @@
     width: 60px !important;
     height: 60px !important;
     margin: 0 auto 15px !important;
+    position: relative !important;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-card-front .service-icon i {
+    color: #fff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.service-card-front .service-icon .icon-bg {
+    position: absolute !important;
+    top: -10px !important;
+    left: -10px !important;
+    right: -10px !important;
+    bottom: -10px !important;
+    background: rgba(255, 255, 255, 0.25) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.4) !important;
+    border-radius: 50% !important;
+    opacity: 1 !important;
+    z-index: -1;
+}
+
+.service-card-front .service-content {
+    position: relative;
+    z-index: 3;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
 }
 
 .service-card-front .service-content h3 {
     font-size: 1.2rem !important;
     margin-bottom: 10px !important;
-    color: #333;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8), 0 1px 3px rgba(0, 0, 0, 0.6);
+    line-height: 1.4;
 }
 
 .service-card-front .service-content p {
     font-size: 0.85rem !important;
-    line-height: 1.5 !important;
-    margin-bottom: 12px !important;
-    color: #666;
+    line-height: 1.6 !important;
+    margin-bottom: 0 !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.5);
+    font-weight: 400;
 }
 
 .service-link-hint {
@@ -442,14 +534,20 @@
 
     .service-card-front .service-icon i {
         font-size: 1.5rem !important;
+        color: #fff !important;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     }
 
     .service-card-front .service-content h3 {
         font-size: 1.1rem !important;
+        color: #ffffff !important;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7), 0 1px 3px rgba(0, 0, 0, 0.5);
     }
 
     .service-card-front .service-content p {
         font-size: 0.8rem !important;
+        color: rgba(255, 255, 255, 0.95) !important;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.4);
     }
 
     .service-back-header h3 {
@@ -508,8 +606,39 @@
     line-height: 1.5 !important;
 }
 
+/* About Visual Section with Background Image */
+.about-visual {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    background-image: url('/images/cards/4.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 400px;
+}
+
+.about-visual::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.6) 100%);
+    z-index: 1;
+    border-radius: 20px;
+}
+
+.about-visual>* {
+    position: relative;
+    z-index: 2;
+}
+
 .stats-container {
     padding: 25px !important;
+    position: relative;
+    z-index: 2;
 }
 
 .stats-grid {
@@ -517,15 +646,49 @@
 }
 
 .stat {
-    padding: 15px 20px !important;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    border-radius: 15px;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.stat-icon {
+    color: #fff !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .stat-number {
     font-size: 1.5rem !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .stat-label {
     font-size: 0.85rem !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.achievement-badge {
+    background: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.achievement-badge i {
+    color: #f39c12 !important;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.achievement-badge span {
+    color: #ffffff !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 /* Contact Section */
@@ -1026,10 +1189,11 @@ section+section {
     /* Compact Stats Section - Mobile */
     .about-visual {
         margin-top: 0 !important;
+        min-height: 350px !important;
     }
 
     .stats-container {
-        padding: 12px !important;
+        padding: 15px !important;
     }
 
     /* Stats Grid - 2x2 Grid on Mobile */
@@ -1040,6 +1204,11 @@ section+section {
 
     .stat {
         padding: 12px 8px !important;
+        background: rgba(255, 255, 255, 0.15) !important;
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white !important;
     }
 
     .stat-icon {
@@ -1052,21 +1221,35 @@ section+section {
         justify-content: center !important;
         margin-left: auto !important;
         margin-right: auto !important;
+        color: #fff !important;
+        background: rgba(255, 255, 255, 0.2) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
 
     .stat-number {
         font-size: 1.2rem !important;
         margin-bottom: 4px !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     }
 
     .stat-label {
         font-size: 0.7rem !important;
+        color: rgba(255, 255, 255, 0.95) !important;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
     }
 
     .achievement-badge {
         padding: 10px 18px !important;
         font-size: 0.8rem !important;
         margin-top: 15px !important;
+        background: rgba(255, 255, 255, 0.2) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: white !important;
     }
 
     /* Contact Section - Compact */

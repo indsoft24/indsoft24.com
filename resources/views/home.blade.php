@@ -362,12 +362,12 @@
 <section id="projects" class="featured-projects">
     <div class="container">
         <div class="section-header text-center text-white">
-            <div class="section-badge" style="background: rgba(255, 255, 255, 0.2); color: rgb(10, 129, 109);">
+            <div class="section-badge">
                 <i class="fas fa-star"></i>
                 <span>Featured Projects</span>
             </div>
-            <h2 class="section-title"><span class="text-warning">Our Portfolio</span></h2>
-            <p class="section-subtitle text-white-50">
+            {{-- <h2 class="section-title"><span class="text-warning">Our Portfolio</span></h2> --}}
+            <p class="section-subtitle text-dark-50">
                 Explore our showcase of innovative projects that demonstrate our expertise and creativity
             </p>
         </div>
@@ -760,8 +760,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span>Contact Us</span>
                 </div>
                 <h2 class="section-title">Let's Build Something <span class="gradient-text">Amazing</span> Together</h2>
-                <p class="section-subtitle">Ready to transform your ideas into reality? Get in touch with our expert team
-                    and let's discuss your project</p>
             </div>
             <div class="contact-content">
                 <div class="contact-info">

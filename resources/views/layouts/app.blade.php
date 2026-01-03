@@ -224,7 +224,28 @@
             <div class="nav-menu" id="nav-menu">
                 <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
 
-                <!-- Tools Mega Menu -->
+                <!-- Services Dropdown -->
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle {{ request()->is('services*') ? 'active' : '' }}" 
+                       id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Services
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                        <li><a class="dropdown-item" href="{{ route('services.index') }}"><i class="fas fa-th me-2"></i>All Services</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ route('services.web') }}"><i class="fas fa-globe me-2"></i>Web Development</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.app') }}"><i class="fas fa-mobile-alt me-2"></i>App Development</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.software') }}"><i class="fas fa-cogs me-2"></i>Software Development</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.seo') }}"><i class="fas fa-search me-2"></i>SEO Optimization</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.digital-marketing') }}"><i class="fas fa-bullhorn me-2"></i>Digital Marketing</a></li>
+                        <li><a class="dropdown-item" href="{{ route('services.social-media-marketing') }}"><i class="fas fa-share-alt me-2"></i>Social Media Marketing</a></li>
+                    </ul>
+                </div>
+                
+                <a href="{{ route('about') }}" class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}">About</a>
+                <a href="{{ route('blog.index') }}" class="nav-link {{ request()->routeIs('blog*') ? 'active' : '' }}">Blog</a>
+
+                   <!-- Tools Mega Menu -->
                 <div class="nav-item dropdown mega-dropdown">
                     <a href="#" class="nav-link dropdown-toggle {{ request()->is('tools*') ? 'active' : '' }}" 
                        id="toolsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -239,6 +260,12 @@
                                             <i class="fas fa-image text-primary me-2"></i>Image Tools
                                         </h6>
                                         <ul class="list-unstyled mega-menu-list">
+                                            <li><a class="dropdown-item" href="{{ route('tools.image-converter') }}">
+                                                <i class="fas fa-exchange-alt me-2"></i>Jpg to Png
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{{ route('tools.image-converter') }}">
+                                                <i class="fas fa-exchange-alt me-2"></i>Jpg to Webp
+                                            </a></li>
                                             <li><a class="dropdown-item" href="{{ route('tools.image-converter') }}">
                                                 <i class="fas fa-exchange-alt me-2"></i>Image Converter
                                             </a></li>
@@ -289,26 +316,6 @@
                     </div>
                 </div>
                 
-                <!-- Services Dropdown -->
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle {{ request()->is('services*') ? 'active' : '' }}" 
-                       id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Services
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
-                        <li><a class="dropdown-item" href="{{ route('services.index') }}"><i class="fas fa-th me-2"></i>All Services</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{{ route('services.web') }}"><i class="fas fa-globe me-2"></i>Web Development</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.app') }}"><i class="fas fa-mobile-alt me-2"></i>App Development</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.software') }}"><i class="fas fa-cogs me-2"></i>Software Development</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.seo') }}"><i class="fas fa-search me-2"></i>SEO Optimization</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.digital-marketing') }}"><i class="fas fa-bullhorn me-2"></i>Digital Marketing</a></li>
-                        <li><a class="dropdown-item" href="{{ route('services.social-media-marketing') }}"><i class="fas fa-share-alt me-2"></i>Social Media Marketing</a></li>
-                    </ul>
-                </div>
-                
-                <a href="{{ route('about') }}" class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}">About</a>
-                <a href="{{ route('blog.index') }}" class="nav-link {{ request()->routeIs('blog*') ? 'active' : '' }}">Blog</a>
                 <a href="{{ route('contact') }}" class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
                 <a href="{{ route('e-commerce') }}" class="nav-link {{ request()->routeIs('e-commerce') ? 'active' : '' }}">e commerce</a>
             </div>
@@ -331,12 +338,13 @@
                             <span>Logout</span>
                         </button>
                     </form>
-                @else
+                @endauth
+                @guest
                     <a href="{{ route('auth.google') }}" class="auth-link auth-login">
                         <i class="fab fa-google"></i>
                         <span>Login with Google</span>
                     </a>
-                @endauth
+                @endguest
             </div>
             
             <!-- Mobile Toggle - Right Side (Mobile/Tablet Only) -->
@@ -486,7 +494,8 @@
                             <span>Logout</span>
                         </button>
                     </form>
-                @else
+                @endauth
+                @guest
                     <a href="{{ route('auth.google') }}" class="sidebar-btn sidebar-btn-login">
                         <i class="fab fa-google"></i>
                         <span>Login</span>
@@ -494,7 +503,7 @@
                     <a href="{{ route('auth.google') }}" class="sidebar-btn sidebar-btn-register">
                         <span>Register</span>
                     </a>
-                @endauth
+                @endguest
             </div>
         </div>
     </div>
@@ -518,12 +527,13 @@
                 <i class="fas fa-blog"></i>
                 <span>My Blog</span>
             </a>
-        @else
+        @endauth
+        @guest
             <a href="{{ route('projects.index') }}" class="bottom-nav-item {{ request()->routeIs('projects*') ? 'active' : '' }}">
                 <i class="fas fa-project-diagram"></i>
                 <span>Projects</span>
             </a>
-        @endauth
+        @endguest
         <a href="{{ route('blog.index') }}" class="bottom-nav-item {{ request()->routeIs('blog*') ? 'active' : '' }}">
             <i class="fas fa-newspaper"></i>
             <span>Blog</span>
